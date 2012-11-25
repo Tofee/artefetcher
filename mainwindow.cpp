@@ -376,7 +376,6 @@ int downloadStream(QString rtmpUrl, QString flashUrl, QProgressBar* bar);
 
 QString MainWindow::getFileName(const QString& targetDirectory, const QString& title, StreamType streamType)
 {//TODO la vitesse de chargement ne s'affiche plus
-    // TODO les accents passent pas à la compilation du code
     QString cleanedTitle(title);
     cleanedTitle.replace(QRegExp("[éèëê]"), "e");
     cleanedTitle.replace(QRegExp("[ô]"), "o");
