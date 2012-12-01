@@ -3,5 +3,6 @@
         <file>warning.png</file>
         <file>finished.png</file>
         <file>progress.png</file>
+        <file>arte-tv.png</file>
     </qresource>
 </RCC>

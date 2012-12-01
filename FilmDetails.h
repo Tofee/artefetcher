@@ -57,8 +57,6 @@ class FilmDetails {
     //TODO mettre tout en privé sauf les accesseurs
 public:
     QString m_title;
-    //QString m_rtmpStreamUrl_FR;
-    //QString m_rtmpStreamUrl_DE;
     QString m_flashPlayerUrl;
     QImage m_preview;
     QString m_summary;

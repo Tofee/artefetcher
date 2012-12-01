@@ -4,13 +4,10 @@
 #include <QObject>
 #include <QNetworkReply>
 #include <FilmDetails.h>
-// TODO c'est pas beau de mettre qt gui en include
-#include <QtGui>
+
 class FilmDetails;
 class QNetworkAccessManager;
 class QSignalMapper;
-
-
 
 class NotFoundException{
 public:

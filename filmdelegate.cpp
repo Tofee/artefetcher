@@ -180,9 +180,7 @@ void FilmDelegate::requestReadyToRead(QObject* object)
     QString itemName = pair->first;
     QString itemStep = pair->second;
 
-    qDebug() << "before delete in requestReadyToRead";
     delete pair;
-    qDebug() << "after delete in requestReadyToRead";
 
     if (itemName.isEmpty())
     {
@@ -378,7 +376,6 @@ void FilmDelegate::requestReadyToRead(QObject* object)
         }
     }
 
-    qDebug() << "Sortie de requestReadyToRead";
     reply->deleteLater();
 
     // TODO plutot qu'utiliser des signals mapper on peut surement mettre une property (ou +) dans la reply

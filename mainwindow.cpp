@@ -6,16 +6,11 @@
 #include <QSqlQuery>
 #include <QNetworkCookie>
 #include <QSqlError>
-#include <QNetworkAccessManager>
-#include <QNetworkRequest>
-#include <QNetworkReply>
 #include <QIcon>
 
 #include <preferencedialog.h>
 #include <filmdelegate.h>
 #include <FilmDetails.h>
-#include <tr1/functional>
-#include <librtmp/rtmp.h>
 #include <rtmpthread.h>
 #include <QList>
 
