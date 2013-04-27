@@ -48,6 +48,8 @@ public:
     bool addMovieFromUrl(const QString url, QString title = QString());
     void removeFilm(FilmDetails* film);
 
+    static QList<QString> listLanguages();
+    static QList<QString> listQualities();
 signals:
     void playListHasBeenUpdated();
     void errorOccured(int filmId, QString errorMessage);
@@ -55,8 +57,7 @@ private slots:
     void requestReadyToRead(QObject*);
     void loadAllCatalog();
 private:
-    static QList<QString> listLanguages();
-    static QList<QString> listQualities();
+
     void playListLoaded(const QString page);
     /**
      * @brief downloadUrl Download a page from the url

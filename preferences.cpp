@@ -1,6 +1,6 @@
 #include "preferences.h"
 #include <QDir>
-
+#include <filmdelegate.h>
 Preferences::Preferences()
 {
     load();
@@ -10,16 +10,18 @@ void Preferences::load()
 {
     QString defaultWorkingPath(QDir::homePath().append(QDir::separator()).append("arteFetcher"));
 
-    m_selectedStreams = settings.value("selectedStreams").toStringList();
+    m_selectedLanguage = settings.value("stream_language", FilmDelegate::listLanguages().first()).toString();
+    m_selectedQuality = settings.value("stream_quality", FilmDelegate::listQualities().first()).toString();
     // TODO "[]" are forbidden in fat32
-    m_filenamePattern = settings.value("filenamePattern", "[%language %quality] %title.flv").toString();
-    m_destinationDir = settings.value("destinationDir", defaultWorkingPath).toString();
+    m_filenamePattern = settings.value("filename_pattern", "[%language %quality] %title.flv").toString();
+    m_destinationDir = settings.value("destination_directory", defaultWorkingPath).toString();
 }
 
 void Preferences::save()
 {
-    settings.setValue("selectedStreams", m_selectedStreams);
-    settings.setValue("filenamePattern", m_filenamePattern);
-    settings.setValue("destinationDir", m_destinationDir);
+    settings.setValue("stream_language", m_selectedLanguage);
+    settings.setValue("stream_quality", m_selectedQuality);
+    settings.setValue("filename_pattern", m_filenamePattern);
+    settings.setValue("destination_directory", m_destinationDir);
     settings.sync();
 }

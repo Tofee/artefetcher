@@ -8,6 +8,7 @@ class IPreferences
 {
 public:
     friend class PreferenceDialog;
+    friend class MainWindow;
 
     IPreferences(){}
 
@@ -15,9 +16,13 @@ public:
      * @brief selectedStreams
      * @return if empty, it means all
      */
-    const QStringList &selectedStreams() const
+    const QString &selectedLanguage() const
     {
-        return m_selectedStreams;
+        return m_selectedLanguage;
+    }
+    const QString &selectedQuality() const
+    {
+        return m_selectedQuality;
     }
 
     const QString &filenamePattern() const
@@ -33,7 +38,8 @@ public:
     virtual void save() = 0;
 
 protected:
-    QStringList m_selectedStreams;
+    QString m_selectedLanguage;
+    QString m_selectedQuality;
     QString m_filenamePattern;
     QString m_destinationDir;
 };

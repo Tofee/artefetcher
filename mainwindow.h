@@ -26,14 +26,13 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 protected:
-    void lockWidgets(bool lock);
+    //void lockWidgets(bool lock);
 
     /**
      * @brief getStreamIdForColumn
-     * @param columnId the column number in ui->tableWidget
-     * @return the stream id associated to the column. -1 if none
+     * @return the stream id matching user preferences
      */
-    StreamType getStreamTypeOfColumn(int columnId) const throw (NotFoundException);
+    StreamType getStreamType() const;
 
     /**
      * @brief getFileName
@@ -57,6 +56,8 @@ private slots:
     void showPreferences();
     void cellHasBeenClicked(int row, int column);
     void removeCurrentFilm();
+    void languageChanged();
+    void qualityChanged();
 
 private:
     void closeEvent(QCloseEvent* event);
