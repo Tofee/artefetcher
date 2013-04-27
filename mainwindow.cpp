@@ -70,32 +70,35 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->progressBar->setMaximum(100);
 
     connect(ui->tableWidget->horizontalHeader(), SIGNAL(sectionClicked(int)),
-            this, SLOT(changeColumnChecking(int)));
+            SLOT(changeColumnChecking(int)));
 
     connect(delegate, SIGNAL(playListHasBeenUpdated()),
-            this, SLOT(refreshTable()));
+            SLOT(refreshTable()));
     connect(delegate, SIGNAL(errorOccured(int,QString)),
-            this, SLOT(errorOccured(int,QString)));
+            SLOT(errorOccured(int,QString)));
 
     connect(ui->loadPlaylistButton, SIGNAL(clicked()),
-            this, SLOT(loadPlayList()));
+            SLOT(loadPlayList()));
 
     connect(ui->tableWidget, SIGNAL(currentCellChanged(int,int,int,int)),
-            this, SLOT(updateCurrentDetails()));
+            SLOT(updateCurrentDetails()));
     connect(ui->downloadVideosButton, SIGNAL(clicked()),
-            this, SLOT(downloadAll()));
+            SLOT(downloadAll()));
 
     connect(ui->reloadFilmButton, SIGNAL(clicked()),
-            this, SLOT(reloadCurrentRow()));
+            SLOT(reloadCurrentRow()));
 
     connect(ui->manualAddButton, SIGNAL(clicked()),
-            this, SLOT(addFilmManuallyFromUrl()));
+            SLOT(addFilmManuallyFromUrl()));
 
     connect(ui->settingsButton, SIGNAL(clicked()),
-            this, SLOT(showPreferences()));
+            SLOT(showPreferences()));
 
     connect(ui->tableWidget, SIGNAL(cellClicked(int,int)),
-            this, SLOT(cellHasBeenClicked(int, int)));
+            SLOT(cellHasBeenClicked(int, int)));
+
+    connect(ui->allVideosButton, SIGNAL(clicked()),
+            delegate, SLOT(loadAllCatalog()));
 
     // TODO the URL used to remove movie is correct, but works only
     // in a browser, even if the HTTP answer is the same here and in the browser. Weird!
@@ -164,12 +167,12 @@ void MainWindow::updateCookieProfiles()
 void MainWindow::loadCookieProfile()
 {
 
-    qDebug() << "Load cookie begin";
     QString firefoxProfile(preferences.firefoxProfile());
     if (firefoxProfile.isEmpty())
     {
         firefoxProfile = cookieProfiles.first();
     }
+    qDebug() << "Load cookie begin " <<firefoxProfile;
 
     if (QSqlDatabase::contains(QSqlDatabase::defaultConnection))
     {
@@ -253,7 +256,7 @@ void MainWindow::loadPlayList()
 bool isReadyForDownload(const FilmDetails * const film, StreamType streamType)
 {
     return !film->m_title.isEmpty()
-            && !film->m_flashPlayerUrl.isEmpty()
+           // && !film->m_flashPlayerUrl.isEmpty()
             && film->m_streamsByType.contains(streamType);
 }
 
@@ -371,6 +374,7 @@ int downloadStream(QString rtmpUrl, QString flashUrl, QProgressBar* bar);
 
 QString MainWindow::getFileName(const QString& targetDirectory, const QString& title, StreamType streamType)
 {//TODO la vitesse de chargement ne s'affiche plus
+    // TODO les caractères HTML sont à convertir (ex:&#39; => ')
     QString cleanedTitle(title);
     cleanedTitle.replace(QRegExp("[éèëê]"), "e");
     cleanedTitle.replace(QRegExp("[ô]"), "o");
@@ -487,12 +491,12 @@ void MainWindow::downloadAll()
     lockWidgets(true);
 
     RTMPThread* thread = new RTMPThread(checkedFilms, this);
-    thread->start();
-    connect(thread, SIGNAL(finished()),
+    //thread->start();
+    connect(thread, SIGNAL(allFilmDownloadFinished()),
             this, SLOT(allFilmDownloadFinished()));
-    connect(thread, SIGNAL(updateProgress(int,StreamType,double,int)),
-            this, SLOT(downloadProgressed(int,StreamType,double,int)));
-    connect(thread, SIGNAL(filmDownloaded(int,StreamType)),
+    connect(thread, SIGNAL(downloadProgressed(int,StreamType,double,double)),
+            this, SLOT(downloadProgressed(int,StreamType,double,double)));
+    connect(thread, SIGNAL(downloadFinished(int,StreamType)),
             this, SLOT(filmDownloaded(int,StreamType)));
 }
 
@@ -508,7 +512,7 @@ void MainWindow::lockWidgets(bool lock)
     ui->progressBar->setVisible(lock);
     ui->settingsButton->setEnabled(!lock);
     ui->downloadVideosButton->setEnabled(!lock);
-    for (int row =0; row < ui->tableWidget->rowCount(); ++row)
+    for (int row = 0; row < ui->tableWidget->rowCount(); ++row)
     {
         for (int col = FIRST_CHECKBOX_COLUMN_IN_TABLE; col < ui->tableWidget->columnCount(); ++col)
         {
@@ -519,11 +523,6 @@ void MainWindow::lockWidgets(bool lock)
                 item->setFlags(item->flags()^Qt::ItemIsEnabled);
             else
                 item->setFlags(item->flags()|Qt::ItemIsEnabled);
-
-//            if (item && item->icon().isNull())
-//            {
-//                item->setFlags(lock?item->flags()^Qt::ItemIsUserCheckable : item->flags()|Qt::ItemIsUserCheckable);
-//            }
         }
     }
     ui->manualAddButton->setEnabled(!lock);
@@ -532,9 +531,9 @@ void MainWindow::lockWidgets(bool lock)
 
 }
 
-void MainWindow::downloadProgressed(int filmId, StreamType streamType, double progression, int speed)
+void MainWindow::downloadProgressed(int filmId, StreamType streamType, double progression, double speed)
 {
-    if (progression == 0)
+    //if (progression == 0)
     {
         for (int column = FIRST_CHECKBOX_COLUMN_IN_TABLE; column < ui->tableWidget->columnCount(); ++column)
         {
@@ -555,7 +554,9 @@ void MainWindow::downloadProgressed(int filmId, StreamType streamType, double pr
                 (speed > 0 ? tr("Download speed: %1 KiB/s (%2)")
                              .arg(speed)
                              .arg(streamType.humanCode)
-                          : tr("Waiting...")));
+                          : tr("Download speed: %1 KiB/s (%2) ...")
+                             .arg(speed)
+                             .arg(streamType.humanCode)));
 }
 
 void MainWindow::filmDownloaded(int filmId, StreamType streamType)
@@ -573,7 +574,22 @@ void MainWindow::filmDownloaded(int filmId, StreamType streamType)
 
             FilmDetails * d = delegate->films().values().at(filmId);
             d->m_streamsByType[streamType].downloaded = true;
+
+            // Save metadata
+            QFile metadataFile(QString(d->m_streamsByType[streamType].m_targetFileName).append(".info"));
+            metadataFile.open(QFile::WriteOnly|QFile::Text);
+            QTextStream stream (&metadataFile);
+            stream<< d->m_title << "\n";
+            stream<< d->m_summary;
+            stream.flush();
+            metadataFile.close();
+            QFile picture(QString(d->m_streamsByType[streamType].m_targetFileName).append(".png"));
+            picture.open(QFile::WriteOnly);
+            QImageWriter writer(&picture, "PNG");
+            writer.write(d->m_preview);
+            picture.close();
             break;
+
         }
     }
 }
@@ -602,8 +618,11 @@ void MainWindow::errorOccured(int filmId, QString errorMessage)
     if (ui->tableWidget->rowCount() <= filmId)
         return;
     QTableWidgetItem *cell = ui->tableWidget->item(filmId, 0);
-    if (cell == NULL) // TODO y'a surement mieux à faire
+    if (cell == NULL)
+    {
+        qDebug() << errorMessage;
         return;
+    }
     if(cell->icon().isNull())
     {
         cell->setIcon(QIcon(":/img/warning.png"));

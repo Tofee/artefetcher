@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QNetworkReply>
 #include <FilmDetails.h>
-
+#include <QDebug>
 class FilmDetails;
 class QNetworkAccessManager;
 class QSignalMapper;
@@ -13,7 +13,10 @@ class NotFoundException{
 public:
     NotFoundException(QString itemSearched)
         :m_searchedItem(itemSearched)
-    {}
+    {
+        qDebug() << "Not found exception for " << itemSearched;
+
+    }
     QString itemSearched() const;
 private:
     QString m_searchedItem;
@@ -42,7 +45,7 @@ public:
     static StreamType getStreamTypeByHumanName(const QString &humanName) throw (NotFoundException);
 
     void reloadFilm(FilmDetails* film);
-    bool addMovieFromUrl(const QString url);
+    bool addMovieFromUrl(const QString url, QString title = QString());
     void removeFilm(FilmDetails* film);
 
 signals:
@@ -50,6 +53,7 @@ signals:
     void errorOccured(int filmId, QString errorMessage);
 private slots:
     void requestReadyToRead(QObject*);
+    void loadAllCatalog();
 private:
     static QList<QString> listLanguages();
     static QList<QString> listQualities();

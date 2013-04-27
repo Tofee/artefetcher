@@ -54,7 +54,7 @@ private slots:
     void updateCurrentDetails();
     void downloadAll();
     void allFilmDownloadFinished();
-    void downloadProgressed(int filmId, StreamType streamType, double progression, int speed);
+    void downloadProgressed(int filmId, StreamType streamType, double progression, double speed);
     void filmDownloaded(int filmId, StreamType streamType);
     void changeColumnChecking(int column);
     void reloadCurrentRow();
@@ -63,6 +63,7 @@ private slots:
     void showPreferences();
     void cellHasBeenClicked(int row, int column);
     void removeCurrentFilm();
+
 private:
     void closeEvent(QCloseEvent* event);
     

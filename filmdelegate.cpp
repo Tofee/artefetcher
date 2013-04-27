@@ -1,16 +1,21 @@
 #include "filmdelegate.h"
-#include <QtNetwork/QNetworkAccessManager>
+#include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QtGui>
 #include <FilmDetails.h>
 #include <QXmlQuery>
 #include <QXmlFormatter>
 #include <QXmlResultItems>
+#include <QAbstractNetworkCache>
+#include <QDebug>
+#include <QScriptEngine>
+#include <QScriptValue>
 #define ARTE_PLAYLIST_URL "http://videos.arte.tv/fr/videos/playlistplaylist/index--3259492.html"
-#define VIDEO_LINE_HTML_BEGIN "<h2><a href=\"/fr/videos/"
+#define VIDEO_LINE_HTML_BEGIN "<div id=\"myPlaylistCont\">" //aaa<h2><a href=\"/fr/videos/"
 
 #define VIDEO_URL_PREFIX "http://videos.arte.tv/fr/videos/"
 
+#define MAPPER_STEP_CATALOG "CATALOG"
 #define MAPPER_STEP_CODE_1_HTML "HTML"
 #define MAPPER_STEP_CODE_2_XML "XML"
 #define MAPPER_STEP_CODE_3_RTMP "RTMP_XML_"
@@ -23,7 +28,7 @@ QList<QString> FilmDelegate::listLanguages()
 }
 QList<QString> FilmDelegate::listQualities()
 {
-    return QList<QString>() << "sd" << "hd";
+    return QList<QString>() << "sq" << "hq" << "eq";
 }
 
 QList<StreamType>& FilmDelegate::listStreamTypes()
@@ -98,6 +103,8 @@ void FilmDelegate::playListLoaded(const QString page)
                 FilmDetails* details = new FilmDetails();
                 details->m_title = lineInfos.at(1);
                 details->m_url = lineInfos.at(0);
+                //TODO vérifier qu'après un retrait de film de la playlist, un reload playlist n'invente pas des films
+                qDebug() << lineInfos.at(1);
                 QString titleInUrl = details->m_url.left(details->m_url.indexOf(QRegExp("-")));
                 QString regExpText("/fr/do_removeFromPlaylist/videos/playlistplaylist/%1[^']+");
                 regExpText = regExpText.arg(titleInUrl);
@@ -130,6 +137,9 @@ void FilmDelegate::playListLoaded(const QString page)
     }
 }
 
+void FilmDelegate::loadAllCatalog() {
+    downloadUrl("http://www.arte.tv/guide/fr/plus7/all.json", QString(), MAPPER_STEP_CATALOG);
+}
 
 QString extractUniqueResult(const QString& document, const QString& xpath)
 {
@@ -169,6 +179,7 @@ int FilmDelegate::getFilmId(FilmDetails * film) const
 
 void FilmDelegate::requestReadyToRead(QObject* object)
 {
+    static int current = 0;
     QNetworkReply* reply = qobject_cast<QNetworkReply *>(m_signalMapper->mapping(object));
 
     if (reply == NULL || object == NULL)
@@ -184,9 +195,29 @@ void FilmDelegate::requestReadyToRead(QObject* object)
 
     if (itemName.isEmpty())
     {
-        // this page is the playlist
-        const QString page(QString::fromUtf8(reply->readAll()));
-        playListLoaded(page);
+        if (itemStep == MAPPER_STEP_CATALOG) {
+            const QString page(QString::fromUtf8(reply->readAll()));
+            QScriptEngine engine;
+            QScriptValue json = engine.evaluate("JSON.parse").call(QScriptValue(),
+                                                                   QScriptValueList() << QString(page));
+            int i = 0;
+            foreach(QVariant catalogItem, json.toVariant().toMap().value("videos").toList())
+            {
+                if (++i <= 20) {
+                    QString url = catalogItem.toMap().value("url").toString();
+                    url.prepend("http://www.arte.tv");
+                    QString title = catalogItem.toMap().value("title").toString();
+                    addMovieFromUrl(url, title);
+                }
+            }
+
+            qDebug() << "Nombre total de résultats : " << i;
+        }
+        else {
+            // this page is the playlist
+            const QString page(QString::fromUtf8(reply->readAll()));
+            playListLoaded(page);
+        }
     }
     else
     {
@@ -196,86 +227,39 @@ void FilmDelegate::requestReadyToRead(QObject* object)
 
         if (itemStep == MAPPER_STEP_CODE_1_HTML)
         {
+            current++;
+            qDebug() << current;
             const QString page(QString::fromUtf8(reply->readAll()));
             // this page is further information for the film
-            QStringList javascriptLines = page.split(";");
+            QRegExp regexp("\"([^\"]+.json)\"");
+            regexp.setMinimal(true);
+            regexp.indexIn(page);
+            QString jsonUrl = regexp.cap(1);
 
-            QString playerUrl = javascriptLines.filter("url_player").value(0).split("\"").value(1);
-            if (playerUrl.isEmpty())
-            {
-                emit(errorOccured(getFilmId(film),tr("Cannot find the player url of this video")));
-            }
-            else{
-                film->m_flashPlayerUrl = playerUrl;
-            }
-
-            QString xmlVideoUrl = javascriptLines.filter("vars_player.videorefFileUrl").value(0).split("\"").value(1);
-            if (xmlVideoUrl.isEmpty())
-            {
-                emit (errorOccured(getFilmId(film),tr("Cannot find the XML page about all the videos")));
-            }
-            else
-            {
-                downloadUrl(xmlVideoUrl, film->m_url, "XML");
-            }
-
-            if (film->m_title.isEmpty())
-            {
-                QRegExp titleRegExp("<title>([^<]+) - videos\\.arte\\.tv</title>");
-                titleRegExp.setMinimal(true);
-                titleRegExp.indexIn(page);
-                film->m_title = titleRegExp.cap(1);
-            }
-
-            QRegExp summaryRegExp("<div class=.recentTracksCont.>\\W?<div>\\W?<p>(.+)</p>");
-            summaryRegExp.setMinimal(true);
-            summaryRegExp.indexIn(page);
-            film->m_summary = summaryRegExp.cap(1);
-
-            {
-                // Note: this part is not always available
-                QRegExp durationYearAndCountry("<div id=\"more\">\\W?<p style=\"margin-top: 0\">\\(([^)]+)\\mn\\)");
-                durationYearAndCountry.setMinimal(true);
-                durationYearAndCountry.indexIn(page);
-                QStringList fields = durationYearAndCountry.cap(1).split(", ");
-                if (fields.size()> 2)
-                {
-                    bool valid;
-                    film->m_countries = fields.mid(0, fields.size()-2);
-
-                    int year = fields.at(fields.size()-2).toInt(&valid);
-                    if (valid)
-                    {
-                        film->m_year = year;
-                    }
-                    int duration = fields.at(fields.size()-1).toInt(&valid);
-                    if (valid)
-                    {
-                        film->m_durationInMinutes = duration;
-                    }
-                }
-            }
-
-            emit playListHasBeenUpdated();
+            downloadUrl(jsonUrl, film->m_url, MAPPER_STEP_CODE_2_XML);
         }
         else if (itemStep == MAPPER_STEP_CODE_2_XML)
         {
             const QString page(QString::fromUtf8(reply->readAll()));
 
-            QString language;
-            foreach (language, listLanguages())
-            {
-                QString result = extractUniqueResult(page, QString("/videoref/videos/video[@lang='%1']/@ref/string()").arg(language));
+            QScriptEngine engine;
+            QScriptValue json = engine.evaluate("JSON.parse").call(QScriptValue(),
+                                                                   QScriptValueList() << QString(page));
 
-                if (!result.isEmpty())
-                {
-                    downloadUrl(result, film->m_url, QString(MAPPER_STEP_CODE_3_RTMP).append(language));
-                }
-                else
-                {
-                    emit(errorOccured(getFilmId(film),tr("Cannot find the movies for language: %1").arg(language)));
-                }
+            QMap<QString, QVariant> mymap = json.toVariant().toMap().value("videoJsonPlayer").toMap();
+
+            film->m_title = mymap.value("VTI").toString();
+            film->m_durationInMinutes = mymap.value("videoDurationSeconds").toInt() /60;
+            film->m_summary = mymap.value("VDE").toString();
+
+            // TODO gérer la liste des langues dynamiquement, en plus on n'est pas forcément sur FR en première langue
+            downloadUrl(mymap.value("videoStreamUrl").toString(), film->m_url, QString(MAPPER_STEP_CODE_3_RTMP).append("fr"));
+            downloadUrl(mymap.value("videoSwitchLang").toMap().value("de_DE").toString(), film->m_url, QString(MAPPER_STEP_CODE_3_RTMP).append("de"));
+            if (mymap.value("videoSwitchLang").toMap().size() > 1)
+            {
+                qDebug () << "Warning, more than german and french available";
             }
+            emit(playListHasBeenUpdated());
         }
         else if (itemStep.startsWith(MAPPER_STEP_CODE_3_RTMP))
         {
@@ -283,71 +267,24 @@ void FilmDelegate::requestReadyToRead(QObject* object)
 
             QString language = itemStep.mid(QString(MAPPER_STEP_CODE_3_RTMP).length());
 
-            bool changed = false;
-            QString quality;
-            foreach (quality, listQualities())
+            QScriptEngine engine;
+            QScriptValue json = engine.evaluate("JSON.parse").call(QScriptValue(),
+                                                                   QScriptValueList() << QString(page));
+            QMap<QString, QVariant> mymap = json.toVariant().toMap().value("video").toMap();
+            foreach(QVariant stream, mymap.value("VSR").toList())
             {
-                QString streamUrl = getStreamUrlFromResponse(page, quality);
-
-                if (streamUrl.isEmpty())
+                QString type = stream.toMap().value("VFO").toString();
+                if (type == "HBBTV")
                 {
-                    emit(errorOccured(getFilmId(film),tr("Cannot find the video stream in %1 %2").arg(language, quality)));
-                    continue;
-                }
-
-                try {
-                    StreamType streamType = getStreamTypeByLanguageAndQuality(language, quality);
-
-                    if (!film->m_streamsByType.contains(streamType))
-                    {
-                        Stream s;
-                        s.use = false;
-                        s.downloaded = false;
-                        film->m_streamsByType.insert(streamType, s);
-                    }
-                    film->m_streamsByType[streamType].m_rtmpStreamUrl = streamUrl;
-
-                } catch(NotFoundException)
-                {
-                    // NOTHING TO DO
+                    QString quality = stream.toMap().value("VQU").toString();
+                    StreamType streamType = getStreamTypeByLanguageAndQuality(language, quality.toLower());
+                    film->m_streamsByType[streamType].m_rtmpStreamUrl = stream.toMap().value("VUR").toString();
                 }
             }
 
-            bool valid = false;
+            emit playListHasBeenUpdated();
 
-            if (film->m_numberOfViews == 0)
-            {
-                ushort numberOfViews = extractUniqueResult(page, "/video/numberOfViews/string()")
-                        .toUShort(&valid);
-                if (valid)
-                {
-                    changed = true;
-                    film->m_numberOfViews = numberOfViews;
-                }
-                else
-                {
-                    emit(errorOccured(getFilmId(film),tr("Cannot find the number of views")));
-                }
-            }
-
-            if (film->m_rating == 0)
-            {
-                double rating = extractUniqueResult(page, "/video/rating/string()").toDouble(&valid);
-                if (valid)
-                {
-                    changed = true;
-                    film->m_rating = rating;
-                }
-                else
-                {
-                    emit(errorOccured(getFilmId(film),tr("Cannot find the rating")));
-                }
-            }
-
-            if (changed)
-                 emit playListHasBeenUpdated();
-
-            QString thumbnail = extractUniqueResult(page, "/video/firstThumbnailUrl/string()");
+            QString thumbnail = mymap.value("programImage").toString();
             if (!thumbnail.isEmpty())
             {
                 downloadUrl(thumbnail, film->m_url, MAPPER_STEP_CODE_4_PREVIEW);
@@ -362,13 +299,15 @@ void FilmDelegate::requestReadyToRead(QObject* object)
             film->m_preview.load(reply,"jpg");
             if (! film->m_preview.isNull())
             {
-                film->m_preview = film->m_preview.scaled(160,90);
+                film->m_preview = film->m_preview; //.scaled(160,90);
                 emit playListHasBeenUpdated();
             }
             else
             {
                 emit(errorOccured(getFilmId(film),tr("Cannot load the preview image")));
             }
+            current--;
+            qDebug() << current;
         }
         else if (itemStep == MAPPER_STEP_CODE_5_REMOVE)
         {
@@ -415,24 +354,24 @@ StreamType FilmDelegate::getStreamTypeByLanguageAndQuality(QString languageCode,
 void FilmDelegate::reloadFilm(FilmDetails* film)
 {
     QString videoPageUrl(film->m_url);
-    videoPageUrl.prepend("http://videos.arte.tv/fr/videos/");
     // Download video web page:
     downloadUrl(videoPageUrl, film->m_url, MAPPER_STEP_CODE_1_HTML);
 }
 
-bool FilmDelegate::addMovieFromUrl(const QString url)
+bool FilmDelegate::addMovieFromUrl(const QString url, QString title)
 {
-    if (!url.startsWith(VIDEO_URL_PREFIX))
+    if (!url.startsWith("http://www.arte.tv/guide/fr/"))
         return false;
 
-    QString internalUrl = url.mid(QString(VIDEO_URL_PREFIX).length());
+    QString internalUrl = url.mid(QString("http://www.arte.tv/guide/fr/").length());
 
     if (m_films.contains(internalUrl))
         return false;
 
     FilmDetails* newFilm = new FilmDetails();
-    newFilm->m_title = "";
-    newFilm->m_url = internalUrl;
+    newFilm->m_title = title;
+    qDebug() << title;
+    newFilm->m_url = url;
     m_films.insert(newFilm->m_url, newFilm);
     reloadFilm(newFilm);
     return true;

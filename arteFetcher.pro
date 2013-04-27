@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui sql network xmlpatterns
+QT       += core gui sql network xmlpatterns webkit script
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -25,6 +25,8 @@ HEADERS  += mainwindow.h \
     rtmpthread.h \
     preferencedialog.h \
     preferences.h
+TRANSLATIONS    = arteFetcher_de.ts \
+                  arteFetcher_fr.ts
 
 FORMS    += mainwindow.ui \
     preferencedialog.ui

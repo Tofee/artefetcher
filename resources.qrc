@@ -5,4 +5,8 @@
         <file>progress.png</file>
         <file>arte-tv.png</file>
     </qresource>
+    <qresource prefix="/translation">
+        <file>arteFetcher_de.qm</file>
+        <file>arteFetcher_fr.qm</file>
+    </qresource>
 </RCC>
