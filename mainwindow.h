@@ -43,7 +43,7 @@ protected:
      * @param streamTypeId
      * @return the filename
      */
-    QString getFileName(const QString& targetDirectory, const QString &title, StreamType streamType);
+    QString getFileName(const QString& targetDirectory, const QString &title);
 private slots:
     void refreshTable();
     void updateCurrentDetails();
@@ -61,9 +61,10 @@ private slots:
     void languageChanged();
     void qualityChanged();
 
-    void tableItemPressed(QTableWidgetItem * item);
-    void tableItemClicked(QTableWidgetItem * item);
-    void checkStateChanged(QTableWidgetItem * item);
+    //void tableItemPressed(QTableWidgetItem * item);
+    //void tableItemClicked(QTableWidgetItem * item);
+    //void checkStateChanged(QTableWidgetItem * item);
+    void downloadButtonClicked();
     //Qt::CheckState m_pressedItemCheckState;
     //int m_pressedItemRow;
 
@@ -71,6 +72,7 @@ private:
     void closeEvent(QCloseEvent* event);
 
     void createOrUpdateFirstColumn(int rowNumber);
+    bool isReadyForDownload(const FilmDetails * const film);
     
 private:
     Ui::MainWindow *ui;

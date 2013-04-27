@@ -87,8 +87,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(thread, SIGNAL(downloadFinished(int,StreamType)),
             this, SLOT(filmDownloaded(int,StreamType)));
 
-    connect(ui->tableWidget, SIGNAL(itemPressed(QTableWidgetItem*)), SLOT(tableItemPressed(QTableWidgetItem*)));
-    connect(ui->tableWidget, SIGNAL(itemClicked(QTableWidgetItem*)), SLOT(tableItemClicked(QTableWidgetItem*)));
+    //connect(ui->tableWidget, SIGNAL(itemPressed(QTableWidgetItem*)), SLOT(tableItemPressed(QTableWidgetItem*)));
+    //connect(ui->tableWidget, SIGNAL(itemClicked(QTableWidgetItem*)), SLOT(tableItemClicked(QTableWidgetItem*)));
+    connect(ui->downloadButton, SIGNAL(clicked()), SLOT(downloadButtonClicked()));
 }
 
 
@@ -131,10 +132,10 @@ MainWindow::~MainWindow()
     delete delegate;
 }
 
-bool isReadyForDownload(const FilmDetails * const film, StreamType streamType)
+bool MainWindow::isReadyForDownload(const FilmDetails * const film)
 {
     return !film->m_title.isEmpty()
-            && film->m_streamsByType.contains(streamType) && !film->m_isDownloading;
+            && film->m_streamsByType.contains(getStreamType()) && !film->m_isDownloading;
 }
 
 void MainWindow::languageChanged(){
@@ -157,21 +158,11 @@ void MainWindow::createOrUpdateFirstColumn(int rowNumber)
     titleTableItem = new QTableWidgetItem();
 
     bool isDownloadRequested = film->m_streamsByType.value(getStreamType()).use;
-    if (isReadyForDownload(film, getStreamType()) && !isDownloadRequested){
-        titleTableItem->setFlags((Qt::ItemIsUserCheckable|titleTableItem->flags())^Qt::ItemIsEditable);
-        titleTableItem->setCheckState(Qt::Unchecked);
-    }
-    else {
-        titleTableItem->setFlags((titleTableItem->flags()^Qt::ItemIsEditable)^Qt::ItemIsUserCheckable);
-    }
-
-    if (isDownloadRequested) {
-        titleTableItem->setCheckState(Qt::Checked);
-    }
 
     if (film->m_isDownloading){
         titleTableItem->setIcon(QIcon(":/img/progress.png"));
-        titleTableItem->setFlags(titleTableItem->flags()^Qt::ItemIsUserCheckable);
+    } else if (isDownloadRequested) {
+        titleTableItem->setIcon(QIcon(":/img/clock.png"));
     }
 
     titleTableItem->setText(film->m_title);
@@ -225,9 +216,9 @@ void MainWindow::refreshTable()
 void MainWindow::updateCurrentDetails(){
     int rowBegin = ui->tableWidget->currentRow();
      QMap<QString, FilmDetails*> details = delegate->films();
+     FilmDetails*  film = details.values().at(rowBegin);
      if (rowBegin >=0 && rowBegin < ui->tableWidget->rowCount())
      {
-        FilmDetails*  film = details.values().at(rowBegin);
         ui->summaryLabel->setText(film->m_summary);
         if (!film->m_preview.isNull())
         {
@@ -259,10 +250,24 @@ void MainWindow::updateCurrentDetails(){
          ui->detailsGroupBox->setTitle("");
          ui->countryYearDurationlabel->setText("");
      }
+
+     bool isDownloadButtonClickable= false;
+     if (film->m_isDownloading)
+         ui->downloadButton->setText("Downloading...");
+     else if (film->m_streamsByType[getStreamType()].use){
+         ui->downloadButton->setText("Waiting...");
+     }
+     else
+     {
+         ui->downloadButton->setText("Download");
+         isDownloadButtonClickable = isReadyForDownload(film);
+     }
+     qDebug() << "clickable: " << isDownloadButtonClickable;
+     ui->downloadButton->setEnabled(isDownloadButtonClickable);
 }
 
 
-QString MainWindow::getFileName(const QString& targetDirectory, const QString& title, StreamType streamType)
+QString MainWindow::getFileName(const QString& targetDirectory, const QString& title)
 {//TODO la vitesse de chargement ne s'affiche plus
     // TODO les caractères HTML sont à convertir (ex:&#39; => ')
     QString cleanedTitle(title);
@@ -280,13 +285,13 @@ QString MainWindow::getFileName(const QString& targetDirectory, const QString& t
     cleanedTitle.replace(QRegExp("[^a-zA-Z0-9 _-()]"), " ");
     cleanedTitle = cleanedTitle.simplified();
 
-    QString language(streamType.languageCode);
+    QString language(getStreamType().languageCode);
     language = language.replace(0, 1, language.left(1).toUpper());
 
     QString baseName(preferences.filenamePattern());
     baseName.replace("%title", cleanedTitle)
             .replace("%language", language)
-            .replace("%quality", streamType.qualityCode.toUpper());
+            .replace("%quality", getStreamType().qualityCode.toUpper());
 
     QString filename("%1%2%3");
     filename = filename.arg(targetDirectory,
@@ -298,14 +303,13 @@ QString MainWindow::getFileName(const QString& targetDirectory, const QString& t
 void MainWindow::downloadFilm(int currentLine, FilmDetails* film){
         qDebug() << "BEGIN MainWindow::downloadFilm(): Add " << film->title() << " to download";
     QString workingPath(QDir::homePath().append(QDir::separator()).append("arteFetcher"));
+
     StreamType streamType = getStreamType();
-    if (isReadyForDownload(film, streamType)
-            && ui->tableWidget->item(currentLine, FIRST_CHECKBOX_COLUMN_IN_TABLE) != NULL
-            && ui->tableWidget->item(currentLine, FIRST_CHECKBOX_COLUMN_IN_TABLE)->checkState()
-                == Qt::Checked)
+
+    if (isReadyForDownload(film))
     {
         QString titleCellText = ui->tableWidget->item(currentLine, COLUMN_FOR_TITLE)->text();
-        QString futureFileName = getFileName(workingPath, titleCellText, streamType);
+        QString futureFileName = getFileName(workingPath, titleCellText);
         if (QFile(futureFileName).exists()
                 && QMessageBox::question(this, "File already exists",
                                   tr("A file has already the name of the film: <%1>.\nDo you want to download it anyway?")
@@ -338,6 +342,7 @@ void MainWindow::downloadFilm(int currentLine, FilmDetails* film){
     checkedFilms.insert(currentLine, *film);
     qDebug() << "MainWindow::downloadFilm(): Add " << film->title() << " to download";
     thread->addFilmToDownloadQueue(currentLine, *film);
+    updateCurrentDetails();
 }
 
 void MainWindow::allFilmDownloadFinished()
@@ -360,6 +365,8 @@ void MainWindow::downloadProgressed(int filmId, StreamType streamType, double pr
                  .arg(delegate->films().values().at(filmId)->title())
                              .arg(speed)
                  .arg(streamType.humanCode).arg(thread->queueSize())));
+    if (filmId == ui->tableWidget->currentRow())
+        updateCurrentDetails();
 }
 
 void MainWindow::filmDownloaded(int filmId, StreamType streamType)
@@ -467,7 +474,7 @@ void MainWindow::cellHasBeenClicked(int row, int column)
         FilmDetails * film = delegate->films().values().value(row);
         if (film != NULL)
         {
-            QString fileName = getFileName(preferences.destinationDir(), ui->tableWidget->item(row, 0)->text(), streamType);
+            QString fileName = getFileName(preferences.destinationDir(), ui->tableWidget->item(row, 0)->text());
             if (film->m_streamsByType.contains(streamType)
                     && film->m_streamsByType[streamType].downloaded)
                 QDesktopServices::openUrl(QUrl::fromLocalFile(fileName));
@@ -480,33 +487,43 @@ void MainWindow::cellHasBeenClicked(int row, int column)
 
 }
 
-// Don't change the code of these methods, it's just suppose to spy the item
-// check state change of the first column
-void  MainWindow::tableItemPressed(QTableWidgetItem * item){
-    // member variable used to keep track of the check state for a
-    // table widget item currently being pressed
-    if (item->column() == FIRST_CHECKBOX_COLUMN_IN_TABLE) {
-        m_pressedItemCheckState = item->checkState();
-        m_pressedItemRow = item->row();
-    }
-}
-// Don't change the code of these methods, it's just suppose to spy the item
-// check state change of the first column
-void  MainWindow::tableItemClicked(QTableWidgetItem * item){
-    if (item->column() == FIRST_CHECKBOX_COLUMN_IN_TABLE
-            && item->row() == m_pressedItemRow
-            && item->checkState() != m_pressedItemCheckState)
-    {
-        checkStateChanged(item);
-    }
-}
-// Here you can change the behaviour
-void  MainWindow::checkStateChanged(QTableWidgetItem * item){
-    int row = item->row();
-    FilmDetails *details = delegate->films().values().value(row);
-    if (item->checkState()== Qt::Checked) {
-        downloadFilm(row, details);
-    } else if (item->checkState() == Qt::Unchecked){
 
-    }
+void MainWindow::downloadButtonClicked()
+{
+    int row = ui->tableWidget->currentRow();
+
+    FilmDetails *details = delegate->films().values().value(row);
+    downloadFilm(row, details);
 }
+
+//// Don't change the code of these methods, it's just suppose to spy the item
+//// check state change of the first column
+//void  MainWindow::tableItemPressed(QTableWidgetItem * item){
+//    // member variable used to keep track of the check state for a
+//    // table widget item currently being pressed
+//    if (item->column() == FIRST_CHECKBOX_COLUMN_IN_TABLE) {
+//        m_pressedItemCheckState = item->checkState();
+//        m_pressedItemRow = item->row();
+//    }
+//}
+//// Don't change the code of these methods, it's just suppose to spy the item
+//// check state change of the first column
+//void  MainWindow::tableItemClicked(QTableWidgetItem * item){
+//    if (item->column() == FIRST_CHECKBOX_COLUMN_IN_TABLE
+//            && item->row() == m_pressedItemRow
+//            && item->checkState() != m_pressedItemCheckState)
+//    {
+//        checkStateChanged(item);
+//    }
+//}
+
+//// Here you can change the behaviour
+//void  MainWindow::checkStateChanged(QTableWidgetItem * item){
+//    int row = item->row();
+//    FilmDetails *details = delegate->films().values().value(row);
+//    if (item->checkState()== Qt::Checked) {
+//        //downloadFilm(row, details);
+//    } else if (item->checkState() == Qt::Unchecked){
+
+//    }
+//}

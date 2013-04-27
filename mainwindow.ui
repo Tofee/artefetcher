@@ -140,9 +140,16 @@
             </spacer>
            </item>
            <item>
+            <widget class="QPushButton" name="downloadButton">
+             <property name="text">
+              <string>Download</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QPushButton" name="reloadFilmButton">
              <property name="text">
-              <string>Reload</string>
+              <string>Refresh details</string>
              </property>
             </widget>
            </item>
