@@ -24,12 +24,12 @@ class Downloader : public QObject
     Q_OBJECT
 public:
     explicit Downloader(QObject *parent = 0)
-        :m_currentDownload(NULL),m_manager(new QNetworkAccessManager(parent))
+        :m_currentDownload(NULL),m_manager(new QNetworkAccessManager(parent)), m_isWorking(false)
     {
     }
 
     void addDownload(QUrl url, QString filename) {
-        if (m_pendingDonwloads.isEmpty())
+        if (m_pendingDonwloads.isEmpty() && ! m_isWorking)
                  QTimer::singleShot(0, this, SLOT(startNextDownload()));
 
         QPair<QUrl, QString> newDownload(url, filename);
@@ -39,12 +39,19 @@ public:
 
     }
 
+    int queueSize() const {
+        return m_pendingDonwloads.size();
+    }
+
+
 private slots:
     void startNextDownload(){
+        m_isWorking = true;
         m_downloadTime.restart();
 
         if (m_pendingDonwloads.isEmpty()){
             emit(allDownloadsFinished());
+            m_isWorking = false;
             return;
         }
         QPair<QUrl, QString> downloadToStart = m_pendingDonwloads.dequeue();
@@ -71,7 +78,7 @@ private slots:
         if (m_lastNotifTime.elapsed() < 800 /* ms */)
             return;
         m_lastNotifTime.restart();
-
+        m_isWorking = true;
         double bytesPerSecond = bytesReceived * 1000.0 / m_downloadTime.elapsed();
         double kbytesPerSecond = bytesPerSecond / 1000.0;
         emit(downloadProgressed(m_currentDownload->url().toString(), bytesReceived, totalSize, kbytesPerSecond));
@@ -109,6 +116,7 @@ private:
     QNetworkReply* m_currentDownload;
     QTime m_downloadTime;
     QTime m_lastNotifTime;
+    bool m_isWorking;
 };
 
 
@@ -122,20 +130,7 @@ RTMPThread(const QMap<int, FilmDetails> details, QObject *parent)
         for (it  = details.constBegin(); it != details.constEnd(); ++it)
 
         {
-            const FilmDetails& detail = it.value();
-            int filmId = it.key();
-
-            for (QMap<StreamType, Stream>::const_iterator it = detail.m_streamsByType.constBegin();
-                 it != detail.m_streamsByType.constEnd(); ++it)
-            {
-                const Stream filmStream = it.value();
-
-                if (! filmStream.use)
-                    continue;
-
-                m_downloader.addDownload(filmStream.m_rtmpStreamUrl, filmStream.m_targetFileName);
-                m_keysForSignalByUrl.insert(filmStream.m_rtmpStreamUrl, QPair<int, StreamType>(filmId, it.key()));
-            }
+            addFilmToDownloadQueue(it.key(), it.value());
         }
         connect(&m_downloader, SIGNAL(downloadProgressed(QString,qint64,qint64, double)), SLOT(downloadProgressed(QString,qint64,qint64, double)));
         connect(&m_downloader, SIGNAL(downloadFinished(QString)), SLOT(downloadFinished(QString)));
@@ -143,11 +138,30 @@ RTMPThread(const QMap<int, FilmDetails> details, QObject *parent)
         connect(&m_downloader, SIGNAL(allDownloadsFinished()), SLOT(allDownloadsFinished()));
     }
 
+void addFilmToDownloadQueue(int filmId, const FilmDetails& details){
+    qDebug() << "RtmpThread::addFilmToDownloadQueue(): Add " << details.title() << " to download";
+
+    for (QMap<StreamType, Stream>::const_iterator it = details.m_streamsByType.constBegin();
+         it != details.m_streamsByType.constEnd(); ++it)
+    {
+        const Stream filmStream = it.value();
+
+        if (! filmStream.use)
+            continue;
+
+        m_downloader.addDownload(filmStream.m_rtmpStreamUrl, filmStream.m_targetFileName);
+        m_keysForSignalByUrl.insert(filmStream.m_rtmpStreamUrl, QPair<int, StreamType>(filmId, it.key()));
+    }
+}
+int queueSize() const {
+    return m_downloader.queueSize();
+}
 
 signals:
     void allFilmDownloadFinished();
     void downloadProgressed(int,StreamType,double,double);
     void downloadFinished(int,StreamType);
+
 private slots:
     void downloadProgressed(QString url, qint64 loadedSize, qint64 totalSize, double kbytesPerSecond){
         int id = m_keysForSignalByUrl.value(url).first;
@@ -170,6 +184,9 @@ private slots:
     void allDownloadsFinished(){
         emit(allFilmDownloadFinished());
     }
+
+
+
 private:
     // Keys sent in emitted signals, indexed by their URL
     QMap<QString, QPair<int, StreamType> > m_keysForSignalByUrl;

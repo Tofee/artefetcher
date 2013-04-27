@@ -68,6 +68,7 @@ public:
     QStringList m_countries;
     int m_durationInMinutes;
     int m_year;
+    bool m_isDownloading;
 
     QMap<StreamType, Stream> m_streamsByType;
 

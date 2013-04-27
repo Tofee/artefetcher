@@ -179,7 +179,6 @@ int FilmDelegate::getFilmId(FilmDetails * film) const
 
 void FilmDelegate::requestReadyToRead(QObject* object)
 {
-    static int current = 0;
     QNetworkReply* reply = qobject_cast<QNetworkReply *>(m_signalMapper->mapping(object));
 
     if (reply == NULL || object == NULL)
@@ -227,8 +226,6 @@ void FilmDelegate::requestReadyToRead(QObject* object)
 
         if (itemStep == MAPPER_STEP_CODE_1_HTML)
         {
-            current++;
-            qDebug() << current;
             const QString page(QString::fromUtf8(reply->readAll()));
             // this page is further information for the film
             QRegExp regexp("\"([^\"]+.json)\"");
@@ -306,8 +303,6 @@ void FilmDelegate::requestReadyToRead(QObject* object)
             {
                 emit(errorOccured(getFilmId(film),tr("Cannot load the preview image")));
             }
-            current--;
-            qDebug() << current;
         }
         else if (itemStep == MAPPER_STEP_CODE_5_REMOVE)
         {

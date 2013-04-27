@@ -13,6 +13,8 @@
 class QNetworkReply;
 class QNetworkAccessManager;
 class FilmDelegate;
+class QTableWidgetItem;
+class RTMPThread;
 
 namespace Ui {
 class MainWindow;
@@ -45,7 +47,7 @@ protected:
 private slots:
     void refreshTable();
     void updateCurrentDetails();
-    void downloadAll();
+    void downloadFilm(int currentLine, FilmDetails* film);
     void allFilmDownloadFinished();
     void downloadProgressed(int filmId, StreamType streamType, double progression, double speed);
     void filmDownloaded(int filmId, StreamType streamType);
@@ -55,18 +57,32 @@ private slots:
     void errorOccured(int filmId, QString errorMessage);
     void showPreferences();
     void cellHasBeenClicked(int row, int column);
-    void removeCurrentFilm();
+
     void languageChanged();
     void qualityChanged();
 
+    void tableItemPressed(QTableWidgetItem * item);
+    void tableItemClicked(QTableWidgetItem * item);
+    void checkStateChanged(QTableWidgetItem * item);
+    //Qt::CheckState m_pressedItemCheckState;
+    //int m_pressedItemRow;
+
 private:
     void closeEvent(QCloseEvent* event);
+
+    void createOrUpdateFirstColumn(int rowNumber);
     
 private:
     Ui::MainWindow *ui;
     QNetworkAccessManager* manager;
     FilmDelegate* delegate;
     Preferences preferences;
+    Qt::CheckState m_pressedItemCheckState;
+    int m_pressedItemRow;
+
+    // 1) Filter the selected films
+    QMap<int, FilmDetails> checkedFilms;
+    RTMPThread* thread;
 };
 
 #endif // MAINWINDOW_H
