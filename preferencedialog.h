@@ -15,8 +15,7 @@ class PreferenceDialog : public QDialog
     
 public:
     explicit PreferenceDialog(QWidget *parent,
-                              Preferences& preferences,
-                              const QStringList &cookieProfiles);
+                              Preferences& preferences);
     ~PreferenceDialog();
 public slots:
     void accept();

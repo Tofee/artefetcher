@@ -3,7 +3,6 @@
 
 #include <QMainWindow>
 #include <QList>
-#include <QNetworkCookie>
 #include <QModelIndex>
 #include <FilmDetails.h>
 #include <QStringList>
@@ -27,9 +26,6 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 protected:
-    void updateCookieProfiles();
-
-
     void lockWidgets(bool lock);
 
     /**
@@ -48,9 +44,7 @@ protected:
      */
     QString getFileName(const QString& targetDirectory, const QString &title, StreamType streamType);
 private slots:
-    void loadCookieProfile();
     void refreshTable();
-    void loadPlayList();
     void updateCurrentDetails();
     void downloadAll();
     void allFilmDownloadFinished();
@@ -71,7 +65,6 @@ private:
     Ui::MainWindow *ui;
     QNetworkAccessManager* manager;
     FilmDelegate* delegate;
-    QStringList cookieProfiles;
     Preferences preferences;
 };
 

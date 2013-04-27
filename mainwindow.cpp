@@ -4,7 +4,6 @@
 #include <QtGui>
 #include <QSqlDatabase>
 #include <QSqlQuery>
-#include <QNetworkCookie>
 #include <QSqlError>
 #include <QIcon>
 
@@ -14,27 +13,9 @@
 #include <rtmpthread.h>
 #include <QList>
 
-#define FIREFOX_SQLITE_FILENAME "/cookies.sqlite"
-#define FIREFOX_PROFILES_PATH "/.mozilla/firefox/"
 #define COLUMN_FOR_PAGE 1
 #define COLUMN_FOR_TITLE 0
 #define FIRST_CHECKBOX_COLUMN_IN_TABLE 4
-
-// source of images /usr/share/icons/oxygen/16x16/status/
-// TODO on peut surement mieux faire que comme ça
-class MyCJar : public QNetworkCookieJar
-{
-public:
-    MyCJar(QObject* parent):QNetworkCookieJar(parent) {}
-
-    void setAllCookies(const QList<QNetworkCookie> &cookieList) {
-        QNetworkCookieJar::setAllCookies(cookieList);
-    }
-
-    QList<QNetworkCookie> allCookies() const {
-        return QNetworkCookieJar::allCookies();
-    }
-};
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -44,9 +25,6 @@ MainWindow::MainWindow(QWidget *parent) :
     preferences.load();
 
     ui->setupUi(this);
-    updateCookieProfiles();
-
-    loadCookieProfile();
 
     delegate = new FilmDelegate(manager);
 
@@ -77,9 +55,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(delegate, SIGNAL(errorOccured(int,QString)),
             SLOT(errorOccured(int,QString)));
 
-    connect(ui->loadPlaylistButton, SIGNAL(clicked()),
-            SLOT(loadPlayList()));
-
     connect(ui->tableWidget, SIGNAL(currentCellChanged(int,int,int,int)),
             SLOT(updateCurrentDetails()));
     connect(ui->downloadVideosButton, SIGNAL(clicked()),
@@ -108,8 +83,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     lockWidgets(false);
-
-    loadPlayList();
 }
 
 
@@ -153,104 +126,6 @@ MainWindow::~MainWindow()
 {
     delete ui;
     delete delegate;
-}
-
-void MainWindow::updateCookieProfiles()
-{
-    cookieProfiles.clear();
-    QDir d(QDir::homePath().append(FIREFOX_PROFILES_PATH));
-    if (! d.exists())
-        return;// TODO
-    cookieProfiles << d.entryList(QDir::AllDirs|QDir::NoDotAndDotDot);
-}
-
-void MainWindow::loadCookieProfile()
-{
-
-    QString firefoxProfile(preferences.firefoxProfile());
-    if (firefoxProfile.isEmpty())
-    {
-        firefoxProfile = cookieProfiles.first();
-    }
-    qDebug() << "Load cookie begin " <<firefoxProfile;
-
-    if (QSqlDatabase::contains(QSqlDatabase::defaultConnection))
-    {
-        QSqlDatabase::removeDatabase(firefoxProfile);
-    }
-    QSqlDatabase base = QSqlDatabase::addDatabase("QSQLITE"); // TODO on a droit qu'à un seul
-    base.setConnectOptions("QSQLITE_OPEN_READONLY");
-    QString baseName(QDir::homePath());
-    baseName.append(FIREFOX_PROFILES_PATH);
-    baseName.append(firefoxProfile);
-    baseName.append(FIREFOX_SQLITE_FILENAME);
-    base.setDatabaseName(baseName);
-
-    QList<QNetworkCookie> result;
-
-    if (!base.open())
-    {
-        //TODO
-        return;
-    }
-
-    QString queryText("select host");
-    queryText.append(", case substr(host,1,1)='.' when 0 then 'FALSE' else 'TRUE' end");
-    queryText.append(", path");
-    queryText.append(", case isSecure when 0 then 'FALSE' else 'TRUE' end");
-    queryText.append(", expiry");
-    queryText.append(", name");
-    queryText.append(", value");
-    queryText.append(" from moz_cookies");
-    queryText.append(" where host like '%arte.tv%';");
-
-    QSqlQuery query;
-    if (!query.exec(queryText))
-    {
-        //TODO
-        qDebug() << query.lastError().databaseText();
-        qDebug() << query.lastError().driverText();
-    }
-
-    while (query.next())
-    {
-//        QString host(query.value(0).toString());
-//        bool unknownBool(query.value(1).toBool());
-//        QString path(query.value(2).toString());
-//        bool isSecure(query.value(3).toBool());
-//        QDateTime expiry(query.value(4).toDateTime());
-//        QString name(query.value(5).toString());
-//        QString value(query.value(6).toString());
-
-        QString name(query.value(5).toString());
-        QString value(query.value(6).toString());
-        QNetworkCookie cookie(name.toAscii(), value.toAscii());
-        cookie.setDomain(query.value(0).toString());
-        result.append(cookie);
-    }
-
-    base.close();
-
-    if (manager->cookieJar() != NULL)
-    {
-        manager->cookieJar()->deleteLater();
-    }
-
-    // Override cookies
-    MyCJar* cookieJar = new MyCJar(manager);
-    cookieJar->setAllCookies(result);
-    manager->setCookieJar(cookieJar);
-
-    qDebug() << "Load cookie end";
-}
-
-void MainWindow::loadPlayList()
-{
-    qDebug() << "Load playlist begin";
-    ui->tableWidget->clearContents();
-    ui->tableWidget->setRowCount(0);
-    delegate->loadPlayList();
-    qDebug() << "Load playlist end";
 }
 
 bool isReadyForDownload(const FilmDetails * const film, StreamType streamType)
@@ -527,7 +402,6 @@ void MainWindow::lockWidgets(bool lock)
     }
     ui->manualAddButton->setEnabled(!lock);
     ui->reloadFilmButton->setEnabled(!lock);
-    ui->loadPlaylistButton->setEnabled(!lock);
 
 }
 
@@ -637,17 +511,8 @@ void MainWindow::errorOccured(int filmId, QString errorMessage)
 
 void MainWindow::showPreferences()
 {
-    QString oldCookieProfile = preferences.firefoxProfile();
-
-    PreferenceDialog dial(this, preferences, cookieProfiles);
-    if (dial.exec())
-    {
-        if (oldCookieProfile != preferences.firefoxProfile())
-        {
-            loadCookieProfile();
-            loadPlayList();
-        }
-    }
+    PreferenceDialog dial(this, preferences);
+    dial.exec();
 }
 
 void MainWindow::closeEvent(QCloseEvent* event)

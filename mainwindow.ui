@@ -22,13 +22,6 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QPushButton" name="loadPlaylistButton">
-        <property name="text">
-         <string>Reload playlist</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QPushButton" name="allVideosButton">
         <property name="text">
          <string>All videos</string>

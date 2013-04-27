@@ -3,20 +3,12 @@
 #include <QtGui>
 
 PreferenceDialog::PreferenceDialog(QWidget *parent,
-                                   Preferences& preferences,
-                                   const QStringList& cookieProfiles) :
+                                   Preferences& preferences) :
     QDialog(parent),
     ui(new Ui::PreferenceDialog),
     m_preferences(preferences)
 {
     ui->setupUi(this);
-
-    ui->firefoxProfileComboBox->addItems(cookieProfiles);
-    int profileIndex = ui->firefoxProfileComboBox->findText(m_preferences.firefoxProfile());
-    if (profileIndex >= 0)
-    {
-        ui->firefoxProfileComboBox->setCurrentIndex(profileIndex);
-    }
 
     QStringList availableStreams;
     for (QList<StreamType>::const_iterator it= FilmDelegate::listStreamTypes().constBegin();
@@ -74,7 +66,6 @@ void PreferenceDialog::accept()
     // TODO must : regarder si les caractères du pattern collent avec le systeme de fichier
     m_preferences.m_destinationDir = ui->destinationDirectoryLineEdit->text();
     m_preferences.m_filenamePattern = ui->filenamePatternLineEdit->text();
-    m_preferences.m_firefoxProfile = ui->firefoxProfileComboBox->currentText();
     m_preferences.save();
     QDialog::accept();
 }

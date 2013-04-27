@@ -20,14 +20,6 @@ public:
         return m_selectedStreams;
     }
 
-    /**
-     * @brief firefoxProfile
-     * @return if empty string, it means any string
-     */
-    const QString &firefoxProfile() const
-    {
-        return m_firefoxProfile;
-    }
     const QString &filenamePattern() const
     {
         return m_filenamePattern;
@@ -42,7 +34,6 @@ public:
 
 protected:
     QStringList m_selectedStreams;
-    QString m_firefoxProfile;
     QString m_filenamePattern;
     QString m_destinationDir;
 };
