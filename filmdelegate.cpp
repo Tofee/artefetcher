@@ -18,9 +18,9 @@
 #define MAPPER_STEP_CATALOG "CATALOG"
 #define MAPPER_STEP_CODE_1_HTML "HTML"
 #define MAPPER_STEP_CODE_2_XML "XML"
-#define MAPPER_STEP_CODE_3_RTMP "RTMP_XML_"
+#define MAPPER_STEP_CODE_3_RTMP "RTMP_XML"
 #define MAPPER_STEP_CODE_4_PREVIEW "PREVIEW"
-#define RESULT_PER_PAGE 15
+#define RESULT_PER_PAGE 10
 
 QList<QString> FilmDelegate::listLanguages()
 {
@@ -56,8 +56,8 @@ QList<StreamType>& FilmDelegate::listStreamTypes()
     return streamTypes;
 }
 
-FilmDelegate::FilmDelegate(QNetworkAccessManager * in_manager)
-    :m_manager(in_manager), m_signalMapper(new QSignalMapper(this))
+FilmDelegate::FilmDelegate(QNetworkAccessManager * in_manager, const Preferences &pref)
+    :m_manager(in_manager), m_signalMapper(new QSignalMapper(this)), m_preferences(pref)
 {
     connect(m_signalMapper, SIGNAL(mapped(QObject*)),
             this, SLOT(requestReadyToRead(QObject*)));
@@ -135,6 +135,14 @@ int FilmDelegate::getFilmId(FilmDetails * film) const
     return m_films.values().indexOf(film);
 }
 
+void addMetadataIfNotEmpty(FilmDetails* film, QVariantMap inputMap, QString fieldName, QString internalFieldName)
+{
+    if (!inputMap.value(fieldName).isValid())
+        return;
+    QString value = inputMap.value(fieldName).toString();
+    film->m_metadata.insert(internalFieldName, value);
+}
+
 void FilmDelegate::requestReadyToRead(QObject* object)
 {
     QNetworkReply* reply = qobject_cast<QNetworkReply *>(m_signalMapper->mapping(object));
@@ -166,7 +174,23 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                     QString url = catalogItem.toMap().value("url").toString();
                     url.prepend("http://www.arte.tv");
                     QString title = catalogItem.toMap().value("title").toString();
-                    addMovieFromUrl(url, title);
+
+                    if (m_films.contains(url))
+                        continue;
+
+                    FilmDetails* newFilm = new FilmDetails();
+                    newFilm->m_title = title;
+                    newFilm->m_url = url;
+
+                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), "airdate_long", tr("First broadcast"));
+                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), "desc", tr("Description"));
+                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), "video_rights_until", tr("Available until"));
+                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), "video_views", tr("Views"));
+                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), "video_channels", tr("Channels"));
+                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), "video_rank", tr("Rank"));
+
+                    m_films.insert(newFilm->m_url, newFilm);
+                    reloadFilm(newFilm);
                 }
             }
 
@@ -203,25 +227,46 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                                                                    QScriptValueList() << QString(page));
 
             QMap<QString, QVariant> mymap = json.toVariant().toMap().value("videoJsonPlayer").toMap();
-
-            film->m_title = mymap.value("VTI").toString();
-            film->m_durationInMinutes = mymap.value("videoDurationSeconds").toInt() /60;
-            film->m_summary = mymap.value("VDE").toString();
-
-            // TODO gérer la liste des langues dynamiquement, en plus on n'est pas forcément sur FR en première langue
-            downloadUrl(mymap.value("videoStreamUrl").toString(), film->m_url, QString(MAPPER_STEP_CODE_3_RTMP).append("fr"));
-            downloadUrl(mymap.value("videoSwitchLang").toMap().value("de_DE").toString(), film->m_url, QString(MAPPER_STEP_CODE_3_RTMP).append("de"));
-            if (mymap.value("videoSwitchLang").toMap().size() > 1)
+            if (mymap.isEmpty())
             {
-                qDebug () << "Warning, more than german and french available";
+                emit(errorOccured(getFilmId(film),tr("Cannot load details")));
             }
-            emit(playListHasBeenUpdated());
+            else {
+
+                if (mymap.value("VTI").toString() != "" && film->m_title == "")
+                {
+                    film->m_title = mymap.value("VTI").toString();
+                }
+                film->m_durationInMinutes = mymap.value("videoDurationSeconds").toInt() /60;
+                film->m_summary = mymap.value("VDE").toString();
+
+                addMetadataIfNotEmpty(film, mymap, "VCG", tr("Type"));
+                addMetadataIfNotEmpty(film, mymap, "VDA", tr("First Broadcast (raw)")); // 25/04/2013 20:50:30 +0200
+                addMetadataIfNotEmpty(film, mymap, "VRU", tr("Available until (raw)")); // 02/05/2013 20:20:30 +0200
+
+
+                if ( mymap.value("videoIsoLang").toString().left(2).toLower() == m_preferences.selectedLanguage().toLower()) {
+                    downloadUrl(mymap.value("videoStreamUrl").toString(), film->m_url, QString(MAPPER_STEP_CODE_3_RTMP));
+                }
+                else {
+                    QString expLanguage = m_preferences.selectedLanguage();
+                    QString externalLanguage = QString("%1_%2").arg(expLanguage.toLower(), expLanguage.toUpper());
+                    QString languageUrl = mymap.value("videoSwitchLang").toMap().value(externalLanguage).toString();
+                    if (!languageUrl.isEmpty())
+                        downloadUrl(languageUrl, film->m_url, QString(MAPPER_STEP_CODE_3_RTMP));
+                }
+
+                //downloadUrl(mymap.value("videoSwitchLang").toMap().value("de_DE").toString(), film->m_url, QString(MAPPER_STEP_CODE_3_RTMP).append("de"));
+                if (mymap.value("videoSwitchLang").toMap().size() > 1)
+                {
+                    qDebug () << "Warning, more than german and french available";
+                }
+                emit(playListHasBeenUpdated());
+            }
         }
-        else if (itemStep.startsWith(MAPPER_STEP_CODE_3_RTMP))
+        else if (itemStep == MAPPER_STEP_CODE_3_RTMP)
         {
             const QString page(QString::fromUtf8(reply->readAll()));
-
-            QString language = itemStep.mid(QString(MAPPER_STEP_CODE_3_RTMP).length());
 
             QScriptEngine engine;
             QScriptValue json = engine.evaluate("JSON.parse").call(QScriptValue(),
@@ -232,9 +277,9 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                 QString type = stream.toMap().value("VFO").toString();
                 if (type == "HBBTV")
                 {
-                    QString quality = stream.toMap().value("VQU").toString();
-                    StreamType streamType = getStreamTypeByLanguageAndQuality(language, quality.toLower());
-                    film->m_streamsByType[streamType].m_rtmpStreamUrl = stream.toMap().value("VUR").toString();
+                    QString quality = stream.toMap().value("VQU").toString().toLower();
+                    if (quality == m_preferences.selectedQuality())
+                        film->m_streamUrl = stream.toMap().value("VUR").toString();
                 }
             }
 
@@ -255,7 +300,7 @@ void FilmDelegate::requestReadyToRead(QObject* object)
             film->m_preview.load(reply,"jpg");
             if (! film->m_preview.isNull())
             {
-                film->m_preview = film->m_preview.scaled(600,340);
+                film->m_preview = film->m_preview.scaled(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT, Qt::KeepAspectRatio);
                 emit playListHasBeenUpdated();
             }
             else

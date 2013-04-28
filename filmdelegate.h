@@ -5,6 +5,12 @@
 #include <QNetworkReply>
 #include <FilmDetails.h>
 #include <QDebug>
+#include <preferences.h>
+
+
+#define MAX_IMAGE_WIDTH 400
+#define MAX_IMAGE_HEIGHT 226
+
 class FilmDetails;
 class QNetworkAccessManager;
 class QSignalMapper;
@@ -27,7 +33,7 @@ class FilmDelegate: public QObject
 {
     Q_OBJECT
 public:
-    FilmDelegate(QNetworkAccessManager*);
+    FilmDelegate(QNetworkAccessManager*, const Preferences& pref);
     virtual ~FilmDelegate();
     /**
      * Call this method to launch the request.
@@ -92,6 +98,7 @@ private:
     QSignalMapper* m_signalMapper;
     int m_currentPage;
     QString m_lastPlaylistUrl;
+    const Preferences& m_preferences;
 
 
 };

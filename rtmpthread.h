@@ -56,12 +56,9 @@ private slots:
         }
         QPair<QUrl, QString> downloadToStart = m_pendingDonwloads.dequeue();
 
-        QNetworkRequest request(downloadToStart.first);
-        m_currentDownload = m_manager->get(request);
-
         m_outputFile.setFileName(downloadToStart.second);
 
-        if (!m_outputFile.open(QIODevice::WriteOnly)) {
+        if (!m_outputFile.open(QIODevice::WriteOnly|QIODevice::Append)) {
             emit(downloadError(downloadToStart.first.toString(),
             QString("Problem opening save file '%1' for download '%2': %3\n").arg(
                     downloadToStart.second,
@@ -69,6 +66,18 @@ private slots:
                     m_outputFile.errorString())));
             return;                 // skip this download
         }
+
+        QNetworkRequest request(downloadToStart.first);
+
+        m_previouslyDownloaded = 0;
+        if (m_outputFile.size() > 0){
+            m_previouslyDownloaded = m_outputFile.size();
+            qDebug() << m_previouslyDownloaded;
+            QByteArray rangeHeaderValue = "bytes=" + QByteArray::number( m_outputFile.size()) + "-";
+            request.setRawHeader("Range", rangeHeaderValue);
+        }
+        m_currentDownload = m_manager->get(request);
+
         connect(m_currentDownload, SIGNAL(readyRead()),                      SLOT(downloadReadyRead()));
         connect(m_currentDownload, SIGNAL(downloadProgress(qint64,qint64)),  SLOT(downloadProgressed(qint64,qint64)));
         connect(m_currentDownload, SIGNAL(finished()),                       SLOT(downloadFinished()));
@@ -81,7 +90,8 @@ private slots:
         m_isWorking = true;
         double bytesPerSecond = bytesReceived * 1000.0 / m_downloadTime.elapsed();
         double kbytesPerSecond = bytesPerSecond / 1000.0;
-        emit(downloadProgressed(m_currentDownload->url().toString(), bytesReceived, totalSize, kbytesPerSecond));
+        double remainingTimeInSecond = (totalSize - bytesReceived) / bytesPerSecond;
+        emit(downloadProgressed(m_currentDownload->url().toString(), m_previouslyDownloaded + bytesReceived, totalSize+m_previouslyDownloaded, kbytesPerSecond, remainingTimeInSecond));
     }
 
     void downloadFinished()
@@ -104,7 +114,7 @@ private slots:
 
 
 signals:
-    void downloadProgressed(QString url, qint64 loadedSize, qint64 totalSize, double kbytesPerSecond);
+    void downloadProgressed(QString url, qint64 loadedSize, qint64 totalSize, double kbytesPerSecond, double remainingTimeInSecond);
     void downloadFinished(QString url);
     void downloadError(QString url, QString message);
     void allDownloadsFinished();
@@ -117,6 +127,7 @@ private:
     QTime m_downloadTime;
     QTime m_lastNotifTime;
     bool m_isWorking;
+    qint64 m_previouslyDownloaded;
 };
 
 
@@ -132,7 +143,7 @@ RTMPThread(const QMap<int, FilmDetails> details, QObject *parent)
         {
             addFilmToDownloadQueue(it.key(), it.value());
         }
-        connect(&m_downloader, SIGNAL(downloadProgressed(QString,qint64,qint64, double)), SLOT(downloadProgressed(QString,qint64,qint64, double)));
+        connect(&m_downloader, SIGNAL(downloadProgressed(QString,qint64,qint64, double, double)), SLOT(downloadProgressed(QString,qint64,qint64, double, double)));
         connect(&m_downloader, SIGNAL(downloadFinished(QString)), SLOT(downloadFinished(QString)));
         connect(&m_downloader, SIGNAL(downloadError(QString,QString)), SLOT(downloadError(QString,QString)));
         connect(&m_downloader, SIGNAL(allDownloadsFinished()), SLOT(allDownloadsFinished()));
@@ -141,17 +152,12 @@ RTMPThread(const QMap<int, FilmDetails> details, QObject *parent)
 void addFilmToDownloadQueue(int filmId, const FilmDetails& details){
     qDebug() << "RtmpThread::addFilmToDownloadQueue(): Add " << details.title() << " to download";
 
-    for (QMap<StreamType, Stream>::const_iterator it = details.m_streamsByType.constBegin();
-         it != details.m_streamsByType.constEnd(); ++it)
-    {
-        const Stream filmStream = it.value();
+        if (details.m_hasBeenRequested)
+        {
 
-        if (! filmStream.use)
-            continue;
-
-        m_downloader.addDownload(filmStream.m_rtmpStreamUrl, filmStream.m_targetFileName);
-        m_keysForSignalByUrl.insert(filmStream.m_rtmpStreamUrl, QPair<int, StreamType>(filmId, it.key()));
-    }
+        m_downloader.addDownload(details.m_streamUrl, details.m_targetFileName);
+        m_keysForSignalByUrl.insert(details.m_streamUrl, filmId);
+        }
 }
 int queueSize() const {
     return m_downloader.queueSize();
@@ -159,21 +165,19 @@ int queueSize() const {
 
 signals:
     void allFilmDownloadFinished();
-    void downloadProgressed(int,StreamType,double,double);
-    void downloadFinished(int,StreamType);
+    void downloadProgressed(int,double,double, double);
+    void downloadFinished(int);
 
 private slots:
-    void downloadProgressed(QString url, qint64 loadedSize, qint64 totalSize, double kbytesPerSecond){
-        int id = m_keysForSignalByUrl.value(url).first;
-        StreamType type = m_keysForSignalByUrl.value(url).second;
-        emit(downloadProgressed(id, type, 100.0 * loadedSize/ (double) totalSize, kbytesPerSecond));
+    void downloadProgressed(QString url, qint64 loadedSize, qint64 totalSize, double kbytesPerSecond, double remainingTimeInSecond){
+        int id = m_keysForSignalByUrl.value(url);
+        emit(downloadProgressed(id, 100.0 * loadedSize/ (double) totalSize, kbytesPerSecond, remainingTimeInSecond));
     }
 
     void downloadFinished(QString url)
     {
-        int id = m_keysForSignalByUrl.value(url).first;
-        StreamType type = m_keysForSignalByUrl.value(url).second;
-        emit(downloadFinished(id, type));
+        int id = m_keysForSignalByUrl.value(url);
+        emit(downloadFinished(id));
     }
 
     void downloadError(QString url, QString message)
@@ -189,7 +193,7 @@ private slots:
 
 private:
     // Keys sent in emitted signals, indexed by their URL
-    QMap<QString, QPair<int, StreamType> > m_keysForSignalByUrl;
+    QMap<QString, int> m_keysForSignalByUrl;
     Downloader m_downloader;
 };
 

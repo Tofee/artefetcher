@@ -65,12 +65,22 @@ public:
     uint m_numberOfViews;
     QString m_url;
     QString m_removeUrl;
-    QStringList m_countries;
+    //QStringList m_countries;
     int m_durationInMinutes;
     int m_year;
-    bool m_isDownloading;
 
-    QMap<StreamType, Stream> m_streamsByType;
+    QMap<QString, QString> m_metadata;
+
+
+    //QMap<StreamType, Stream> m_streamsByType;
+
+//public:
+    bool m_hasBeenRequested;
+    bool m_isDownloaded;
+    bool m_isDownloading;
+    QString m_streamUrl;
+    // Full path of the future downloaded film.
+    QString m_targetFileName;
 
 
     QString title() const { return m_title; }

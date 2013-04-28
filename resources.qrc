@@ -5,6 +5,7 @@
         <file>progress.png</file>
         <file>arte-tv.png</file>
         <file>clock.png</file>
+        <file>Arte.jpg</file>
     </qresource>
     <qresource prefix="/translation">
         <file>arteFetcher_de.qm</file>

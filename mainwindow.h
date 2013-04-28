@@ -49,9 +49,9 @@ private slots:
     void updateCurrentDetails();
     void downloadFilm(int currentLine, FilmDetails* film);
     void allFilmDownloadFinished();
-    void downloadProgressed(int filmId, StreamType streamType, double progression, double speed);
-    void filmDownloaded(int filmId, StreamType streamType);
-    void changeColumnChecking(int column);
+    void downloadProgressed(int filmId, double progression, double speed, double remainingTime);
+    void filmDownloaded(int filmId);
+
     void reloadCurrentRow();
     void addFilmManuallyFromUrl();
     void errorOccured(int filmId, QString errorMessage);
