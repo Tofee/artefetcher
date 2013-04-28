@@ -35,8 +35,6 @@ public:
         QPair<QUrl, QString> newDownload(url, filename);
         m_pendingDonwloads.enqueue(newDownload);
 
-        qDebug() << "Downloading" << url.toString() << "into" << filename;
-
     }
 
     int queueSize() const {
@@ -120,10 +118,10 @@ signals:
     void allDownloadsFinished();
 private:
 
+    QNetworkReply* m_currentDownload;
     QNetworkAccessManager* m_manager;
     QQueue<QPair<QUrl, QString> > m_pendingDonwloads;
     QFile m_outputFile;
-    QNetworkReply* m_currentDownload;
     QTime m_downloadTime;
     QTime m_lastNotifTime;
     bool m_isWorking;
@@ -150,7 +148,6 @@ RTMPThread(const QMap<int, FilmDetails> details, QObject *parent)
     }
 
 void addFilmToDownloadQueue(int filmId, const FilmDetails& details){
-    qDebug() << "RtmpThread::addFilmToDownloadQueue(): Add " << details.title() << " to download";
 
         if (details.m_hasBeenRequested)
         {

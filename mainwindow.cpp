@@ -115,7 +115,7 @@ MainWindow::MainWindow(QWidget *parent) :
     clearAndLoadTable();
 }
 
-void MainWindow::streamIndexLoaded(int resultCount, int currentPage, int pageCount){
+void MainWindow::streamIndexLoaded(int /*resultCount*/, int currentPage, int pageCount){
     ui->pageLabel->setText(QString("%1/%2").arg(currentPage).arg(pageCount));
     ui->leftPageButton->setEnabled(currentPage <= 1);
     ui->rightPageButton->setEnabled(currentPage < pageCount);
@@ -203,18 +203,6 @@ void MainWindow::refreshTable()
     {
         createOrUpdateFirstColumn(rowNumber);
 
-//        if (film->m_rating)
-//        {
-//            QTableWidgetItem* item = new QTableWidgetItem(QString::number(film->m_rating));
-//            item->setFlags(item->flags()^Qt::ItemIsEditable);
-//            ui->tableWidget->setItem(rowNumber, 1, item);
-//        }
-//        if (film->m_numberOfViews)
-//        {
-//            QTableWidgetItem* item = new QTableWidgetItem(QString::number(film->m_numberOfViews));
-//            item->setFlags(item->flags()^Qt::ItemIsEditable);
-//            ui->tableWidget->setItem(rowNumber, 2, item);
-//        }
         if (film->m_durationInMinutes > 0)
         {
             QTableWidgetItem* item = new QTableWidgetItem(QString::number(film->m_durationInMinutes));
@@ -232,7 +220,7 @@ void MainWindow::refreshTable()
     {
         ui->tableWidget->setCurrentCell(0,0);
     }
-    //ui->tableWidget->resizeColumnsToContents();
+
     updateCurrentDetails();
 }
 
@@ -305,7 +293,7 @@ void MainWindow::updateCurrentDetails(){
 
 
 QString MainWindow::getFileName(const QString& targetDirectory, const QString& title)
-{//TODO la vitesse de chargement ne s'affiche plus
+{
     // TODO les caractères HTML sont à convertir (ex:&#39; => ')
     QString cleanedTitle(title);
     cleanedTitle.replace(QRegExp("[éèëê]"), "e");
@@ -361,8 +349,6 @@ void MainWindow::downloadFilm(int currentLine, FilmDetails* film){
         }
         else
         {
-            qDebug() << film->m_streamUrl;
-
             film->m_hasBeenRequested = true;
             film->m_targetFileName = futureFileName;
         }
@@ -386,7 +372,11 @@ void MainWindow::downloadFilm(int currentLine, FilmDetails* film){
 // TODO qdebug remove
 // TODO trads
 // TODO quand le film est téléchargé et qu'on clique dessus, il faut afficher downloaded et pas waiting
-
+// TODO dans la popup quand le fichier existe déjà, donner trois choix: annuler, continuer, recommencer
+// TODO sauver plus de métadata
+// TODO renommer et nettoyer rtmpthread.h/cpp
+// TODO bloquer les pages quand un téléchargement est en court ou mieux gérer les changements de page
+// TODO quand on est à la page 2 on ne peut pas revenir en arrière
 void MainWindow::allFilmDownloadFinished()
 {
     ui->progressBar->setVisible(false);
