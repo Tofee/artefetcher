@@ -70,7 +70,6 @@ private slots:
         m_previouslyDownloaded = 0;
         if (m_outputFile.size() > 0){
             m_previouslyDownloaded = m_outputFile.size();
-            qDebug() << m_previouslyDownloaded;
             QByteArray rangeHeaderValue = "bytes=" + QByteArray::number( m_outputFile.size()) + "-";
             request.setRawHeader("Range", rangeHeaderValue);
         }
@@ -96,7 +95,7 @@ private slots:
     {
         m_outputFile.close();
 
-         if (m_currentDownload->error()) {
+        if (m_currentDownload->error()) {
              emit(downloadError(m_currentDownload->url().toString(), QString("Failed: %1\n").arg(m_currentDownload->errorString())));
          } else {
              emit(downloadFinished(m_currentDownload->url().toString()));
@@ -107,7 +106,15 @@ private slots:
     }
 
     void downloadReadyRead() {
-        m_outputFile.write(m_currentDownload->readAll());
+        if (m_previouslyDownloaded >= m_currentDownload->header(QNetworkRequest::ContentLengthHeader).toLongLong())
+        {
+            m_currentDownload->disconnect();// prevent any error message
+            m_currentDownload->abort();
+            emit(downloadFinished(m_currentDownload->url().toString()));
+        }
+        else {
+            m_outputFile.write(m_currentDownload->readAll());
+        }
     }
 
 

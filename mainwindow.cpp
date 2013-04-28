@@ -117,9 +117,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::streamIndexLoaded(int /*resultCount*/, int currentPage, int pageCount){
     ui->pageLabel->setText(QString("%1/%2").arg(currentPage).arg(pageCount));
-    ui->leftPageButton->setEnabled(currentPage <= 1);
+    ui->leftPageButton->setEnabled(currentPage > 1);
     ui->rightPageButton->setEnabled(currentPage < pageCount);
-
 }
 
 StreamType MainWindow::getStreamType() const
@@ -176,16 +175,17 @@ void MainWindow::createOrUpdateFirstColumn(int rowNumber)
     }
     titleTableItem = new QTableWidgetItem();
 
-    bool isDownloadRequested = film->m_hasBeenRequested;
-
     QFontMetrics metric(ui->tableWidget->font());
 
     ui->tableWidget->verticalHeader()->resizeSection(rowNumber, 3*(metric.lineSpacing()));
 
     if (film->m_isDownloading){
         titleTableItem->setIcon(QIcon(":/img/progress.png"));
-    } else if (isDownloadRequested) {
-        titleTableItem->setIcon(QIcon(":/img/clock.png"));
+    } else if (film->m_hasBeenRequested) {
+        if (film->m_isDownloaded)
+            titleTableItem->setIcon(QIcon(":/img/finished.png"));
+        else
+            titleTableItem->setIcon(QIcon(":/img/clock.png"));
     }
 
     titleTableItem->setText(film->m_title);
@@ -224,12 +224,17 @@ void MainWindow::refreshTable()
     updateCurrentDetails();
 }
 
-void MainWindow::updateCurrentDetails(){
+const QStringList& MainWindow::interestingDetails() {
     static QStringList shownMetadata;
     if (shownMetadata.isEmpty())
     {
         shownMetadata << tr("Available until") << tr("Description") << tr("First broadcast") << tr("Type") << tr("Views") << tr("Rank");
     }
+    return shownMetadata;
+}
+
+void MainWindow::updateCurrentDetails(){
+
     int rowBegin = ui->tableWidget->currentRow();
      QMap<QString, FilmDetails*> details = delegate->films();
      if (details.values().size()<=rowBegin)
@@ -242,7 +247,7 @@ void MainWindow::updateCurrentDetails(){
         /*foreach(QString key, film->m_metadata.keys()){
             prefix.append(tr("<b> %0 : </b>%1<br/>").arg(key).arg(film->m_metadata.value(key)));
         }*/
-        foreach(QString key, shownMetadata){
+        foreach(QString key, interestingDetails()){
             if (film->m_metadata.contains(key) && film->m_metadata.value(key) != "0")
                     prefix.append(tr("<b> %0 : </b>%1<br/>").arg(key).arg(film->m_metadata.value(key)));
         }
@@ -281,7 +286,10 @@ void MainWindow::updateCurrentDetails(){
      if (film->m_isDownloading)
          ui->downloadButton->setText("Downloading...");
      else if (film->m_hasBeenRequested){
-         ui->downloadButton->setText("Waiting...");
+         if (film->m_isDownloaded)
+             ui->downloadButton->setText("Downloaded");
+         else
+            ui->downloadButton->setText("Waiting...");
      }
      else
      {
@@ -292,8 +300,16 @@ void MainWindow::updateCurrentDetails(){
 }
 
 
-QString MainWindow::getFileName(const QString& targetDirectory, const QString& title)
+QString MainWindow::getFileName(const QString& targetDirectory, const QString& title, const QString& remoteFilename)
 {
+    QString extension = "flv";
+    if (remoteFilename != "")
+    {
+        QFileInfo remoteFile(remoteFilename);
+        if (remoteFile.suffix().size() == 3 || remoteFile.suffix().size() == 4)
+            extension = remoteFile.suffix();
+    }
+
     // TODO les caractères HTML sont à convertir (ex:&#39; => ')
     QString cleanedTitle(title);
     cleanedTitle.replace(QRegExp("[éèëê]"), "e");
@@ -318,23 +334,20 @@ QString MainWindow::getFileName(const QString& targetDirectory, const QString& t
             .replace("%language", language)
             .replace("%quality", getStreamType().qualityCode.toUpper());
 
-    QString filename("%1%2%3");
+    QString filename("%1%2%3.%4");
     filename = filename.arg(targetDirectory,
                             QDir::separator(),
-                            baseName);
+                            baseName, extension);
     return filename;
 }
 
 void MainWindow::downloadFilm(int currentLine, FilmDetails* film){
-        qDebug() << "BEGIN MainWindow::downloadFilm(): Add " << film->title() << " to download";
     QString workingPath(QDir::homePath().append(QDir::separator()).append("arteFetcher"));
-
-    StreamType streamType = getStreamType();
 
     if (isReadyForDownload(film))
     {
         QString titleCellText = ui->tableWidget->item(currentLine, COLUMN_FOR_TITLE)->text();
-        QString futureFileName = getFileName(workingPath, titleCellText);
+        QString futureFileName = getFileName(workingPath, titleCellText, film->m_streamUrl);
         if (QFile(futureFileName).exists()
                 && QMessageBox::question(this, "File already exists",
                                   tr("A file has already the name of the film: <%1>.\nDo you want to download it anyway?")
@@ -367,16 +380,12 @@ void MainWindow::downloadFilm(int currentLine, FilmDetails* film){
     updateCurrentDetails();
 }
 
-// TODO gérer l'extension du fichier
-// TODO quand on reprend le téléchargement sur un film, si le film était fini, il recommence
-// TODO qdebug remove
+
 // TODO trads
-// TODO quand le film est téléchargé et qu'on clique dessus, il faut afficher downloaded et pas waiting
 // TODO dans la popup quand le fichier existe déjà, donner trois choix: annuler, continuer, recommencer
-// TODO sauver plus de métadata
 // TODO renommer et nettoyer rtmpthread.h/cpp
 // TODO bloquer les pages quand un téléchargement est en court ou mieux gérer les changements de page
-// TODO quand on est à la page 2 on ne peut pas revenir en arrière
+
 void MainWindow::allFilmDownloadFinished()
 {
     ui->progressBar->setVisible(false);
@@ -410,22 +419,26 @@ void MainWindow::filmDownloaded(int filmId)
 {
 
     QTableWidgetItem* item = ui->tableWidget->item(filmId, FIRST_CHECKBOX_COLUMN_IN_TABLE);
-    //delete item;
-    //item = new QTableWidgetItem();
     item->setIcon(QIcon(":/img/finished.png"));
-    ui->tableWidget->setItem(filmId, FIRST_CHECKBOX_COLUMN_IN_TABLE, item);
     item->setFlags(item->flags()^Qt::ItemIsUserCheckable);
 
-    delegate->films().values().at(filmId)->m_isDownloading = false;
     FilmDetails * d = delegate->films().values().at(filmId);
     d->m_isDownloaded = true;
+    d->m_isDownloading = false;
 
     // Save metadata
     QFile metadataFile(QString(d->m_targetFileName).append(".info"));
     metadataFile.open(QFile::WriteOnly|QFile::Text);
     QTextStream stream (&metadataFile);
     stream<< d->m_title << "\n";
+
+    foreach (QString key,interestingDetails())
+    {
+        QString value = d->m_metadata.value(key);
+        stream << key << ": " << value << "\n";
+    }
     stream<< d->m_summary;
+
     stream.flush();
     metadataFile.close();
     QFile picture(QString(d->m_targetFileName).append(".png"));
@@ -433,6 +446,7 @@ void MainWindow::filmDownloaded(int filmId)
     QImageWriter writer(&picture, "PNG");
     writer.write(d->m_preview);
     picture.close();
+    updateCurrentDetails();
 }
 
 void MainWindow::reloadCurrentRow()
@@ -510,7 +524,7 @@ void MainWindow::cellHasBeenClicked(int row, int column)
         FilmDetails * film = delegate->films().values().value(row);
         if (film != NULL)
         {
-            QString fileName = getFileName(preferences.destinationDir(), ui->tableWidget->item(row, 0)->text());
+            QString fileName = getFileName(preferences.destinationDir(), ui->tableWidget->item(row, 0)->text(), film->m_streamUrl);
             if (film->m_isDownloaded)
                 QDesktopServices::openUrl(QUrl::fromLocalFile(fileName));
         }

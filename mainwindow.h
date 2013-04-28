@@ -43,7 +43,7 @@ protected:
      * @param streamTypeId
      * @return the filename
      */
-    QString getFileName(const QString& targetDirectory, const QString &title);
+    QString getFileName(const QString& targetDirectory, const QString &title, const QString &remoteFilename);
 private slots:
     void refreshTable();
     void updateCurrentDetails();
@@ -67,6 +67,8 @@ private slots:
     void nextPage();
     void previousPage();
     void streamIndexLoaded(int resultCount, int currentPage, int pageCount);
+
+    const QStringList& interestingDetails();
 
 private:
     void closeEvent(QCloseEvent* event);

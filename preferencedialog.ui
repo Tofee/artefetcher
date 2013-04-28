@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>456</width>
-    <height>172</height>
+    <width>457</width>
+    <height>186</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,7 +30,7 @@
    <item row="3" column="3">
     <widget class="QLabel" name="label_4">
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pattern to generate the film filenames:&lt;br/&gt;%1: video title&lt;br/&gt;%2: language code&lt;br/&gt;%3: stream type code (hd/sd...)&lt;/p&gt;&lt;p&gt;Example: [%2 %3]%1.flv&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pattern to generate the film filenames:&lt;br/&gt;%title: video title&lt;br/&gt;%language: language code&lt;br/&gt;%quality: stream type code (hd/sd...)&lt;/p&gt;&lt;p&gt;Example: '[%quality %language] %title' will create&lt;br/&gt;[HQ DE] Movie title.mp4&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </item>

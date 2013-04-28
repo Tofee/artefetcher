@@ -13,7 +13,7 @@ void Preferences::load()
     m_selectedLanguage = settings.value("stream_language", FilmDelegate::listLanguages().first()).toString();
     m_selectedQuality = settings.value("stream_quality", FilmDelegate::listQualities().first()).toString();
     // TODO "[]" are forbidden in fat32
-    m_filenamePattern = settings.value("filename_pattern", "[%language %quality] %title.flv").toString();
+    m_filenamePattern = settings.value("filename_pattern", "[%language %quality] %title").toString();
     m_destinationDir = settings.value("destination_directory", defaultWorkingPath).toString();
 }
 

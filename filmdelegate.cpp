@@ -180,7 +180,7 @@ void FilmDelegate::requestReadyToRead(QObject* object)
 
                     FilmDetails* newFilm = new FilmDetails();
                     newFilm->m_title = title;
-                    newFilm->m_url = url;
+                    newFilm->m_infoUrl = url;
 
                     addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), "airdate_long", tr("First broadcast"));
                     addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), "desc", tr("Description"));
@@ -189,7 +189,7 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                     addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), "video_channels", tr("Channels"));
                     addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), "video_rank", tr("Rank"));
 
-                    m_films.insert(newFilm->m_url, newFilm);
+                    m_films.insert(newFilm->m_infoUrl, newFilm);
                     reloadFilm(newFilm);
                 }
             }
@@ -216,7 +216,7 @@ void FilmDelegate::requestReadyToRead(QObject* object)
             regexp.indexIn(page);
             QString jsonUrl = regexp.cap(1);
 
-            downloadUrl(jsonUrl, film->m_url, MAPPER_STEP_CODE_2_XML);
+            downloadUrl(jsonUrl, film->m_infoUrl, MAPPER_STEP_CODE_2_XML);
         }
         else if (itemStep == MAPPER_STEP_CODE_2_XML)
         {
@@ -246,17 +246,16 @@ void FilmDelegate::requestReadyToRead(QObject* object)
 
 
                 if ( mymap.value("videoIsoLang").toString().left(2).toLower() == m_preferences.selectedLanguage().toLower()) {
-                    downloadUrl(mymap.value("videoStreamUrl").toString(), film->m_url, QString(MAPPER_STEP_CODE_3_RTMP));
+                    downloadUrl(mymap.value("videoStreamUrl").toString(), film->m_infoUrl, QString(MAPPER_STEP_CODE_3_RTMP));
                 }
                 else {
                     QString expLanguage = m_preferences.selectedLanguage();
                     QString externalLanguage = QString("%1_%2").arg(expLanguage.toLower(), expLanguage.toUpper());
                     QString languageUrl = mymap.value("videoSwitchLang").toMap().value(externalLanguage).toString();
                     if (!languageUrl.isEmpty())
-                        downloadUrl(languageUrl, film->m_url, QString(MAPPER_STEP_CODE_3_RTMP));
+                        downloadUrl(languageUrl, film->m_infoUrl, QString(MAPPER_STEP_CODE_3_RTMP));
                 }
 
-                //downloadUrl(mymap.value("videoSwitchLang").toMap().value("de_DE").toString(), film->m_url, QString(MAPPER_STEP_CODE_3_RTMP).append("de"));
                 if (mymap.value("videoSwitchLang").toMap().size() > 1)
                 {
                     qDebug () << "Warning, more than german and french available";
@@ -288,7 +287,7 @@ void FilmDelegate::requestReadyToRead(QObject* object)
             QString thumbnail = mymap.value("programImage").toString();
             if (!thumbnail.isEmpty())
             {
-                downloadUrl(thumbnail, film->m_url, MAPPER_STEP_CODE_4_PREVIEW);
+                downloadUrl(thumbnail, film->m_infoUrl, MAPPER_STEP_CODE_4_PREVIEW);
             }
             else
             {
@@ -312,7 +311,6 @@ void FilmDelegate::requestReadyToRead(QObject* object)
 
     reply->deleteLater();
 
-    // TODO plutot qu'utiliser des signals mapper on peut surement mettre une property (ou +) dans la reply
 }
 // TODO y'a plein de NEW sur les my pair, et ils ne sont pas forcément delete
 
@@ -348,9 +346,9 @@ StreamType FilmDelegate::getStreamTypeByLanguageAndQuality(QString languageCode,
 
 void FilmDelegate::reloadFilm(FilmDetails* film)
 {
-    QString videoPageUrl(film->m_url);
+    QString videoPageUrl(film->m_infoUrl);
     // Download video web page:
-    downloadUrl(videoPageUrl, film->m_url, MAPPER_STEP_CODE_1_HTML);
+    downloadUrl(videoPageUrl, film->m_infoUrl, MAPPER_STEP_CODE_1_HTML);
 }
 
 bool FilmDelegate::addMovieFromUrl(const QString url, QString title)
@@ -365,8 +363,8 @@ bool FilmDelegate::addMovieFromUrl(const QString url, QString title)
 
     FilmDetails* newFilm = new FilmDetails();
     newFilm->m_title = title;
-    newFilm->m_url = url;
-    m_films.insert(newFilm->m_url, newFilm);
+    newFilm->m_infoUrl = url;
+    m_films.insert(newFilm->m_infoUrl, newFilm);
     reloadFilm(newFilm);
     return true;
 }

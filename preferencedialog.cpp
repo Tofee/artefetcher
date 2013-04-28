@@ -10,6 +10,9 @@ PreferenceDialog::PreferenceDialog(QWidget *parent,
 {
     ui->setupUi(this);
 
+    ui->destinationDirectoryLineEdit->setText(m_preferences.m_destinationDir);
+    ui->filenamePatternLineEdit->setText(m_preferences.m_filenamePattern);
+
     connect(ui->browsePushButton, SIGNAL(clicked()),
             this, SLOT(browse()));
 }

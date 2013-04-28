@@ -42,29 +42,18 @@ public:
 };
 //Q_DECLARE_METATYPE ( StreamType );
 
-class Stream
-{
-    //TODO mettre tout en privé sauf les accesseurs
-public:
-    bool use;
-    bool downloaded;
-    QString m_rtmpStreamUrl;
-    // Full path of the future downloaded film.
-    QString m_targetFileName;
-};
+
 
 class FilmDetails {
     //TODO mettre tout en privé sauf les accesseurs
 public:
     QString m_title;
-    QString m_flashPlayerUrl;
     QImage m_preview;
     QString m_summary;
     // TODO last availability date
     double m_rating;
     uint m_numberOfViews;
-    QString m_url;
-    QString m_removeUrl;
+    QString m_infoUrl;
     //QStringList m_countries;
     int m_durationInMinutes;
     int m_year;
