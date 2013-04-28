@@ -20,7 +20,7 @@
 #define MAPPER_STEP_CODE_2_XML "XML"
 #define MAPPER_STEP_CODE_3_RTMP "RTMP_XML_"
 #define MAPPER_STEP_CODE_4_PREVIEW "PREVIEW"
-#define MAPPER_STEP_CODE_5_REMOVE "REMOVE"
+#define RESULT_PER_PAGE 15
 
 QList<QString> FilmDelegate::listLanguages()
 {
@@ -72,73 +72,31 @@ FilmDelegate::~FilmDelegate()
     }
 }
 
-void FilmDelegate::loadPlayList()
+void FilmDelegate::loadPlayList(QString url)
 {
-    FilmDetails* film;
-    foreach(film, m_films)
+    m_currentPage = 1;
+    m_lastPlaylistUrl = url;
+    commonLoadPlaylist();
+}
+
+
+void FilmDelegate::loadNextPage(){
+    ++m_currentPage;
+    commonLoadPlaylist();
+}
+void FilmDelegate::loadPreviousPage(){
+    --m_currentPage;
+    commonLoadPlaylist();
+}
+
+void FilmDelegate::commonLoadPlaylist(){
+    QMap<QString, FilmDetails*> oldFilms(m_films);
+    m_films.clear();
+    downloadUrl(m_lastPlaylistUrl, QString(), MAPPER_STEP_CATALOG);
+    foreach(FilmDetails* film, oldFilms)
     {
         delete film;
     }
-    m_films.clear();
-    downloadUrl(ARTE_PLAYLIST_URL, "", "");
-}
-
-void FilmDelegate::playListLoaded(const QString page)
-{
-
-    static int beginTagLength = QString(VIDEO_LINE_HTML_BEGIN).length();
-
-    int currentPos=0;
-    while (currentPos >=0 && currentPos < page.length())
-    {
-        int beginIndex = page.indexOf(VIDEO_LINE_HTML_BEGIN, currentPos);
-        int endIndex = page.indexOf("</a>", beginIndex);
-
-        if (beginIndex>0 && endIndex >0)
-        {
-            const QString line = page.mid(beginIndex + beginTagLength, endIndex - beginIndex - beginTagLength);
-            const QStringList lineInfos = line.split("\">");
-            if (lineInfos.size()==2)
-            {
-                FilmDetails* details = new FilmDetails();
-                details->m_title = lineInfos.at(1);
-                details->m_url = lineInfos.at(0);
-                //TODO vérifier qu'après un retrait de film de la playlist, un reload playlist n'invente pas des films
-                qDebug() << lineInfos.at(1);
-                QString titleInUrl = details->m_url.left(details->m_url.indexOf(QRegExp("-")));
-                QString regExpText("/fr/do_removeFromPlaylist/videos/playlistplaylist/%1[^']+");
-                regExpText = regExpText.arg(titleInUrl);
-                QRegExp removeRegExp(regExpText);
-                removeRegExp.indexIn(page);
-                details->m_removeUrl = removeRegExp.cap(0);
-                m_films.insert(details->m_url, details);
-            }
-
-            currentPos = endIndex + 1;
-
-        }
-        else
-        {
-            break;
-        }
-    }
-
-    emit playListHasBeenUpdated();
-
-    // Now we load each film in details
-    FilmDetails* film;
-    foreach(film, m_films.values())
-    {
-
-        QString videoPageUrl(film->m_url);
-        videoPageUrl.prepend("http://videos.arte.tv/fr/videos/");
-        // Download video web page:
-        downloadUrl(videoPageUrl, film->m_url, MAPPER_STEP_CODE_1_HTML);
-    }
-}
-
-void FilmDelegate::loadAllCatalog() {
-    downloadUrl("http://www.arte.tv/guide/fr/plus7/all.json", QString(), MAPPER_STEP_CATALOG);
 }
 
 QString extractUniqueResult(const QString& document, const QString& xpath)
@@ -202,7 +160,9 @@ void FilmDelegate::requestReadyToRead(QObject* object)
             int i = 0;
             foreach(QVariant catalogItem, json.toVariant().toMap().value("videos").toList())
             {
-                if (++i <= 20) {
+                ++i;
+                if (i > RESULT_PER_PAGE * (m_currentPage - 1) &&
+                        i <= RESULT_PER_PAGE * m_currentPage) {
                     QString url = catalogItem.toMap().value("url").toString();
                     url.prepend("http://www.arte.tv");
                     QString title = catalogItem.toMap().value("title").toString();
@@ -210,12 +170,11 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                 }
             }
 
-            qDebug() << "Nombre total de résultats : " << i;
-        }
-        else {
-            // this page is the playlist
-            const QString page(QString::fromUtf8(reply->readAll()));
-            playListLoaded(page);
+            if (i % RESULT_PER_PAGE== 0)
+                emit(streamIndexLoaded(i, m_currentPage, i/ RESULT_PER_PAGE));
+            else
+                emit(streamIndexLoaded(i, m_currentPage, (i / RESULT_PER_PAGE) + 1));
+
         }
     }
     else
@@ -296,17 +255,13 @@ void FilmDelegate::requestReadyToRead(QObject* object)
             film->m_preview.load(reply,"jpg");
             if (! film->m_preview.isNull())
             {
-                film->m_preview = film->m_preview; //.scaled(160,90);
+                film->m_preview = film->m_preview.scaled(600,340);
                 emit playListHasBeenUpdated();
             }
             else
             {
                 emit(errorOccured(getFilmId(film),tr("Cannot load the preview image")));
             }
-        }
-        else if (itemStep == MAPPER_STEP_CODE_5_REMOVE)
-        {
-            const QString page(QString::fromUtf8(reply->readAll()));
         }
     }
 
@@ -365,16 +320,8 @@ bool FilmDelegate::addMovieFromUrl(const QString url, QString title)
 
     FilmDetails* newFilm = new FilmDetails();
     newFilm->m_title = title;
-    qDebug() << title;
     newFilm->m_url = url;
     m_films.insert(newFilm->m_url, newFilm);
     reloadFilm(newFilm);
     return true;
-}
-
-void FilmDelegate::removeFilm(FilmDetails *film)
-{
-    QString urlString("http://videos.arte.tv");
-    urlString.append(film->m_removeUrl);
-    downloadUrl(urlString, film->m_url, MAPPER_STEP_CODE_5_REMOVE);
 }

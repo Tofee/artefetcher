@@ -45,6 +45,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->qualityComboBox->addItems(FilmDelegate::listQualities());
     ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findText(preferences.selectedQuality())); // TODO tooltip pour les qualités, c'est pas du tout intuitif
 
+    ui->streamComboBox->addItem("Popular", "http://www.arte.tv/guide/fr/plus7/popular.json");
+    ui->streamComboBox->addItem("Arte likes", "http://www.arte.tv/guide/fr/plus7/recommended.json");
+    ui->streamComboBox->addItem("Last chance", "http://www.arte.tv/guide/fr/plus7/last_chance.json");
+    ui->streamComboBox->addItem("All", "http://www.arte.tv/guide/fr/plus7/all.json");
+
     connect(ui->tableWidget->horizontalHeader(), SIGNAL(sectionClicked(int)),
             SLOT(changeColumnChecking(int)));
 
@@ -68,8 +73,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->tableWidget, SIGNAL(cellClicked(int,int)),
             SLOT(cellHasBeenClicked(int, int)));
 
-    connect(ui->allVideosButton, SIGNAL(clicked()),
-            delegate, SLOT(loadAllCatalog()));
+    connect(ui->streamComboBox, SIGNAL(currentIndexChanged(int)),
+            this, SLOT(clearAndLoadTable()));
 
     connect(ui->languageComboBox, SIGNAL(currentIndexChanged(int)),
             SLOT(languageChanged()));
@@ -87,12 +92,26 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(thread, SIGNAL(downloadFinished(int,StreamType)),
             this, SLOT(filmDownloaded(int,StreamType)));
 
-    //connect(ui->tableWidget, SIGNAL(itemPressed(QTableWidgetItem*)), SLOT(tableItemPressed(QTableWidgetItem*)));
-    //connect(ui->tableWidget, SIGNAL(itemClicked(QTableWidgetItem*)), SLOT(tableItemClicked(QTableWidgetItem*)));
     connect(ui->downloadButton, SIGNAL(clicked()), SLOT(downloadButtonClicked()));
+
+    connect(delegate, SIGNAL(streamIndexLoaded(int,int,int)),
+            SLOT(streamIndexLoaded(int,int,int)));
+
+    connect(ui->rightPageButton, SIGNAL(clicked()),
+            this, SLOT(nextPage()));
+
+    connect(ui->leftPageButton, SIGNAL(clicked()),
+            this, SLOT(previousPage()));
+
+    clearAndLoadTable();
 }
 
+void MainWindow::streamIndexLoaded(int resultCount, int currentPage, int pageCount){
+    ui->pageLabel->setText(QString("%1/%2").arg(currentPage).arg(pageCount));
+    ui->leftPageButton->setEnabled(currentPage <= 1);
+    ui->rightPageButton->setEnabled(currentPage < pageCount);
 
+}
 
 StreamType MainWindow::getStreamType() const
 {
@@ -145,6 +164,22 @@ void MainWindow::languageChanged(){
 void MainWindow::qualityChanged()
 {
     preferences.m_selectedQuality = ui->qualityComboBox->currentText();
+}
+
+void MainWindow::clearAndLoadTable()
+{
+    QString url = ui->streamComboBox->itemData(ui->streamComboBox->currentIndex()).toString();
+    delegate->loadPlayList(url);
+}
+
+void MainWindow::nextPage()
+{
+    delegate->loadNextPage();
+}
+
+void MainWindow::previousPage()
+{
+    delegate->loadPreviousPage();
 }
 
 void MainWindow::createOrUpdateFirstColumn(int rowNumber)
@@ -216,6 +251,8 @@ void MainWindow::refreshTable()
 void MainWindow::updateCurrentDetails(){
     int rowBegin = ui->tableWidget->currentRow();
      QMap<QString, FilmDetails*> details = delegate->films();
+     if (details.values().size()<=rowBegin)
+         return;
      FilmDetails*  film = details.values().at(rowBegin);
      if (rowBegin >=0 && rowBegin < ui->tableWidget->rowCount())
      {
@@ -262,7 +299,6 @@ void MainWindow::updateCurrentDetails(){
          ui->downloadButton->setText("Download");
          isDownloadButtonClickable = isReadyForDownload(film);
      }
-     qDebug() << "clickable: " << isDownloadButtonClickable;
      ui->downloadButton->setEnabled(isDownloadButtonClickable);
 }
 
@@ -495,35 +531,3 @@ void MainWindow::downloadButtonClicked()
     FilmDetails *details = delegate->films().values().value(row);
     downloadFilm(row, details);
 }
-
-//// Don't change the code of these methods, it's just suppose to spy the item
-//// check state change of the first column
-//void  MainWindow::tableItemPressed(QTableWidgetItem * item){
-//    // member variable used to keep track of the check state for a
-//    // table widget item currently being pressed
-//    if (item->column() == FIRST_CHECKBOX_COLUMN_IN_TABLE) {
-//        m_pressedItemCheckState = item->checkState();
-//        m_pressedItemRow = item->row();
-//    }
-//}
-//// Don't change the code of these methods, it's just suppose to spy the item
-//// check state change of the first column
-//void  MainWindow::tableItemClicked(QTableWidgetItem * item){
-//    if (item->column() == FIRST_CHECKBOX_COLUMN_IN_TABLE
-//            && item->row() == m_pressedItemRow
-//            && item->checkState() != m_pressedItemCheckState)
-//    {
-//        checkStateChanged(item);
-//    }
-//}
-
-//// Here you can change the behaviour
-//void  MainWindow::checkStateChanged(QTableWidgetItem * item){
-//    int row = item->row();
-//    FilmDetails *details = delegate->films().values().value(row);
-//    if (item->checkState()== Qt::Checked) {
-//        //downloadFilm(row, details);
-//    } else if (item->checkState() == Qt::Unchecked){
-
-//    }
-//}

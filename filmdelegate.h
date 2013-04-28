@@ -33,7 +33,7 @@ public:
      * Call this method to launch the request.
      * playlistLoaded() will be called when the page is ready.
      */
-    void loadPlayList();
+    void loadPlayList(QString url);
 
     const QMap<QString, FilmDetails*> films() const { return m_films; }
 
@@ -46,16 +46,19 @@ public:
 
     void reloadFilm(FilmDetails* film);
     bool addMovieFromUrl(const QString url, QString title = QString());
-    void removeFilm(FilmDetails* film);
 
     static QList<QString> listLanguages();
     static QList<QString> listQualities();
+
+    void loadNextPage();
+    void loadPreviousPage();
 signals:
     void playListHasBeenUpdated();
     void errorOccured(int filmId, QString errorMessage);
+    void streamIndexLoaded(int resultCount, int currentPage, int pageCount);
 private slots:
     void requestReadyToRead(QObject*);
-    void loadAllCatalog();
+
 private:
 
     void playListLoaded(const QString page);
@@ -82,11 +85,13 @@ private:
     QString getStreamUrlFromResponse(const QString &page, const QString &quality);
 
     int getFilmId(FilmDetails*film) const;
-
+    void commonLoadPlaylist();
 
     QMap<QString, FilmDetails*> m_films;
     QNetworkAccessManager* m_manager;
     QSignalMapper* m_signalMapper;
+    int m_currentPage;
+    QString m_lastPlaylistUrl;
 
 
 };

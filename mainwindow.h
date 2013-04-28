@@ -60,13 +60,13 @@ private slots:
 
     void languageChanged();
     void qualityChanged();
+    void clearAndLoadTable();
 
-    //void tableItemPressed(QTableWidgetItem * item);
-    //void tableItemClicked(QTableWidgetItem * item);
-    //void checkStateChanged(QTableWidgetItem * item);
     void downloadButtonClicked();
-    //Qt::CheckState m_pressedItemCheckState;
-    //int m_pressedItemRow;
+
+    void nextPage();
+    void previousPage();
+    void streamIndexLoaded(int resultCount, int currentPage, int pageCount);
 
 private:
     void closeEvent(QCloseEvent* event);
