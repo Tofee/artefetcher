@@ -168,7 +168,7 @@
     <message>
         <location filename="mainwindow.ui" line="158"/>
         <source>&gt;</source>
-        <translation>&lt;</translation>
+        <translation>&gt;</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="165"/>
@@ -290,7 +290,8 @@ Check: &lt;%1&gt;</source>
         <location filename="mainwindow.cpp" line="408"/>
         <source>Downloading %1
 Speed %2 kB/s  -  Remaining: %3</source>
-        <translation>Unterladen: %1\n%2 kB/s  -  Übrig: %3</translation>
+        <translation>Unterladen: %1
+%2 kB/s  -  Übrig: %3</translation>
     </message>
     <message>
         <location filename="mainwindow.cpp" line="412"/>
