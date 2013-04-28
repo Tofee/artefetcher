@@ -135,7 +135,7 @@ int FilmDelegate::getFilmId(FilmDetails * film) const
     return m_films.values().indexOf(film);
 }
 
-void addMetadataIfNotEmpty(FilmDetails* film, QVariantMap inputMap, QString fieldName, QString internalFieldName)
+void addMetadataIfNotEmpty(FilmDetails* film, QVariantMap inputMap, QString fieldName, MetaType internalFieldName)
 {
     if (!inputMap.value(fieldName).isValid())
         return;
@@ -182,12 +182,12 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                     newFilm->m_title = title;
                     newFilm->m_infoUrl = url;
 
-                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), "airdate_long", tr("First broadcast"));
-                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), "desc", tr("Description"));
-                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), "video_rights_until", tr("Available until"));
-                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), "video_views", tr("Views"));
-                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), "video_channels", tr("Channels"));
-                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), "video_rank", tr("Rank"));
+                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), "airdate_long", First_broadcast);
+                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), "desc", Description);
+                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), "video_rights_until", Available_until);
+                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), "video_views", Views);
+                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), "video_channels", Channels);
+                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), "video_rank", Rank);
 
                     m_films.insert(newFilm->m_infoUrl, newFilm);
                     reloadFilm(newFilm);
@@ -240,9 +240,9 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                 film->m_durationInMinutes = mymap.value("videoDurationSeconds").toInt() /60;
                 film->m_summary = mymap.value("VDE").toString();
 
-                addMetadataIfNotEmpty(film, mymap, "VCG", tr("Type"));
-                addMetadataIfNotEmpty(film, mymap, "VDA", tr("First Broadcast (raw)")); // 25/04/2013 20:50:30 +0200
-                addMetadataIfNotEmpty(film, mymap, "VRU", tr("Available until (raw)")); // 02/05/2013 20:20:30 +0200
+                addMetadataIfNotEmpty(film, mymap, "VCG", Type);
+                addMetadataIfNotEmpty(film, mymap, "VDA", RAW_First_Broadcast); // 25/04/2013 20:50:30 +0200
+                addMetadataIfNotEmpty(film, mymap, "VRU", RAW_Available_until); // 02/05/2013 20:20:30 +0200
 
 
                 if ( mymap.value("videoIsoLang").toString().left(2).toLower() == m_preferences.selectedLanguage().toLower()) {

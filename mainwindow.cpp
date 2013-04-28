@@ -224,11 +224,11 @@ void MainWindow::refreshTable()
     updateCurrentDetails();
 }
 
-const QStringList& MainWindow::interestingDetails() {
-    static QStringList shownMetadata;
+const QList<MetaType>& MainWindow::interestingDetails() {
+    static QList<MetaType> shownMetadata;
     if (shownMetadata.isEmpty())
     {
-        shownMetadata << tr("Available until") << tr("Description") << tr("First broadcast") << tr("Type") << tr("Views") << tr("Rank");
+        shownMetadata << Available_until << Description << First_broadcast << Type << Views << Rank;
     }
     return shownMetadata;
 }
@@ -247,9 +247,9 @@ void MainWindow::updateCurrentDetails(){
         /*foreach(QString key, film->m_metadata.keys()){
             prefix.append(tr("<b> %0 : </b>%1<br/>").arg(key).arg(film->m_metadata.value(key)));
         }*/
-        foreach(QString key, interestingDetails()){
+        foreach(MetaType key, interestingDetails()){
             if (film->m_metadata.contains(key) && film->m_metadata.value(key) != "0")
-                    prefix.append(tr("<b> %0 : </b>%1<br/>").arg(key).arg(film->m_metadata.value(key)));
+                    prefix.append(tr("<b> %0 : </b>%1<br/>").arg(FilmDetails::enum2Str(key)).arg(film->m_metadata.value(key)));
         }
 
         prefix.append("<br/>");
@@ -268,7 +268,7 @@ void MainWindow::updateCurrentDetails(){
         ui->detailsGroupBox->setTitle(film->m_title);
         {
             ui->countryYearDurationlabel->setText(tr("Broadcasted %2 (%3min)")
-                                                  .arg(film->m_metadata.value("First broadcast"),
+                                                  .arg(film->m_metadata.value(First_broadcast),
                                                        QString::number(film->m_durationInMinutes)));
         }
 
@@ -381,7 +381,6 @@ void MainWindow::downloadFilm(int currentLine, FilmDetails* film){
 }
 
 
-// TODO trads
 // TODO dans la popup quand le fichier existe déjà, donner trois choix: annuler, continuer, recommencer
 // TODO bloquer les pages quand un téléchargement est en court ou mieux gérer les changements de page
 
@@ -431,10 +430,10 @@ void MainWindow::filmDownloaded(int filmId)
     QTextStream stream (&metadataFile);
     stream<< d->m_title << "\n";
 
-    foreach (QString key,interestingDetails())
+    foreach (MetaType key,interestingDetails())
     {
         QString value = d->m_metadata.value(key);
-        stream << key << ": " << value << "\n";
+        stream << FilmDetails::enum2Str(key) << ": " << value << "\n";
     }
     stream<< d->m_summary;
 
@@ -461,7 +460,6 @@ void MainWindow::reloadCurrentRow()
 
 void MainWindow::addFilmManuallyFromUrl()
 {
-    // TODO add drag&drop
     QString url = QInputDialog::getText(this, tr("Add a new Film from URL"),tr("Enter the URL of your arte film page"));
     delegate->addMovieFromUrl(url);
 }

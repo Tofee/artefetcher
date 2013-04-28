@@ -4,7 +4,7 @@
 #include <QImage>
 #include <QMap>
 #include <QStringList>
-
+#include <QApplication>
 struct StreamType {
 
 public:
@@ -40,30 +40,37 @@ public:
     QString languageCode;
     QString qualityCode;
 };
-//Q_DECLARE_METATYPE ( StreamType );
 
+enum MetaType {
+    First_broadcast,
+    Description,
+    Available_until,
+    Views,
+    Channels,
+    Rank,
+    Type,
+    RAW_First_Broadcast,
+    RAW_Available_until
+};
 
 
 class FilmDetails {
+
     //TODO mettre tout en privé sauf les accesseurs
 public:
     QString m_title;
     QImage m_preview;
     QString m_summary;
-    // TODO last availability date
+
     double m_rating;
     uint m_numberOfViews;
     QString m_infoUrl;
-    //QStringList m_countries;
+
     int m_durationInMinutes;
     int m_year;
 
-    QMap<QString, QString> m_metadata;
+    QMap<MetaType, QString> m_metadata;
 
-
-    //QMap<StreamType, Stream> m_streamsByType;
-
-//public:
     bool m_hasBeenRequested;
     bool m_isDownloaded;
     bool m_isDownloading;
@@ -73,6 +80,25 @@ public:
 
 
     QString title() const { return m_title; }
+    static const QString enum2Str(MetaType t){
+        static const char* enum2Str[] = {
+             QT_TRANSLATE_NOOP("FilmDetails","First broadcast"),
+             QT_TRANSLATE_NOOP("FilmDetails","Description"),
+             QT_TRANSLATE_NOOP("FilmDetails","Available until"),
+             QT_TRANSLATE_NOOP("FilmDetails","Views"),
+             QT_TRANSLATE_NOOP("FilmDetails","Channels"),
+             QT_TRANSLATE_NOOP("FilmDetails","Rank"),
+             QT_TRANSLATE_NOOP("FilmDetails","Type"),
+             QT_TRANSLATE_NOOP("FilmDetails","RAW First Broadcast"),
+             QT_TRANSLATE_NOOP("FilmDetails","RAW Available until")
+        };
+
+
+        return QApplication::translate("FilmDetails",
+                                       enum2Str[t]);
+    }
 };
+
+
 
 #endif // FILMDETAILS_H

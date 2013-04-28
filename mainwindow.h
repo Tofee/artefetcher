@@ -68,7 +68,7 @@ private slots:
     void previousPage();
     void streamIndexLoaded(int resultCount, int currentPage, int pageCount);
 
-    const QStringList& interestingDetails();
+    const QList<MetaType> &interestingDetails();
 
 private:
     void closeEvent(QCloseEvent* event);
