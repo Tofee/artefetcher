@@ -15,16 +15,18 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     filmdelegate.cpp \
-    rtmpthread.cpp \
     preferencedialog.cpp \
-    preferences.cpp
+    preferences.cpp \
+    downloadManager.cpp \
+    queuedownloader.cpp
 
 HEADERS  += mainwindow.h \
     FilmDetails.h \
     filmdelegate.h \
-    rtmpthread.h \
     preferencedialog.h \
-    preferences.h
+    preferences.h \
+    downloadManager.h \
+    queuedownloader.h
 TRANSLATIONS    = arteFetcher_de.ts \
                   arteFetcher_fr.ts
 

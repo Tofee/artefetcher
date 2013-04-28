@@ -10,7 +10,7 @@
 #include <preferencedialog.h>
 #include <filmdelegate.h>
 #include <FilmDetails.h>
-#include "./rtmpthread.h"
+#include <downloadManager.h>
 
 
 //#define COLUMN_FOR_PAGE 1
@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     manager(new QNetworkAccessManager(this)),
-        thread (new RTMPThread(checkedFilms, this))
+        thread (new DownloadManager(checkedFilms, this))
 {
     preferences.load();
 
@@ -383,7 +383,6 @@ void MainWindow::downloadFilm(int currentLine, FilmDetails* film){
 
 // TODO trads
 // TODO dans la popup quand le fichier existe déjà, donner trois choix: annuler, continuer, recommencer
-// TODO renommer et nettoyer rtmpthread.h/cpp
 // TODO bloquer les pages quand un téléchargement est en court ou mieux gérer les changements de page
 
 void MainWindow::allFilmDownloadFinished()

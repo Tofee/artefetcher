@@ -14,7 +14,7 @@ class QNetworkReply;
 class QNetworkAccessManager;
 class FilmDelegate;
 class QTableWidgetItem;
-class RTMPThread;
+class DownloadManager;
 
 namespace Ui {
 class MainWindow;
@@ -86,7 +86,7 @@ private:
 
     // 1) Filter the selected films
     QMap<int, FilmDetails> checkedFilms;
-    RTMPThread* thread;
+    DownloadManager* thread;
 };
 
 #endif // MAINWINDOW_H
