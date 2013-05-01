@@ -50,12 +50,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->languageComboBox->addItems(FilmDelegate::listLanguages());
     ui->languageComboBox->setCurrentIndex(ui->languageComboBox->findText(preferences.selectedLanguage()));
     ui->qualityComboBox->addItems(FilmDelegate::listQualities());
-    ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findText(preferences.selectedQuality())); // TODO tooltip pour les qualités, c'est pas du tout intuitif
+    ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findText(preferences.selectedQuality()));
 
-    ui->streamComboBox->addItem("Popular", "http://www.arte.tv/guide/fr/plus7/popular.json");
-    ui->streamComboBox->addItem("Arte likes", "http://www.arte.tv/guide/fr/plus7/recommended.json");
-    ui->streamComboBox->addItem("Last chance", "http://www.arte.tv/guide/fr/plus7/last_chance.json");
-    ui->streamComboBox->addItem("All", "http://www.arte.tv/guide/fr/plus7/all.json");
+    ui->streamComboBox->addItem("Sélection Arte", "http://www.arte.tv/guide/fr/plus7/selection.json");
+    ui->streamComboBox->addItem("Plus récentes", "http://www.arte.tv/guide/fr/plus7/plus_recentes.json");
+    ui->streamComboBox->addItem("Plus vues", "http://www.arte.tv/guide/fr/plus7/plus_vues.json");
+    ui->streamComboBox->addItem("Dernière chance", "http://www.arte.tv/guide/fr/plus7/derniere_chance.json");
+    ui->streamComboBox->addItem("Tout", "http://www.arte.tv/guide/fr/plus7.json");
 
     ui->previewLabel->setMaximumSize(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT);
     ui->previewLabel->setMinimumSize(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT);
@@ -164,7 +165,7 @@ void MainWindow::previousPage()
 {
     delegate->loadPreviousPage();
 }
-
+// TODO si une fois que toute la liste des films est chargée on ajoute des films dans la liste d'attente, l'icône de l'horloge ne s'affiche pas...
 void MainWindow::createOrUpdateFirstColumn(int rowNumber)
 {
     FilmDetails* film = delegate->films().values().at(rowNumber);
@@ -349,40 +350,38 @@ void MainWindow::downloadFilm(int currentLine, FilmDetails* film){
         QString titleCellText = ui->tableWidget->item(currentLine, COLUMN_FOR_TITLE)->text();
         QString futureFileName = getFileName(workingPath, titleCellText, film->m_streamUrl);
         if (QFile(futureFileName).exists()
-                && QMessageBox::question(this, "File already exists",
-                                  tr("A file has already the name of the film: <%1>.\nDo you want to download it anyway?")
+                && QMessageBox::question(this, tr("File already exists"),
+                                  tr("A file has already the name of the film: <%1>.\nYou can either continue the download (already fetched data will be kept) or cancel.\nDo you want to continue the download?")
                                          .arg(titleCellText),
                                   QMessageBox::Yes,
                                   QMessageBox::No)
                     == QMessageBox::No)
         {
-            ui->tableWidget->item(currentLine, FIRST_CHECKBOX_COLUMN_IN_TABLE)->setCheckState(Qt::Unchecked);
             film->m_hasBeenRequested = false;
-            return;
         }
         else
         {
             film->m_hasBeenRequested = true;
             film->m_targetFileName = futureFileName;
+            // 3) Check the destination directory
+            QDir workingDir(workingPath);
+            if (!workingDir.exists() && ! workingDir.mkdir(workingPath))
+            {
+                statusBar()->showMessage(tr("Cannot create the working directory %1").arg(workingPath));
+                return;
+            }
+
+            checkedFilms.insert(currentLine, *film);
+            thread->addFilmToDownloadQueue(currentLine, *film);
         }
     }
-
-    // 3) Check the destination directory
-    QDir workingDir(workingPath);
-    if (!workingDir.exists() && ! workingDir.mkdir(workingPath))
-    {
-        statusBar()->showMessage(tr("Cannot create the working directory %1").arg(workingPath));
-        return;
-    }
-
-    checkedFilms.insert(currentLine, *film);
-    thread->addFilmToDownloadQueue(currentLine, *film);
     updateCurrentDetails();
 }
 
 
 // TODO dans la popup quand le fichier existe déjà, donner trois choix: annuler, continuer, recommencer
 // TODO bloquer les pages quand un téléchargement est en court ou mieux gérer les changements de page
+// TODO Segfault quand on change de page alors qu'un téléchargement est en cours
 
 void MainWindow::allFilmDownloadFinished()
 {
