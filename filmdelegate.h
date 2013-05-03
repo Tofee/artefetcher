@@ -77,6 +77,13 @@ public:
      * @return  the line in the view containing this film (of NULL if not found)
      */
     FilmDetails* findFilmByUrl(QString filmUrl);
+
+
+    void addUrlToDownloadList(QString url)
+    {
+        m_currentDownloads << url;
+    }
+
 signals:
     void playListHasBeenUpdated();
     void errorOccured(QString filmUrl, QString errorMessage);
@@ -113,8 +120,10 @@ private:
     int getFilmId(FilmDetails*film) const;
     void commonLoadPlaylist();
 
+
     // List of the film description paged shown in the UI
     QList<QString> m_visibleFilms;
+    QList<QString> m_currentDownloads;
 
     // Indexed by the url of the film description page
     QMap<QString, FilmDetails*> m_films;

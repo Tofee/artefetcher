@@ -47,7 +47,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->tableWidget->horizontalHeader()->resizeSection(COLUMN_FOR_DURATION, metric.boundingRect("999 min.").width());
     ui->tableWidget->horizontalHeader()->resizeSection(COLUMN_FOR_PREVIEW, 110);
-    ui->tableWidget->horizontalHeader()->resizeSection(COLUMN_FOR_TITLE, metric.boundingRect("Sample of a fitting title. Great!").width());
+    ui->tableWidget->horizontalHeader()->resizeSection(COLUMN_FOR_TITLE, metric.boundingRect("Sample of a fitting title").width());
 
     ui->progressBar->setMaximum(100);
 
@@ -61,6 +61,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->streamComboBox->addItem("Plus vues", "http://www.arte.tv/guide/fr/plus7/plus_vues.json");
     ui->streamComboBox->addItem("Dernière chance", "http://www.arte.tv/guide/fr/plus7/derniere_chance.json");
     ui->streamComboBox->addItem("Tout", "http://www.arte.tv/guide/fr/plus7.json");
+    ui->streamComboBox->addItem(tr("Downloads"), "about:downloads");
 
     ui->previewLabel->setMaximumSize(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT);
     ui->previewLabel->setMinimumSize(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT);
@@ -208,7 +209,6 @@ void MainWindow::refreshTable()
     foreach (film, details)
     {
         createOrUpdateFirstColumn(rowNumber);
-        qDebug() << " *** ROW ***" << rowNumber;
         if (film->m_durationInMinutes > 0)
         {
             QTableWidgetItem* item = new QTableWidgetItem(QString::number(film->m_durationInMinutes));
@@ -236,6 +236,7 @@ void MainWindow::refreshTable()
     }
 
     updateCurrentDetails();
+
 }
 
 const QList<MetaType>& MainWindow::interestingDetails() {
@@ -385,6 +386,7 @@ void MainWindow::downloadFilm(int currentLine, FilmDetails* film){
                 return;
             }
 
+            delegate->addUrlToDownloadList(film->m_infoUrl); // TODO c'est trop trop moche de faire ça. Design à revoir
             thread->addFilmToDownloadQueue(film->m_infoUrl, *film);
         }
     }

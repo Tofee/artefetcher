@@ -74,6 +74,13 @@ FilmDelegate::~FilmDelegate()
 
 void FilmDelegate::loadPlayList(QString url)
 {
+    if (url == "about:downloads")
+    {
+        m_visibleFilms.clear();
+        m_visibleFilms << m_currentDownloads;
+        emit(playListHasBeenUpdated());
+        return;
+    }
     m_currentPage = 1;
     m_lastPlaylistUrl = url;
     commonLoadPlaylist();
