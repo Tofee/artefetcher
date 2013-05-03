@@ -14,15 +14,16 @@
 
 
 //#define COLUMN_FOR_PAGE 1
-#define COLUMN_FOR_TITLE 0
-#define COLUMN_FOR_DURATION 1
-#define FIRST_CHECKBOX_COLUMN_IN_TABLE 0
+#define COLUMN_FOR_TITLE 1
+#define COLUMN_FOR_DURATION 2
+//#define FIRST_CHECKBOX_COLUMN_IN_TABLE 1
+#define COLUMN_FOR_PREVIEW 0
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     manager(new QNetworkAccessManager(this)),
-        thread (new DownloadManager(checkedFilms, this))
+        thread (new DownloadManager(this))
 {
     preferences.load();
 
@@ -31,9 +32,11 @@ MainWindow::MainWindow(QWidget *parent) :
     delegate = new FilmDelegate(manager, preferences);
 
     QStringList header;
-    header << tr("Title")
-           //<< tr("Rating") << tr("Views")
-           << tr("Duration");
+    header
+           << "" // Preview
+           << tr("Title")
+           << tr("Duration")
+    ;
 
     ui->tableWidget->setColumnCount(header.size());
     ui->tableWidget->setHorizontalHeaderLabels(header);
@@ -43,7 +46,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QFontMetrics metric(ui->tableWidget->font());
 
     ui->tableWidget->horizontalHeader()->resizeSection(COLUMN_FOR_DURATION, metric.boundingRect("999 min.").width());
-            ui->tableWidget->horizontalHeader()->resizeSection(COLUMN_FOR_TITLE, metric.boundingRect("Sample of a fitting title. Great!").width());
+    ui->tableWidget->horizontalHeader()->resizeSection(COLUMN_FOR_PREVIEW, 110);
+    ui->tableWidget->horizontalHeader()->resizeSection(COLUMN_FOR_TITLE, metric.boundingRect("Sample of a fitting title. Great!").width());
 
     ui->progressBar->setMaximum(100);
 
@@ -65,8 +69,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(delegate, SIGNAL(playListHasBeenUpdated()),
             SLOT(refreshTable()));
-    connect(delegate, SIGNAL(errorOccured(int,QString)),
-            SLOT(errorOccured(int,QString)));
+    connect(delegate, SIGNAL(errorOccured(QString,QString)),
+            SLOT(errorOccured(QString,QString)));
 
     connect(ui->tableWidget, SIGNAL(currentCellChanged(int,int,int,int)),
             SLOT(updateCurrentDetails()));
@@ -95,12 +99,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->progressBar->setVisible(false);
 
 
-    connect(thread, SIGNAL(allFilmDownloadFinished()),
+    connect(thread, SIGNAL(signalAllFilmDownloadFinished()),
             this, SLOT(allFilmDownloadFinished()));
-    connect(thread, SIGNAL(downloadProgressed(int,double,double, double)),
-            this, SLOT(downloadProgressed(int,double,double, double)));
-    connect(thread, SIGNAL(downloadFinished(int)),
-            this, SLOT(filmDownloaded(int)));
+    connect(thread, SIGNAL(signalDownloadProgressed(QString,double,double, double)),
+            this, SLOT(downloadProgressed(QString,double,double, double)));
+    connect(thread, SIGNAL(signalDownloadFinished(QString)),
+            this, SLOT(filmDownloaded(QString)));
 
     connect(ui->downloadButton, SIGNAL(clicked()), SLOT(downloadButtonClicked()));
 
@@ -120,6 +124,7 @@ void MainWindow::streamIndexLoaded(int /*resultCount*/, int currentPage, int pag
     ui->pageLabel->setText(QString("%1/%2").arg(currentPage).arg(pageCount));
     ui->leftPageButton->setEnabled(currentPage > 1);
     ui->rightPageButton->setEnabled(currentPage < pageCount);
+    ui->tableWidget->clearContents();
 }
 
 StreamType MainWindow::getStreamType() const
@@ -168,17 +173,18 @@ void MainWindow::previousPage()
 // TODO si une fois que toute la liste des films est chargée on ajoute des films dans la liste d'attente, l'icône de l'horloge ne s'affiche pas...
 void MainWindow::createOrUpdateFirstColumn(int rowNumber)
 {
-    FilmDetails* film = delegate->films().values().at(rowNumber);
-    QTableWidgetItem* titleTableItem = ui->tableWidget->item(rowNumber, FIRST_CHECKBOX_COLUMN_IN_TABLE);
-    if (titleTableItem != NULL)
+    FilmDetails* film = delegate->visibleFilms().at(rowNumber);
+    QTableWidgetItem* titleTableItem = ui->tableWidget->item(rowNumber, COLUMN_FOR_TITLE);
+    if (titleTableItem== NULL)
     {
-        delete titleTableItem;
+        titleTableItem = new QTableWidgetItem();
+
+    ui->tableWidget->setItem(rowNumber, COLUMN_FOR_TITLE, titleTableItem);
     }
-    titleTableItem = new QTableWidgetItem();
 
     QFontMetrics metric(ui->tableWidget->font());
 
-    ui->tableWidget->verticalHeader()->resizeSection(rowNumber, 3*(metric.lineSpacing()));
+    ui->tableWidget->verticalHeader()->resizeSection(rowNumber, 5*(metric.lineSpacing()));
 
     if (film->m_isDownloading){
         titleTableItem->setIcon(QIcon(":/img/progress.png"));
@@ -191,24 +197,31 @@ void MainWindow::createOrUpdateFirstColumn(int rowNumber)
 
     titleTableItem->setText(film->m_title);
 
-    ui->tableWidget->setItem(rowNumber, FIRST_CHECKBOX_COLUMN_IN_TABLE, titleTableItem);
 }
 
 void MainWindow::refreshTable()
 {
 
-    QMap<QString, FilmDetails*> details = delegate->films();
+    QList<FilmDetails*> details = delegate->visibleFilms();
     FilmDetails* film;
     int rowNumber = 0;
     foreach (film, details)
     {
         createOrUpdateFirstColumn(rowNumber);
-
+        qDebug() << " *** ROW ***" << rowNumber;
         if (film->m_durationInMinutes > 0)
         {
             QTableWidgetItem* item = new QTableWidgetItem(QString::number(film->m_durationInMinutes));
             item->setFlags(item->flags()^Qt::ItemIsEditable);
             ui->tableWidget->setItem(rowNumber, COLUMN_FOR_DURATION, item);
+        }
+
+        if (!film->m_preview.isNull() && ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW) == NULL)
+        {
+            QTableWidgetItem* item = new QTableWidgetItem(QString::number(film->m_durationInMinutes));
+            ui->tableWidget->setIconSize(QSize(100,100));
+            item->setIcon(QIcon(QPixmap::fromImage(film->m_preview)));
+            ui->tableWidget->setItem(rowNumber, COLUMN_FOR_PREVIEW, item);
         }
 
         ++rowNumber;
@@ -237,10 +250,11 @@ const QList<MetaType>& MainWindow::interestingDetails() {
 void MainWindow::updateCurrentDetails(){
 
     int rowBegin = ui->tableWidget->currentRow();
-     QMap<QString, FilmDetails*> details = delegate->films();
-     if (details.values().size()<=rowBegin)
+
+     QList<FilmDetails*> details = delegate->visibleFilms();
+     if (rowBegin < 0 || rowBegin >= details.size())
          return;
-     FilmDetails*  film = details.values().at(rowBegin);
+     FilmDetails* film = details.at(rowBegin);
      if (rowBegin >=0 && rowBegin < ui->tableWidget->rowCount())
      {
         QString prefix;
@@ -371,8 +385,7 @@ void MainWindow::downloadFilm(int currentLine, FilmDetails* film){
                 return;
             }
 
-            checkedFilms.insert(currentLine, *film);
-            thread->addFilmToDownloadQueue(currentLine, *film);
+            thread->addFilmToDownloadQueue(film->m_infoUrl, *film);
         }
     }
     updateCurrentDetails();
@@ -390,60 +403,85 @@ void MainWindow::allFilmDownloadFinished()
     statusBar()->showMessage(tr("Download finished."));
 }
 
-void MainWindow::downloadProgressed(int filmId, double progression, double speed, double remainingTime)
+void MainWindow::downloadProgressed(QString filmUrl, double progression, double speed, double remainingTime)
 {
     ui->progressBar->setVisible(true);
+    ui->progressBar->setValue(progression);
 
-    delegate->films().values().at(filmId)->m_isDownloading = true;
-    createOrUpdateFirstColumn(filmId);
+
+    FilmDetails* film = delegate->findFilmByUrl(filmUrl);
+    QString filmFileName("...");
+    if (film)
+    {
+        filmFileName = film->m_targetFileName;
+        film->m_isDownloading = true;
+    }
 
     QString remainingTimeString;
     QTime remainingTimeTime(0,0,0);
-    ;
-    remainingTimeString = remainingTimeTime.addSecs(remainingTime).toString();
 
-    ui->progressBar->setValue(progression);
+    remainingTimeString = remainingTimeTime.addSecs(remainingTime).toString();
     ui->downloadLabel->setText(tr("Downloading %1\nSpeed %2 kB/s  -  Remaining: %3")
-                               .arg(delegate->films().values().at(filmId)->m_targetFileName)
+                               .arg(filmFileName)
                                .arg(speed)
                                .arg(remainingTimeString));
+
     statusBar()->showMessage((tr("%1 item(s) in queue").arg(thread->queueSize())));
-    if (filmId == ui->tableWidget->currentRow())
-        updateCurrentDetails();
+    int filmId = delegate->getLineForUrl(filmUrl);
+
+    if (filmId >= 0)
+    {
+        createOrUpdateFirstColumn(filmId);
+        if (filmId == ui->tableWidget->currentRow())
+            updateCurrentDetails();
+    }
 }
 
-void MainWindow::filmDownloaded(int filmId)
+void MainWindow::filmDownloaded(QString filmUrl)
 {
 
-    QTableWidgetItem* item = ui->tableWidget->item(filmId, FIRST_CHECKBOX_COLUMN_IN_TABLE);
-    item->setIcon(QIcon(":/img/finished.png"));
-    item->setFlags(item->flags()^Qt::ItemIsUserCheckable);
-
-    FilmDetails * d = delegate->films().values().at(filmId);
-    d->m_isDownloaded = true;
-    d->m_isDownloading = false;
-
-    // Save metadata
-    QFile metadataFile(QString(d->m_targetFileName).append(".info"));
-    metadataFile.open(QFile::WriteOnly|QFile::Text);
-    QTextStream stream (&metadataFile);
-    stream<< d->m_title << "\n";
-
-    foreach (MetaType key,interestingDetails())
+    FilmDetails * film = delegate->findFilmByUrl(filmUrl);
+    if (film)
     {
-        QString value = d->m_metadata.value(key);
-        stream << FilmDetails::enum2Str(key) << ": " << value << "\n";
-    }
-    stream<< d->m_summary;
+        // All of that should be done in the delegate!!
+        film->m_isDownloaded = true;
+        film->m_isDownloading = false;
 
-    stream.flush();
-    metadataFile.close();
-    QFile picture(QString(d->m_targetFileName).append(".png"));
-    picture.open(QFile::WriteOnly);
-    QImageWriter writer(&picture, "PNG");
-    writer.write(d->m_preview);
-    picture.close();
-    updateCurrentDetails();
+        // Save metadata
+        QFile metadataFile(QString(film->m_targetFileName).append(".info"));
+        metadataFile.open(QFile::WriteOnly|QFile::Text);
+        QTextStream stream (&metadataFile);
+        stream<< film->m_title << "\n";
+
+        foreach (MetaType key,interestingDetails())
+        {
+            QString value = film->m_metadata.value(key);
+            stream << FilmDetails::enum2Str(key) << ": " << value << "\n";
+        }
+        stream<< film->m_summary;
+
+        stream.flush();
+        metadataFile.close();
+
+        // Save preview picture
+        QFile picture(QString(film->m_targetFileName).append(".png"));
+        picture.open(QFile::WriteOnly);
+        QImageWriter writer(&picture, "PNG");
+        writer.write(film->m_preview);
+        picture.close();
+    }
+
+    int filmId = delegate->getLineForUrl(filmUrl);
+
+    if (filmId >= 0)
+    {
+        refreshTable();
+    }
+
+    if (filmId == ui->tableWidget->currentRow())
+    {
+        updateCurrentDetails();
+    }
 }
 
 void MainWindow::reloadCurrentRow()
@@ -451,9 +489,9 @@ void MainWindow::reloadCurrentRow()
     if (ui->tableWidget->rowCount() <=0)
         return;
     int currentRow = ui->tableWidget->currentRow();
-    ui->tableWidget->item(currentRow, 0)->setToolTip("");
-    ui->tableWidget->item(currentRow, 0)->setIcon(QIcon());
-    delegate->reloadFilm(delegate->films().values()[currentRow]);
+    ui->tableWidget->item(currentRow, COLUMN_FOR_TITLE)->setToolTip("");
+    ui->tableWidget->item(currentRow, COLUMN_FOR_TITLE)->setIcon(QIcon());
+    delegate->reloadFilm(delegate->visibleFilms()[currentRow]);
 }
 
 
@@ -464,11 +502,12 @@ void MainWindow::addFilmManuallyFromUrl()
 }
 
 
-void MainWindow::errorOccured(int filmId, QString errorMessage)
+void MainWindow::errorOccured(QString filmUrl, QString errorMessage)
 {
+    int filmId = delegate->getLineForUrl(filmUrl);
     if (ui->tableWidget->rowCount() <= filmId)
         return;
-    QTableWidgetItem *cell = ui->tableWidget->item(filmId, 0);
+    QTableWidgetItem *cell = ui->tableWidget->item(filmId, COLUMN_FOR_TITLE);
     if (cell == NULL)
     {
         qDebug() << errorMessage;
@@ -512,15 +551,15 @@ void MainWindow::closeEvent(QCloseEvent* event)
 
 void MainWindow::cellHasBeenClicked(int row, int column)
 {
-    if (ui->progressBar->isVisible() || column != FIRST_CHECKBOX_COLUMN_IN_TABLE)
+    if (ui->progressBar->isVisible() || column != COLUMN_FOR_TITLE)
     {
         return;
     }
     try{
-        FilmDetails * film = delegate->films().values().value(row);
+        FilmDetails * film = delegate->visibleFilms()[row];
         if (film != NULL)
         {
-            QString fileName = getFileName(preferences.destinationDir(), ui->tableWidget->item(row, 0)->text(), film->m_streamUrl);
+            QString fileName = getFileName(preferences.destinationDir(), ui->tableWidget->item(row, COLUMN_FOR_TITLE)->text(), film->m_streamUrl);
             if (film->m_isDownloaded)
                 QDesktopServices::openUrl(QUrl::fromLocalFile(fileName));
         }
@@ -537,6 +576,6 @@ void MainWindow::downloadButtonClicked()
 {
     int row = ui->tableWidget->currentRow();
 
-    FilmDetails *details = delegate->films().values().value(row);
+    FilmDetails *details = delegate->visibleFilms()[row];
     downloadFilm(row, details);
 }

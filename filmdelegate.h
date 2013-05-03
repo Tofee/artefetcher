@@ -41,7 +41,12 @@ public:
      */
     void loadPlayList(QString url);
 
-    const QMap<QString, FilmDetails*> films() const { return m_films; }
+    const QList<FilmDetails*> visibleFilms() const { QList<FilmDetails*> result;
+                                              foreach(QString key, m_visibleFilms)
+                                              {
+                                                  result << m_films[key];
+                                              }
+                                                                                    return result; }
 
     static QString getStreamHumanName(int i);
     static QString getStreamLanguageCode(int i);
@@ -58,14 +63,29 @@ public:
 
     void loadNextPage();
     void loadPreviousPage();
+
+    /**
+     * @brief getLineForUrl for an URL of a film
+     * @param filmUrl url of the film description page
+     * @return the line in the view containing this film (or -1 if not found)
+     */
+    int getLineForUrl(QString filmUrl);
+
+    /**
+     * @brief findFilmByUrl find the film for a given url
+     * @param filmUrl url of the film description page
+     * @return  the line in the view containing this film (of NULL if not found)
+     */
+    FilmDetails* findFilmByUrl(QString filmUrl);
 signals:
     void playListHasBeenUpdated();
-    void errorOccured(int filmId, QString errorMessage);
+    void errorOccured(QString filmUrl, QString errorMessage);
     void streamIndexLoaded(int resultCount, int currentPage, int pageCount);
 private slots:
     void requestReadyToRead(QObject*);
 
 private:
+    const QMap<QString, FilmDetails*> films() const { return m_films; }
 
     void playListLoaded(const QString page);
     /**
@@ -93,6 +113,10 @@ private:
     int getFilmId(FilmDetails*film) const;
     void commonLoadPlaylist();
 
+    // List of the film description paged shown in the UI
+    QList<QString> m_visibleFilms;
+
+    // Indexed by the url of the film description page
     QMap<QString, FilmDetails*> m_films;
     QNetworkAccessManager* m_manager;
     QSignalMapper* m_signalMapper;

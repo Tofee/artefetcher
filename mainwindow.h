@@ -44,17 +44,21 @@ protected:
      * @return the filename
      */
     QString getFileName(const QString& targetDirectory, const QString &title, const QString &remoteFilename);
+
+    void downloadFilm(int currentLine, FilmDetails* film);
+
+
 private slots:
     void refreshTable();
     void updateCurrentDetails();
-    void downloadFilm(int currentLine, FilmDetails* film);
+
     void allFilmDownloadFinished();
-    void downloadProgressed(int filmId, double progression, double speed, double remainingTime);
-    void filmDownloaded(int filmId);
+    void downloadProgressed(QString filmUrl, double progression, double speed, double remainingTime);
+    void filmDownloaded(QString filmUrl);
 
     void reloadCurrentRow();
     void addFilmManuallyFromUrl();
-    void errorOccured(int filmId, QString errorMessage);
+    void errorOccured(QString filmUrl, QString errorMessage);
     void showPreferences();
     void cellHasBeenClicked(int row, int column);
 
@@ -84,8 +88,6 @@ private:
     Qt::CheckState m_pressedItemCheckState;
     int m_pressedItemRow;
 
-    // 1) Filter the selected films
-    QMap<int, FilmDetails> checkedFilms;
     DownloadManager* thread;
 };
 
