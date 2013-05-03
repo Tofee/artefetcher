@@ -1,23 +1,18 @@
 #ifndef RTMPTHREAD_H
 #define RTMPTHREAD_H
 
-
 #include <queuedownloader.h>
 #include <FilmDetails.h>
 
 class QNetworkAccessManager;
 
-
-
-
 class DownloadManager : public QObject{
     Q_OBJECT
 public:
-DownloadManager(QObject *parent);
+    DownloadManager(QObject *parent);
 
-void addFilmToDownloadQueue(QString key, const FilmDetails& details);
-
-int queueSize() const;
+    void addFilmToDownloadQueue(QString key, const FilmDetails& details);
+    int queueSize() const;
 
 signals:
     void signalAllFilmDownloadFinished();

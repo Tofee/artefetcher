@@ -12,11 +12,8 @@
 #include <FilmDetails.h>
 #include <downloadManager.h>
 
-
-//#define COLUMN_FOR_PAGE 1
 #define COLUMN_FOR_TITLE 1
 #define COLUMN_FOR_DURATION 2
-//#define FIRST_CHECKBOX_COLUMN_IN_TABLE 1
 #define COLUMN_FOR_PREVIEW 0
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -48,6 +45,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableWidget->horizontalHeader()->resizeSection(COLUMN_FOR_DURATION, metric.boundingRect("999 min.").width());
     ui->tableWidget->horizontalHeader()->resizeSection(COLUMN_FOR_PREVIEW, 110);
     ui->tableWidget->horizontalHeader()->resizeSection(COLUMN_FOR_TITLE, metric.boundingRect("Sample of a fitting title").width());
+    ui->tableWidget->setIconSize(QSize(100,100));
 
     ui->progressBar->setMaximum(100);
 
@@ -171,7 +169,7 @@ void MainWindow::previousPage()
 {
     delegate->loadPreviousPage();
 }
-// TODO si une fois que toute la liste des films est chargée on ajoute des films dans la liste d'attente, l'icône de l'horloge ne s'affiche pas...
+
 void MainWindow::createOrUpdateFirstColumn(int rowNumber)
 {
     FilmDetails* film = delegate->visibleFilms().at(rowNumber);
@@ -179,8 +177,7 @@ void MainWindow::createOrUpdateFirstColumn(int rowNumber)
     if (titleTableItem== NULL)
     {
         titleTableItem = new QTableWidgetItem();
-
-    ui->tableWidget->setItem(rowNumber, COLUMN_FOR_TITLE, titleTableItem);
+        ui->tableWidget->setItem(rowNumber, COLUMN_FOR_TITLE, titleTableItem);
     }
 
     QFontMetrics metric(ui->tableWidget->font());
@@ -216,13 +213,16 @@ void MainWindow::refreshTable()
             ui->tableWidget->setItem(rowNumber, COLUMN_FOR_DURATION, item);
         }
 
-        if (!film->m_preview.isNull() && ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW) == NULL)
+        QTableWidgetItem* item = ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW);
+        if (ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW) == NULL)
         {
-            QTableWidgetItem* item = new QTableWidgetItem(QString::number(film->m_durationInMinutes));
-            ui->tableWidget->setIconSize(QSize(100,100));
-            item->setIcon(QIcon(QPixmap::fromImage(film->m_preview)));
+            item = new QTableWidgetItem();
             ui->tableWidget->setItem(rowNumber, COLUMN_FOR_PREVIEW, item);
         }
+        if (film->m_preview.isNull())
+            item->setIcon(QIcon(QPixmap(":/img/Arte.jpg").scaled(100, 100, Qt::KeepAspectRatio)));
+        else
+            item->setIcon(QIcon(QPixmap::fromImage(film->m_preview)));
 
         ++rowNumber;
     }
@@ -260,9 +260,6 @@ void MainWindow::updateCurrentDetails(){
      {
         QString prefix;
 
-        /*foreach(QString key, film->m_metadata.keys()){
-            prefix.append(tr("<b> %0 : </b>%1<br/>").arg(key).arg(film->m_metadata.value(key)));
-        }*/
         foreach(MetaType key, interestingDetails()){
             if (film->m_metadata.contains(key) && film->m_metadata.value(key) != "0")
                     prefix.append(tr("<b> %0 : </b>%1<br/>").arg(FilmDetails::enum2Str(key)).arg(film->m_metadata.value(key)));
@@ -277,7 +274,6 @@ void MainWindow::updateCurrentDetails(){
         }
         else
         {
-            //ui->previewLabel->setVisible(false);
             ui->previewLabel->setPixmap(QPixmap(":/img/Arte.jpg").scaled(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT, Qt::KeepAspectRatio));
             ui->previewLabel->setDisabled(true);
         }
@@ -390,13 +386,9 @@ void MainWindow::downloadFilm(int currentLine, FilmDetails* film){
             thread->addFilmToDownloadQueue(film->m_infoUrl, *film);
         }
     }
-    updateCurrentDetails();
+
+    refreshTable();
 }
-
-
-// TODO dans la popup quand le fichier existe déjà, donner trois choix: annuler, continuer, recommencer
-// TODO bloquer les pages quand un téléchargement est en court ou mieux gérer les changements de page
-// TODO Segfault quand on change de page alors qu'un téléchargement est en cours
 
 void MainWindow::allFilmDownloadFinished()
 {

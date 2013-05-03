@@ -98,7 +98,6 @@ void FilmDelegate::loadPreviousPage(){
 
 void FilmDelegate::commonLoadPlaylist(){
     m_visibleFilms.clear();
-    //emit(playListHasBeenUpdated());
 
     downloadUrl(m_lastPlaylistUrl, QString(), MAPPER_STEP_CATALOG);
 }
@@ -337,7 +336,6 @@ void FilmDelegate::requestReadyToRead(QObject* object)
     reply->deleteLater();
 
 }
-// TODO y'a plein de NEW sur les my pair, et ils ne sont pas forcément delete
 
 QString FilmDelegate::getStreamUrlFromResponse(const QString& page, const QString& quality)
 {

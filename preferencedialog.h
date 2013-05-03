@@ -2,9 +2,8 @@
 #define PREFERENCEDIALOG_H
 
 #include <QDialog>
-#include <QList>
 #include <preferences.h>
-#include <filmdelegate.h>
+
 namespace Ui {
 class PreferenceDialog;
 }

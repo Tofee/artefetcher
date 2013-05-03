@@ -138,7 +138,6 @@ private:
 
 class MyPair : public QObject{
     Q_OBJECT
-    // TODO surtout pas un truc comme ça
 public:
 
     MyPair(QString s1, QString s2): first(s1), second(s2)

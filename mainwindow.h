@@ -3,9 +3,6 @@
 
 #include <QMainWindow>
 #include <QList>
-#include <QModelIndex>
-#include <FilmDetails.h>
-#include <QStringList>
 
 #include <preferences.h>
 #include <filmdelegate.h>
@@ -15,6 +12,7 @@ class QNetworkAccessManager;
 class FilmDelegate;
 class QTableWidgetItem;
 class DownloadManager;
+class FilmDetails;
 
 namespace Ui {
 class MainWindow;
