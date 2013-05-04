@@ -34,3 +34,4 @@ int main(int argc, char *argv[])
 // TODO bouton pour mettre en pause, arrêter les téléchargements, ou annuler les demandes
 // TODO refactor pour avoir le thread dans le delegate
 // TODO se débarrasser des MyPair ou au moins s'assurer que le nombre de new/delete coïncide
+// TODO avoir un changement de page plus simple

@@ -214,7 +214,7 @@ void MainWindow::refreshTable()
         }
 
         QTableWidgetItem* item = ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW);
-        if (ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW) == NULL)
+        if (item == NULL)
         {
             item = new QTableWidgetItem();
             ui->tableWidget->setItem(rowNumber, COLUMN_FOR_PREVIEW, item);
@@ -358,6 +358,11 @@ void MainWindow::downloadFilm(int currentLine, FilmDetails* film){
 
     if (isReadyForDownload(film))
     {
+        if (ui->tableWidget->item(currentLine, COLUMN_FOR_TITLE) == NULL)
+        {
+            qDebug() << "No title for the current row";
+            return;
+        }
         QString titleCellText = ui->tableWidget->item(currentLine, COLUMN_FOR_TITLE)->text();
         QString futureFileName = getFileName(workingPath, titleCellText, film->m_streamUrl);
         if (QFile(futureFileName).exists()
@@ -483,8 +488,12 @@ void MainWindow::reloadCurrentRow()
     if (ui->tableWidget->rowCount() <=0)
         return;
     int currentRow = ui->tableWidget->currentRow();
-    ui->tableWidget->item(currentRow, COLUMN_FOR_TITLE)->setToolTip("");
-    ui->tableWidget->item(currentRow, COLUMN_FOR_TITLE)->setIcon(QIcon());
+    QTableWidgetItem* titleWidgetItem = ui->tableWidget->item(currentRow, COLUMN_FOR_TITLE);
+    if (titleWidgetItem != NULL)
+    {
+        titleWidgetItem->setToolTip("");
+        titleWidgetItem->setIcon(QIcon());
+    }
     delegate->reloadFilm(delegate->visibleFilms()[currentRow]);
 }
 
@@ -551,9 +560,10 @@ void MainWindow::cellHasBeenClicked(int row, int column)
     }
     try{
         FilmDetails * film = delegate->visibleFilms()[row];
-        if (film != NULL)
+        QTableWidgetItem* titleItem = ui->tableWidget->item(row, COLUMN_FOR_TITLE);
+        if (film != NULL && titleItem != NULL)
         {
-            QString fileName = getFileName(preferences.destinationDir(), ui->tableWidget->item(row, COLUMN_FOR_TITLE)->text(), film->m_streamUrl);
+            QString fileName = getFileName(preferences.destinationDir(), titleItem->text(), film->m_streamUrl);
             if (film->m_isDownloaded)
                 QDesktopServices::openUrl(QUrl::fromLocalFile(fileName));
         }

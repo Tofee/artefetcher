@@ -142,12 +142,12 @@ public:
 
     MyPair(QString s1, QString s2): first(s1), second(s2)
     {
-        //qDebug() << "on en est a" << currentCountReference(true);
+        // qDebug() << "on en est a" << currentCountReference(true);
 
     }
     ~MyPair()
     {
-        //qDebug() << "on en est a" << currentCountReference(false);
+        // qDebug() << "on en est a" << currentCountReference(false);
     }
 
     QString first;
@@ -156,9 +156,10 @@ private:
     int currentCountReference(bool add)
     {
         static int count(0);
-        if (add) count++;
+        if (add)
+            count++;
         else
-             count --;
+            count --;
         return count;
     }
 };
