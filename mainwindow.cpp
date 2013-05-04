@@ -201,6 +201,10 @@ void MainWindow::refreshTable()
 {
 
     QList<FilmDetails*> details = delegate->visibleFilms();
+
+    int previousCount = ui->tableWidget->rowCount();
+    ui->tableWidget->setRowCount(details.size());
+
     FilmDetails* film;
     int rowNumber = 0;
     foreach (film, details)
@@ -213,24 +217,21 @@ void MainWindow::refreshTable()
             ui->tableWidget->setItem(rowNumber, COLUMN_FOR_DURATION, item);
         }
 
-        QTableWidgetItem* item = ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW);
-        if (item == NULL)
+        QTableWidgetItem* previewItem = ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW);
+        if (previewItem == NULL)
         {
-            item = new QTableWidgetItem();
-            ui->tableWidget->setItem(rowNumber, COLUMN_FOR_PREVIEW, item);
+            previewItem = new QTableWidgetItem();
+            ui->tableWidget->setItem(rowNumber, COLUMN_FOR_PREVIEW, previewItem);
         }
         if (film->m_preview.isNull())
-            item->setIcon(QIcon(QPixmap(":/img/Arte.jpg").scaled(100, 100, Qt::KeepAspectRatio)));
+            previewItem->setIcon(QIcon(QPixmap(":/img/Arte.jpg").scaled(100, 100, Qt::KeepAspectRatio)));
         else
-            item->setIcon(QIcon(QPixmap::fromImage(film->m_preview)));
+            previewItem->setIcon(QIcon(QPixmap::fromImage(film->m_preview)));
 
         ++rowNumber;
     }
 
-    int previousCount = ui->tableWidget->rowCount();
-    ui->tableWidget->setRowCount(rowNumber);
-
-    if (previousCount <= 0 && rowNumber>0 )
+    if (previousCount <= 0 && details.size() > 0 )
     {
         ui->tableWidget->setCurrentCell(0,0);
     }
