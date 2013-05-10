@@ -33,7 +33,7 @@ class FilmDelegate: public QObject
 {
     Q_OBJECT
 public:
-    FilmDelegate(QNetworkAccessManager*, const Preferences& pref);
+    FilmDelegate(QNetworkAccessManager*, Preferences &pref);
     virtual ~FilmDelegate();
     /**
      * Call this method to launch the request.
@@ -84,6 +84,10 @@ public:
         m_currentDownloads << url;
     }
 
+    QStringList downloadList() const {
+        return m_currentDownloads.toList();
+    }
+
 signals:
     void playListHasBeenUpdated();
     void errorOccured(QString filmUrl, QString errorMessage);
@@ -122,8 +126,8 @@ private:
 
 
     // List of the film description paged shown in the UI
-    QList<QString> m_visibleFilms;
-    QList<QString> m_currentDownloads;
+    QSet<QString> m_visibleFilms;
+    QSet<QString> m_currentDownloads;
 
     // Indexed by the url of the film description page
     QMap<QString, FilmDetails*> m_films;
@@ -131,7 +135,7 @@ private:
     QSignalMapper* m_signalMapper;
     int m_currentPage;
     QString m_lastPlaylistUrl;
-    const Preferences& m_preferences;
+    Preferences& m_preferences;
 
 
 };

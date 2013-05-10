@@ -8,6 +8,8 @@
 #include <QPair>
 #include <QTime>
 
+#define TEMP_FILE_PREFIX ".part"
+
 class QueueDownloader : public QObject
 {
     Q_OBJECT

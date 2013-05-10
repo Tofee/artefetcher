@@ -6,6 +6,7 @@
 
 #include <preferences.h>
 #include <filmdelegate.h>
+#include <QSystemTrayIcon>
 
 class QNetworkReply;
 class QNetworkAccessManager;
@@ -13,7 +14,7 @@ class FilmDelegate;
 class QTableWidgetItem;
 class DownloadManager;
 class FilmDetails;
-
+class QSystemTrayIcon;
 namespace Ui {
 class MainWindow;
 }
@@ -72,6 +73,8 @@ private slots:
 
     const QList<MetaType> &interestingDetails();
 
+    void iconActivated(QSystemTrayIcon::ActivationReason reason);
+
 private:
     void closeEvent(QCloseEvent* event);
 
@@ -86,7 +89,9 @@ private:
     Qt::CheckState m_pressedItemCheckState;
     int m_pressedItemRow;
 
+
     DownloadManager* thread;
+    QSystemTrayIcon *m_trayIcon;
 };
 
 #endif // MAINWINDOW_H

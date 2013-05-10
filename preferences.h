@@ -3,6 +3,7 @@
 #include <QStringList>
 #include <QString>
 #include <QSettings>
+#include <QSet>
 
 class IPreferences
 {
@@ -33,6 +34,13 @@ public:
     {
         return m_destinationDir;
     }
+    const QSet<QString> &pendingDownloads() const
+    {
+        return m_pendingDownloads;
+    }
+    void setPendingDonwloads(QSet<QString> downloadUrls){
+        m_pendingDownloads = downloadUrls;
+    }
 
     virtual void load() = 0;
     virtual void save() = 0;
@@ -42,6 +50,7 @@ protected:
     QString m_selectedQuality;
     QString m_filenamePattern;
     QString m_destinationDir;
+    QSet<QString> m_pendingDownloads;
 };
 
 class Preferences: public IPreferences

@@ -22,6 +22,15 @@
 #define MAPPER_STEP_CODE_4_PREVIEW "PREVIEW"
 #define RESULT_PER_PAGE 10
 
+#define JSON_AIRDATE        "airdate_long"
+#define JSON_DESC           "desc"
+#define JSON_RIGHTS_UNTIL   "video_rights_until"
+#define JSON_VIEWS          "video_views"
+#define JSON_VIDEO_CHANNEL  "video_channels"
+#define JSON_RANK           "video_rank"
+
+#define DOWNLOAD_STREAM     "about:downloads"
+
 QList<QString> FilmDelegate::listLanguages()
 {
     return QList<QString>() << "fr" << "de";
@@ -56,15 +65,28 @@ QList<StreamType>& FilmDelegate::listStreamTypes()
     return streamTypes;
 }
 
-FilmDelegate::FilmDelegate(QNetworkAccessManager * in_manager, const Preferences &pref)
+FilmDelegate::FilmDelegate(QNetworkAccessManager * in_manager, Preferences &pref)
     :m_manager(in_manager), m_signalMapper(new QSignalMapper(this)), m_preferences(pref)
 {
     connect(m_signalMapper, SIGNAL(mapped(QObject*)),
             this, SLOT(requestReadyToRead(QObject*)));
+    m_currentDownloads = m_preferences.pendingDownloads();
 }
 
 FilmDelegate::~FilmDelegate()
 {
+    QSet<QString> pendingDownloads;
+    foreach (QString dlUrl, m_currentDownloads)
+    {
+        FilmDetails* film = findFilmByUrl(dlUrl);
+        if (film && (film->m_isDownloading
+                    || (film->m_hasBeenRequested && !film->m_isDownloaded)))
+        {
+            pendingDownloads << dlUrl;
+        }
+    }
+    m_preferences.setPendingDonwloads(pendingDownloads);
+
     FilmDetails* film;
     foreach(film, m_films)
     {
@@ -74,10 +96,19 @@ FilmDelegate::~FilmDelegate()
 
 void FilmDelegate::loadPlayList(QString url)
 {
-    if (url == "about:downloads")
+    if (url == DOWNLOAD_STREAM)
     {
         m_visibleFilms.clear();
-        m_visibleFilms << m_currentDownloads;
+        foreach(QString filmUrl, m_currentDownloads)
+        {
+            if (!m_films.contains(filmUrl))
+            {
+                addMovieFromUrl(filmUrl);
+            }
+            else {
+                m_visibleFilms << filmUrl;
+            }
+        }
         emit(playListHasBeenUpdated());
         return;
     }
@@ -181,7 +212,6 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                     if (m_films.contains(url))
                     {
                         m_visibleFilms << url;
-                        qDebug() << "[CACHE]" << url;
                         continue;
                     }
 
@@ -189,12 +219,12 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                     newFilm->m_title = title;
                     newFilm->m_infoUrl = url;
 
-                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), "airdate_long", First_broadcast);
-                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), "desc", Description);
-                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), "video_rights_until", Available_until);
-                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), "video_views", Views);
-                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), "video_channels", Channels);
-                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), "video_rank", Rank);
+                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_AIRDATE, First_broadcast);
+                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_DESC, Description);
+                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_RIGHTS_UNTIL, Available_until);
+                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_VIEWS, Views);
+                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_VIDEO_CHANNEL, Channels);
+                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_RANK, Rank);
 
                     m_films.insert(newFilm->m_infoUrl, newFilm);
                     m_visibleFilms << newFilm->m_infoUrl;
@@ -356,7 +386,7 @@ StreamType FilmDelegate::getStreamTypeByHumanName(const QString& humanName) thro
 
 int FilmDelegate::getLineForUrl(QString filmUrl)
 {
-    return m_visibleFilms.indexOf(filmUrl);
+    return m_visibleFilms.toList().indexOf(filmUrl);
 }
 
 /**
@@ -399,7 +429,6 @@ bool FilmDelegate::addMovieFromUrl(const QString url, QString title)
     if (m_films.contains(url))
     {
         film = m_films[url];
-        qDebug() << url << "is already in cache";
     }
     else
     {

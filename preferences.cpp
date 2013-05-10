@@ -15,6 +15,7 @@ void Preferences::load()
     // TODO "[]" are forbidden in fat32
     m_filenamePattern = settings.value("filename_pattern", "[%language %quality] %title").toString();
     m_destinationDir = settings.value("destination_directory", defaultWorkingPath).toString();
+    m_pendingDownloads = QSet<QString>::fromList(settings.value("pending_downloads", QStringList()).toStringList());
 }
 
 void Preferences::save()
@@ -23,5 +24,6 @@ void Preferences::save()
     settings.setValue("stream_quality", m_selectedQuality);
     settings.setValue("filename_pattern", m_filenamePattern);
     settings.setValue("destination_directory", m_destinationDir);
+    settings.setValue("pending_downloads", QStringList(m_pendingDownloads.toList()));
     settings.sync();
 }

@@ -25,13 +25,23 @@ int main(int argc, char *argv[])
     return a.exec();
 }
 
+//       Importance     Temps       Description
+// DONE  Grande         Moyen       quand on quitte, enregistrer la liste des URL en cours de téléchargement
+// DONE  Standard       Moyen       Un fichier incomplet est un .mp4.part, l'image un .png et l'info un .txt,
+//                                  Quand un .part existe déjà indiquer qu'on va le continuer (Y/N)
+//                                  Quand le fichier définitif existe déjà, indiquer qu'on va l'écraser (Y/N)
+// DONE  Grande         Moyen       pouvoir minimiser l'application dans le tray
+// TODO                             recherche par calendrier et par champ texte
+// DONE  Mineur         Rapide      l'icône de download n'est pas de la même taille que clock => c'est moche
+// TODO  Standard       Long        voir s'il est possible de récupérer d'autres infos
+// TODO  Mineur         Rapide      Une icône moins large pour le tray
 
-// TODO pas coder de chiffres en dur, utiliser au moins des macros
-// TODO l'icône de download n'est pas de la même taille que clock => c'est moche
-// TODO voir si y'a pas moyen de récupérer d'autres infos
-// TODO traductions
-// TODO dans la popup quand le fichier existe déjà, donner trois choix: annuler, continuer, recommencer
-// TODO bouton pour mettre en pause, arrêter les téléchargements, ou annuler les demandes
-// TODO refactor pour avoir le thread dans le delegate
-// TODO se débarrasser des MyPair ou au moins s'assurer que le nombre de new/delete coïncide
-// TODO avoir un changement de page plus simple
+// TODO  Grande         Moyen       boutons pour mettre en pause, arrêter les téléchargements, ou annuler les demandes
+// TODO  Standard       Rapide      traductions
+// TODO  Mineur         Moyen       Notifications systeme quand un film est téléchargé
+// TODO  Standard       Rapide      ne pas coder de chiffres ou de string en dur, utiliser des macros ou mieux
+// TODO  Standard       Moyen       refactor pour avoir le thread dans le delegate
+
+// TODO  Mineur         Moyen       se débarrasser des MyPair ou au moins s'assurer que le nombre de new/delete coïncide
+// TODO  Mineur         Moyen       avoir un changement de page plus simple
+

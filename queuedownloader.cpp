@@ -2,6 +2,8 @@
 
 #include <downloadManager.h>
 #include <QTimer>
+#include <QFileInfo>
+#include <QDir>
 
 QueueDownloader::QueueDownloader(QObject *parent)
         :m_currentDownload(NULL),m_manager(new QNetworkAccessManager(parent)), m_isWorking(false)
@@ -32,7 +34,7 @@ void QueueDownloader::startNextDownload(){
     }
     QPair<QUrl, QString> downloadToStart = m_pendingDonwloads.dequeue();
 
-    m_outputFile.setFileName(downloadToStart.second);
+    m_outputFile.setFileName(QString(downloadToStart.second).append(TEMP_FILE_PREFIX));
 
     if (!m_outputFile.open(QIODevice::WriteOnly|QIODevice::Append)) {
         emit(downloadError(downloadToStart.first.toString(),
@@ -76,6 +78,9 @@ void QueueDownloader::downloadFinished()
     if (m_currentDownload->error()) {
          emit(downloadError(m_currentDownload->url().toString(), QString("Failed: %1\n").arg(m_currentDownload->errorString())));
      } else {
+        // Remove .part
+        QFileInfo info(m_outputFile.fileName());
+        m_outputFile.rename(info.absolutePath() + QDir::separator() + info.completeBaseName());
          emit(downloadFinished(m_currentDownload->url().toString()));
      }
 
