@@ -1,0 +1,7 @@
+# Files and dirs to ignore
+release
+debug
+*.qm
+Makefile
+*.pro.user*
+

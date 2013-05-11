@@ -128,6 +128,8 @@ MainWindow::MainWindow(QWidget *parent) :
                  this, SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
 
     clearAndLoadTable();
+
+    this->setWindowTitle("ArteFetcher v0.1.1");
 }
 
 void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
@@ -145,8 +147,8 @@ void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
     }
 }
 
-void MainWindow::streamIndexLoaded(int /*resultCount*/, int currentPage, int pageCount){
-    ui->pageLabel->setText(QString("%1/%2").arg(currentPage).arg(pageCount));
+void MainWindow::streamIndexLoaded(int resultCount, int currentPage, int pageCount){
+    ui->pageLabel->setText(tr("Page %1/%2\nTotal results: %3").arg(currentPage).arg(pageCount).arg(resultCount));
     ui->leftPageButton->setEnabled(currentPage > 1);
     ui->rightPageButton->setEnabled(currentPage < pageCount);
     ui->tableWidget->clearContents();
@@ -409,6 +411,8 @@ void MainWindow::downloadFilm(int currentLine, FilmDetails* film){
                                   QMessageBox::No)
                     == QMessageBox::No)
         {
+            // TODO on ne gère pas l'écrasement du film, il faut supprimer l'ancien film si on répond yes !!
+            // Il faut revoir chacun des cas... on peut être dans plusieurs cas à la fois
             film->m_hasBeenRequested = false;
         }
         else if (QFile(QString(futureFileName).append(TEMP_FILE_PREFIX)).exists()

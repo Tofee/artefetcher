@@ -31,13 +31,14 @@ int main(int argc, char *argv[])
 //                                  Quand un .part existe déjà indiquer qu'on va le continuer (Y/N)
 //                                  Quand le fichier définitif existe déjà, indiquer qu'on va l'écraser (Y/N)
 // DONE  Grande         Moyen       pouvoir minimiser l'application dans le tray
-// TODO                             recherche par calendrier et par champ texte
-// DONE  Mineur         Rapide      l'icône de download n'est pas de la même taille que clock => c'est moche
+// DONE  Mineur         Rapide      Une icône moins large pour le tray
+// DONE  Mineur         Rapide      l'icône de download n'est pas de la même taille que clock
+// DONE  Standard       Rapide      traductions
+// TODO                             recherche par calendrier QCalendarWidget et http://www.arte.tv/guide/fr/20130427.json
+// TODO                             recherche par champ texte
 // TODO  Standard       Long        voir s'il est possible de récupérer d'autres infos
-// TODO  Mineur         Rapide      Une icône moins large pour le tray
 
 // TODO  Grande         Moyen       boutons pour mettre en pause, arrêter les téléchargements, ou annuler les demandes
-// TODO  Standard       Rapide      traductions
 // TODO  Mineur         Moyen       Notifications systeme quand un film est téléchargé
 // TODO  Standard       Rapide      ne pas coder de chiffres ou de string en dur, utiliser des macros ou mieux
 // TODO  Standard       Moyen       refactor pour avoir le thread dans le delegate

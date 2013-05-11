@@ -33,10 +33,8 @@ TRANSLATIONS    = arteFetcher_de.ts \
 FORMS    += mainwindow.ui \
     preferencedialog.ui
 
-unix:!macx:!symbian: LIBS += -L$$PWD/../../../../usr/lib64/ -lrtmp
-
-INCLUDEPATH += $$PWD/../../../../usr/lib64
-DEPENDPATH += $$PWD/../../../../usr/lib64
+INCLUDEPATH += /usr/lib64
+DEPENDPATH += /usr/lib64
 
 RESOURCES += \
     resources.qrc
