@@ -60,12 +60,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->qualityComboBox->addItems(FilmDelegate::listQualities());
     ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findText(preferences.selectedQuality()));
 
-    ui->streamComboBox->addItem("Sélection Arte", "http://www.arte.tv/guide/fr/plus7/selection.json");
-    ui->streamComboBox->addItem("Plus récentes", "http://www.arte.tv/guide/fr/plus7/plus_recentes.json");
-    ui->streamComboBox->addItem("Plus vues", "http://www.arte.tv/guide/fr/plus7/plus_vues.json");
-    ui->streamComboBox->addItem("Dernière chance", "http://www.arte.tv/guide/fr/plus7/derniere_chance.json");
-    ui->streamComboBox->addItem("Tout", "http://www.arte.tv/guide/fr/plus7.json");
-    ui->streamComboBox->addItem(tr("Downloads"), "about:downloads");
+    ui->streamComboBox->addItem(tr("Arte selection"), "http://www.arte.tv/guide/fr/plus7/selection.json");
+    ui->streamComboBox->addItem(tr("Most recent"), "http://www.arte.tv/guide/fr/plus7/plus_recentes.json");
+    ui->streamComboBox->addItem(tr("Most seen"), "http://www.arte.tv/guide/fr/plus7/plus_vues.json");
+    ui->streamComboBox->addItem(tr("Last chance"), "http://www.arte.tv/guide/fr/plus7/derniere_chance.json");
+    ui->streamComboBox->addItem(tr("All"), "http://www.arte.tv/guide/fr/plus7.json");
+    ui->streamComboBox->addItem(tr("By date"), DATE_STREAM_PREFIX);
+    ui->streamComboBox->addItem(tr("Downloads"), DOWNLOAD_STREAM);
 
     ui->previewLabel->setMaximumSize(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT);
     ui->previewLabel->setMinimumSize(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT);
@@ -94,23 +95,25 @@ MainWindow::MainWindow(QWidget *parent) :
             SLOT(cellHasBeenClicked(int, int)));
 
     connect(ui->streamComboBox, SIGNAL(currentIndexChanged(int)),
-            this, SLOT(clearAndLoadTable()));
+            SLOT(clearAndLoadTable()));
+
+    connect(ui->dateEdit, SIGNAL(dateChanged(QDate)),
+            SLOT(clearAndLoadTable()));
 
     connect(ui->languageComboBox, SIGNAL(currentIndexChanged(int)),
             SLOT(languageChanged()));
     connect(ui->qualityComboBox, SIGNAL(currentIndexChanged(int)),
             SLOT(qualityChanged()));
 
-
     ui->progressBar->setVisible(false);
 
 
     connect(thread, SIGNAL(signalAllFilmDownloadFinished()),
-            this, SLOT(allFilmDownloadFinished()));
+            SLOT(allFilmDownloadFinished()));
     connect(thread, SIGNAL(signalDownloadProgressed(QString,double,double, double)),
-            this, SLOT(downloadProgressed(QString,double,double, double)));
+            SLOT(downloadProgressed(QString,double,double, double)));
     connect(thread, SIGNAL(signalDownloadFinished(QString)),
-            this, SLOT(filmDownloaded(QString)));
+            SLOT(filmDownloaded(QString)));
 
     connect(ui->downloadButton, SIGNAL(clicked()), SLOT(downloadButtonClicked()));
 
@@ -118,10 +121,10 @@ MainWindow::MainWindow(QWidget *parent) :
             SLOT(streamIndexLoaded(int,int,int)));
 
     connect(ui->rightPageButton, SIGNAL(clicked()),
-            this, SLOT(nextPage()));
+            SLOT(nextPage()));
 
     connect(ui->leftPageButton, SIGNAL(clicked()),
-            this, SLOT(previousPage()));
+            SLOT(previousPage()));
 
     //connect(m_trayIcon, SIGNAL(messageClicked()), this, SLOT(messageClicked()));
     connect(m_trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
@@ -129,7 +132,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     clearAndLoadTable();
 
-    this->setWindowTitle("ArteFetcher v0.1.1");
+    this->setWindowTitle("ArteFetcher v0.1.2");
+
+    ui->dateEdit->setVisible(false);
+    ui->dateEdit->setDate(QDate::currentDate());
 }
 
 void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
@@ -186,6 +192,13 @@ void MainWindow::qualityChanged()
 void MainWindow::clearAndLoadTable()
 {
     QString url = ui->streamComboBox->itemData(ui->streamComboBox->currentIndex()).toString();
+    bool dateCurrentlyShown = false;
+    if (url == DATE_STREAM_PREFIX)
+    {
+        dateCurrentlyShown = true;
+        url = url.append(ui->dateEdit->date().toString("yyyyMMdd"));
+    }
+    ui->dateEdit->setVisible(dateCurrentlyShown);
     delegate->loadPlayList(url);
 }
 
@@ -273,12 +286,12 @@ void MainWindow::refreshTable()
 
 }
 
-const QList<MetaType>& MainWindow::interestingDetails() {
+const QList<MetaType>& MainWindow::listInterestingDetails() {
     static QList<MetaType> shownMetadata;
     if (shownMetadata.isEmpty())
     {
         shownMetadata // << Available_until
-                      << Description << First_broadcast << Type << Views << Rank;
+                      << Description << First_broadcast_long << Type << Views << Rank;
     }
     return shownMetadata;
 }
@@ -296,7 +309,7 @@ void MainWindow::updateCurrentDetails(){
      {
         QString prefix;
 
-        foreach(MetaType key, interestingDetails()){
+        foreach(MetaType key, listInterestingDetails()){
             if (film->m_metadata.contains(key) && film->m_metadata.value(key) != "0")
                     prefix.append(tr("<b> %0 : </b>%1<br/>").arg(FilmDetails::enum2Str(key)).arg(film->m_metadata.value(key)));
         }
@@ -316,8 +329,8 @@ void MainWindow::updateCurrentDetails(){
         ui->detailsGroupBox->setTitle(film->m_title);
         {
             ui->countryYearDurationlabel->setText(tr("%1 %2 (%3min)\n%4")
-                                                  .arg(FilmDetails::enum2Str(First_broadcast))
-                                                  .arg(film->m_metadata.value(First_broadcast))
+                                                  .arg(FilmDetails::enum2Str(First_broadcast_long))
+                                                  .arg(film->m_metadata.value(First_broadcast_long))
                                                   .arg(QString::number(film->m_durationInMinutes))
                                                   .arg(film->m_metadata.value(Available_until)));
         }
@@ -343,7 +356,7 @@ void MainWindow::updateCurrentDetails(){
      }
      else
      {
-         ui->downloadButton->setText("Download");
+         ui->downloadButton->setText(tr("Download"));
          isDownloadButtonClickable = isReadyForDownload(film);
      }
      ui->downloadButton->setEnabled(isDownloadButtonClickable);
@@ -503,7 +516,7 @@ void MainWindow::filmDownloaded(QString filmUrl)
         QTextStream stream (&metadataFile);
         stream<< film->m_title << "\n";
 
-        foreach (MetaType key,interestingDetails())
+        foreach (MetaType key, listInterestingDetails())
         {
             QString value = film->m_metadata.value(key);
             stream << FilmDetails::enum2Str(key) << ": " << value << "\n";

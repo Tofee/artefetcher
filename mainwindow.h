@@ -71,7 +71,7 @@ private slots:
     void previousPage();
     void streamIndexLoaded(int resultCount, int currentPage, int pageCount);
 
-    const QList<MetaType> &interestingDetails();
+    const QList<MetaType> &listInterestingDetails();
 
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
 

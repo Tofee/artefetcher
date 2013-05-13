@@ -15,6 +15,7 @@
 
 #define VIDEO_URL_PREFIX "http://videos.arte.tv/fr/videos/"
 
+#define MAPPER_STEP_DATE "DATE"
 #define MAPPER_STEP_CATALOG "CATALOG"
 #define MAPPER_STEP_CODE_1_HTML "HTML"
 #define MAPPER_STEP_CODE_2_XML "XML"
@@ -22,14 +23,16 @@
 #define MAPPER_STEP_CODE_4_PREVIEW "PREVIEW"
 #define RESULT_PER_PAGE 10
 
-#define JSON_AIRDATE        "airdate_long"
+#define JSON_AIRDATE        "airdate"
+#define JSON_AIRDATE_LONG   "airdate_long"
+#define JSON_AIRTIME        "airtime"
 #define JSON_DESC           "desc"
 #define JSON_RIGHTS_UNTIL   "video_rights_until"
 #define JSON_VIEWS          "video_views"
 #define JSON_VIDEO_CHANNEL  "video_channels"
 #define JSON_RANK           "video_rank"
 
-#define DOWNLOAD_STREAM     "about:downloads"
+
 
 QList<QString> FilmDelegate::listLanguages()
 {
@@ -96,6 +99,7 @@ FilmDelegate::~FilmDelegate()
 
 void FilmDelegate::loadPlayList(QString url)
 {
+    QString type  = MAPPER_STEP_CATALOG;
     if (url == DOWNLOAD_STREAM)
     {
         m_visibleFilms.clear();
@@ -112,25 +116,32 @@ void FilmDelegate::loadPlayList(QString url)
         emit(playListHasBeenUpdated());
         return;
     }
+    else if (url.startsWith(DATE_STREAM_PREFIX))
+    {
+        url = QString("http://www.arte.tv/guide/fr/%1.json")
+                .arg(url.mid(QString(DATE_STREAM_PREFIX).size()));
+        type = MAPPER_STEP_DATE;
+
+    }
     m_currentPage = 1;
     m_lastPlaylistUrl = url;
-    commonLoadPlaylist();
+    commonLoadPlaylist(type);
 }
 
 
 void FilmDelegate::loadNextPage(){
     ++m_currentPage;
-    commonLoadPlaylist();
+    commonLoadPlaylist(m_initialyCatalog ? MAPPER_STEP_CATALOG : MAPPER_STEP_DATE);
 }
 void FilmDelegate::loadPreviousPage(){
     --m_currentPage;
-    commonLoadPlaylist();
+    commonLoadPlaylist(m_initialyCatalog ? MAPPER_STEP_CATALOG : MAPPER_STEP_DATE);
 }
 
-void FilmDelegate::commonLoadPlaylist(){
+void FilmDelegate::commonLoadPlaylist(QString type){
     m_visibleFilms.clear();
-
-    downloadUrl(m_lastPlaylistUrl, QString(), MAPPER_STEP_CATALOG);
+    m_initialyCatalog = (type == MAPPER_STEP_CATALOG);
+    downloadUrl(m_lastPlaylistUrl, QString(), type);
 }
 
 QString extractUniqueResult(const QString& document, const QString& xpath)
@@ -194,19 +205,28 @@ void FilmDelegate::requestReadyToRead(QObject* object)
 
     if (itemName.isEmpty())
     {
-        if (itemStep == MAPPER_STEP_CATALOG) {
+        if (itemStep == MAPPER_STEP_CATALOG || itemStep == MAPPER_STEP_DATE) {
             const QString page(QString::fromUtf8(reply->readAll()));
             QScriptEngine engine;
             QScriptValue json = engine.evaluate("JSON.parse").call(QScriptValue(),
                                                                    QScriptValueList() << QString(page));
             int i = 0;
-            foreach(QVariant catalogItem, json.toVariant().toMap().value("videos").toList())
+            QList<QVariant> list;
+            if (itemStep == MAPPER_STEP_CATALOG)
+                list = json.toVariant().toMap().value("videos").toList();
+            else // MAPPER_STEP_DATE
+                list = json.toVariant().toList();
+            foreach(QVariant catalogItem, list)
             {
                 ++i;
-                if (i > RESULT_PER_PAGE * (m_currentPage - 1) &&
-                        i <= RESULT_PER_PAGE * m_currentPage) {
-                    QString url = catalogItem.toMap().value("url").toString();
-                    url.prepend("http://www.arte.tv");
+                if (i > RESULT_PER_PAGE * (m_currentPage - 1)) {
+
+                    if (i > RESULT_PER_PAGE * m_currentPage)
+                        break;
+
+                    QString url = catalogItem.toMap().value(itemStep == MAPPER_STEP_CATALOG ? "url" : "details_url").toString();
+                    if (itemStep == MAPPER_STEP_CATALOG)
+                        url.prepend("http://www.arte.tv");
                     QString title = catalogItem.toMap().value("title").toString();
 
                     if (m_films.contains(url))
@@ -219,12 +239,17 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                     newFilm->m_title = title;
                     newFilm->m_infoUrl = url;
 
-                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_AIRDATE, First_broadcast);
+                    // For MAPPER_STEP_CATALOG and MAPPER_STEP_DATE
+                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_AIRDATE_LONG, First_broadcast_long);
+                    // For MAPPER_STEP_CATALOG
                     addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_DESC, Description);
                     addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_RIGHTS_UNTIL, Available_until);
                     addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_VIEWS, Views);
                     addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_VIDEO_CHANNEL, Channels);
                     addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_RANK, Rank);
+                    // For MAPPER_STEP_DATE
+                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_AIRDATE, First_broadcast);
+                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_AIRTIME, First_broadcast_time);
 
                     m_films.insert(newFilm->m_infoUrl, newFilm);
                     m_visibleFilms << newFilm->m_infoUrl;
@@ -232,7 +257,7 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                 }
             }
 
-            if (i % RESULT_PER_PAGE== 0)
+            if (i % RESULT_PER_PAGE == 0)
                 emit(streamIndexLoaded(i, m_currentPage, i/ RESULT_PER_PAGE));
             else
                 emit(streamIndexLoaded(i, m_currentPage, (i / RESULT_PER_PAGE) + 1));
@@ -258,7 +283,7 @@ void FilmDelegate::requestReadyToRead(QObject* object)
             if (jsonUrl.isEmpty())
             {
                 emit(errorOccured(film->m_infoUrl, tr("Cannot find the main information for the movie")));
-                qDebug() << "[ERROR] No json link in page " << reply->request().url();
+                qDebug() << "[ERROR] No json link in page" << reply->request().url().toString();
             }
             else
             {

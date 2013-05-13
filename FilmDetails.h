@@ -43,6 +43,8 @@ public:
 
 enum MetaType {
     First_broadcast,
+    First_broadcast_long,
+    First_broadcast_time,
     Description,
     Available_until,
     Views,
@@ -83,6 +85,8 @@ public:
     static const QString enum2Str(MetaType t){
         static const char* enum2Str[] = {
              QT_TRANSLATE_NOOP("FilmDetails","First broadcast"),
+             QT_TRANSLATE_NOOP("FilmDetails","First broadcast"),
+             QT_TRANSLATE_NOOP("FilmDetails","Time of the first broadcast"),
              QT_TRANSLATE_NOOP("FilmDetails","Description"),
              QT_TRANSLATE_NOOP("FilmDetails","Available until"),
              QT_TRANSLATE_NOOP("FilmDetails","Views"),

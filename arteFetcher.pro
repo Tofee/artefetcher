@@ -8,7 +8,15 @@ QT       += core gui sql network xmlpatterns webkit script
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
+isEmpty(PREFIX) {
+ PREFIX = /usr/bin
+}
+
 TARGET = arteFetcher
+
+target.path = $$PREFIX/
+INSTALLS += target
+
 TEMPLATE = app
 
 

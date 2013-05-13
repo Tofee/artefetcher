@@ -34,7 +34,8 @@ int main(int argc, char *argv[])
 // DONE  Mineur         Rapide      Une icône moins large pour le tray
 // DONE  Mineur         Rapide      l'icône de download n'est pas de la même taille que clock
 // DONE  Standard       Rapide      traductions
-// TODO                             recherche par calendrier QCalendarWidget et http://www.arte.tv/guide/fr/20130427.json
+// TODO  Grande         Moyen       Bug : quand on change de langue ou de qualité, il faut effacer le cache ou recharger toutes les vidéos....
+// DONE                             recherche par calendrier QCalendarWidget
 // TODO                             recherche par champ texte
 // TODO  Standard       Long        voir s'il est possible de récupérer d'autres infos
 

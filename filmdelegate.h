@@ -11,6 +11,9 @@
 #define MAX_IMAGE_WIDTH 400
 #define MAX_IMAGE_HEIGHT 226
 
+#define DOWNLOAD_STREAM     "about:downloads"
+#define DATE_STREAM_PREFIX  "about:date:"
+
 class FilmDetails;
 class QNetworkAccessManager;
 class QSignalMapper;
@@ -122,7 +125,7 @@ private:
     QString getStreamUrlFromResponse(const QString &page, const QString &quality);
 
     int getFilmId(FilmDetails*film) const;
-    void commonLoadPlaylist();
+    void commonLoadPlaylist(QString type);
 
 
     // List of the film description paged shown in the UI
@@ -136,6 +139,11 @@ private:
     int m_currentPage;
     QString m_lastPlaylistUrl;
     Preferences& m_preferences;
+    /**
+     * @brief m_initialyCatalog is true if the initial request is a catalog fetch,
+     * i.e. is not a date fetch
+     */
+    bool m_initialyCatalog;
 
 
 };

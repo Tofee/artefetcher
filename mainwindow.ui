@@ -38,6 +38,9 @@
        <widget class="QComboBox" name="streamComboBox"/>
       </item>
       <item>
+       <widget class="QDateEdit" name="dateEdit"/>
+      </item>
+      <item>
        <spacer name="horizontalSpacer_4">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
