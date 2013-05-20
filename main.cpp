@@ -26,16 +26,8 @@ int main(int argc, char *argv[])
 }
 
 //       Importance     Temps       Description
-// DONE  Grande         Moyen       quand on quitte, enregistrer la liste des URL en cours de téléchargement
-// DONE  Standard       Moyen       Un fichier incomplet est un .mp4.part, l'image un .png et l'info un .txt,
-//                                  Quand un .part existe déjà indiquer qu'on va le continuer (Y/N)
-//                                  Quand le fichier définitif existe déjà, indiquer qu'on va l'écraser (Y/N)
-// DONE  Grande         Moyen       pouvoir minimiser l'application dans le tray
-// DONE  Mineur         Rapide      Une icône moins large pour le tray
-// DONE  Mineur         Rapide      l'icône de download n'est pas de la même taille que clock
-// DONE  Standard       Rapide      traductions
+// TODO  Grande         Moyen       Bug : quand on télécharge deux épisodes d'une même série (ex téléchat), l'un écrase l'autre...
 // TODO  Grande         Moyen       Bug : quand on change de langue ou de qualité, il faut effacer le cache ou recharger toutes les vidéos....
-// DONE                             recherche par calendrier QCalendarWidget
 // TODO                             recherche par champ texte
 // TODO  Standard       Long        voir s'il est possible de récupérer d'autres infos
 

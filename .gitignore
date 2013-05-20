@@ -4,4 +4,6 @@ debug
 *.qm
 Makefile
 *.pro.user*
+*.o
+arteFetcher
 

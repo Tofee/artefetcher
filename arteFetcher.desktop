@@ -1,0 +1,21 @@
+[Desktop Entry]
+Comment[fr]=Récupérez les vidéos de la chaîne Arte
+Comment=Get videos from Arte TV channel
+Exec=arteFetcher
+GenericName=Video fetcher
+Icon=arteFetcher.png
+MimeType=image/png;
+Categories=Video;TV;qt;
+Name[fr]=Arte Fetcher
+Name=Arte Fetcher
+Path=
+StartupNotify=true
+Terminal=false
+TerminalOptions=
+TryExec=arteFetcher
+Type=Application
+Version=0.1.2
+X-DBUS-ServiceName=
+X-DBUS-StartupType=
+X-KDE-SubstituteUID=false
+X-KDE-Username=
