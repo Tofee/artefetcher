@@ -405,7 +405,7 @@ QString MainWindow::getFileName(const QString& targetDirectory, const QString& t
 }
 
 void MainWindow::downloadFilm(int currentLine, FilmDetails* film){
-    QString workingPath(QDir::homePath().append(QDir::separator()).append("arteFetcher"));
+    QString workingPath(preferences.destinationDir());
 
     if (isReadyForDownload(film))
     {
