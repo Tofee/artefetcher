@@ -26,7 +26,8 @@ To build arteFetcher from scratch for linux, you need:
 - make
 
 1) unzip the archive
-2) qmake
-3) make
+2) lrelease
+3) qmake
+4) make
 
 Then you can launch the arteFetcher link.

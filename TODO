@@ -19,6 +19,7 @@
 
 
 Importance     Temps       Description
+Grande         Moyen	   Gestion du dossier de destination de vidéos à parfaire
 Grande         Moyen       Ajouter des crédits
 Petite         Moyen       Retour vers le futur possible
 Grande         Moyen       Bug : quand on télécharge deux épisodes d'une même série (ex téléchat), l'un écrase l'autre...
