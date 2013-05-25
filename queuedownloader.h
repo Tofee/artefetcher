@@ -48,7 +48,6 @@ private slots:
 
     void downloadReadyRead() ;
 
-
 signals:
     void downloadProgressed(QString url, qint64 loadedSize, qint64 totalSize, double kbytesPerSecond, double remainingTimeInSecond);
     void downloadFinished(QString url);

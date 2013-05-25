@@ -23,6 +23,8 @@ Thanks to:
 - toto740 for the creation of the desktop icon.
 - FredBezies, he packages for Arch.
 
+
+
 To build arteFetcher from scratch for linux, you need:
 - qt devel libraries, including qt webkit (devel)
 - gcc-c++
@@ -34,3 +36,13 @@ To build arteFetcher from scratch for linux, you need:
 4) make
 
 Then you can launch the arteFetcher application.
+
+Release notes :
+v0.1.3
+Fix: page count is increasing when going to the next page
+Fix: continue download does not continue
+Preferences improvements
+Show Downloads page at startup if necessary
+Prevent loading old film load request
+Refresh cache movie if cover or download stream is missing
+Add credits in Readme

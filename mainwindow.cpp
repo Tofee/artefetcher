@@ -93,6 +93,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->detailsGroupBox->setStyleSheet("QGroupBox { font-size: 16px; font-weight: bold; }");
 
+    if (!preferences.pendingDownloads().isEmpty())
+    {
+        ui->streamComboBox->setCurrentIndex(ui->streamComboBox->findText(tr("Downloads")));
+    }
+
     connect(delegate, SIGNAL(playListHasBeenUpdated()),
             SLOT(refreshTable()));
     connect(delegate, SIGNAL(errorOccured(QString,QString)),
@@ -147,16 +152,12 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(m_trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
                  this, SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
 
-    clearAndLoadTable();
+    //clearAndLoadTable();
 
-    this->setWindowTitle("ArteFetcher v0.1.2");
+    this->setWindowTitle("ArteFetcher v0.1.3");
 
     ui->dateEdit->setVisible(false);
     ui->dateEdit->setDate(QDate::currentDate());
-    if (!preferences.pendingDownloads().isEmpty())
-    {
-        ui->streamComboBox->setCurrentIndex(ui->streamComboBox->findText(tr("Downloads")));
-    }
 }
 
 void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)

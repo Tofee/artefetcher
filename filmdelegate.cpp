@@ -88,7 +88,7 @@ QList<StreamType>& FilmDelegate::listStreamTypes()
 }
 
 FilmDelegate::FilmDelegate(QNetworkAccessManager * in_manager, Preferences &pref)
-    :m_manager(in_manager), m_signalMapper(new QSignalMapper(this)), m_preferences(pref)
+    :m_manager(in_manager), m_signalMapper(new QSignalMapper(this)), m_preferences(pref), m_lastRequestPageId(0)
 {
     connect(m_signalMapper, SIGNAL(mapped(QObject*)),
             this, SLOT(requestReadyToRead(QObject*)));
@@ -158,9 +158,10 @@ void FilmDelegate::loadPreviousPage(){
 }
 
 void FilmDelegate::commonLoadPlaylist(QString type){
+    ++m_lastRequestPageId;
     m_visibleFilms.clear();
     m_initialyCatalog = (type == MAPPER_STEP_CATALOG);
-    downloadUrl(m_lastPlaylistUrl, QString(), type);
+    downloadUrl(m_lastPlaylistUrl, m_lastRequestPageId, QString(), type);
 }
 
 QString extractUniqueResult(const QString& document, const QString& xpath)
@@ -187,10 +188,15 @@ QString extractUniqueResult(const QString& document, const QString& xpath)
     return result;
 }
 
-void FilmDelegate::downloadUrl(const QString& url, const QString& destinationKey, const QString& step)
+void FilmDelegate::downloadUrl(const QString& url, int requestPageId, const QString& destinationKey, const QString& step)
 {
+    if (requestPageId < m_lastRequestPageId)
+    {
+        // No need to continue, this download request is out dated
+        return;
+    }
     QNetworkReply* xmlReply = m_manager->get(QNetworkRequest(QUrl(url)));
-    m_signalMapper->setMapping(xmlReply, new MyPair(destinationKey, step));
+    m_signalMapper->setMapping(xmlReply, new MyPair(requestPageId, destinationKey, step));
     connect(xmlReply, SIGNAL(finished()), m_signalMapper, SLOT(map()));
 }
 
@@ -219,8 +225,14 @@ void FilmDelegate::requestReadyToRead(QObject* object)
         return;
     QString itemName = pair->first;
     QString itemStep = pair->second;
+    int pageRequestId = pair->pageRequestId;
 
     delete pair;
+    if (pageRequestId < m_lastRequestPageId)
+    {
+        // This download request is out dated. No need to continue
+        return;
+    }
 
     if (itemName.isEmpty())
     {
@@ -248,6 +260,12 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                     if (m_films.contains(url))
                     {
                         m_visibleFilms << url;
+                        if (m_films.value(url)->m_preview.isNull() || m_films.value(url)->m_streamUrl.isNull())
+                        {
+                            // refresh incomplete cache
+                            reloadFilm(m_films.value(url));
+                        }
+                        // Continue with cache
                         continue;
                     }
 
@@ -303,7 +321,7 @@ void FilmDelegate::requestReadyToRead(QObject* object)
             }
             else
             {
-                downloadUrl(jsonUrl, film->m_infoUrl, MAPPER_STEP_CODE_2_XML);
+                downloadUrl(jsonUrl, pageRequestId, film->m_infoUrl, MAPPER_STEP_CODE_2_XML);
             }
             // jsonUrl = http://org-www.arte.tv/papi/tvguide/videos/stream/player/F/048473-089_PLUS7-F/ALL/ALL.json
         }
@@ -341,14 +359,14 @@ void FilmDelegate::requestReadyToRead(QObject* object)
 
 
                 if ( mymap.value("videoIsoLang").toString().left(2).toLower() == m_preferences.selectedLanguage().toLower()) {
-                    downloadUrl(mymap.value("videoStreamUrl").toString(), film->m_infoUrl, QString(MAPPER_STEP_CODE_3_RTMP));
+                    downloadUrl(mymap.value("videoStreamUrl").toString(), pageRequestId, film->m_infoUrl, QString(MAPPER_STEP_CODE_3_RTMP));
                 }
                 else {
                     QString expLanguage = m_preferences.selectedLanguage();
                     QString externalLanguage = QString("%1_%2").arg(expLanguage.toLower(), expLanguage.toUpper());
                     QString languageUrl = mymap.value("videoSwitchLang").toMap().value(externalLanguage).toString();
                     if (!languageUrl.isEmpty())
-                        downloadUrl(languageUrl, film->m_infoUrl, QString(MAPPER_STEP_CODE_3_RTMP));
+                        downloadUrl(languageUrl, pageRequestId, film->m_infoUrl, QString(MAPPER_STEP_CODE_3_RTMP));
                 }
 
                 if (mymap.value("videoSwitchLang").toMap().size() > 1)
@@ -382,7 +400,7 @@ void FilmDelegate::requestReadyToRead(QObject* object)
             QString thumbnail = mymap.value("programImage").toString();
             if (!thumbnail.isEmpty())
             {
-                downloadUrl(thumbnail, film->m_infoUrl, MAPPER_STEP_CODE_4_PREVIEW);
+                downloadUrl(thumbnail, pageRequestId, film->m_infoUrl, MAPPER_STEP_CODE_4_PREVIEW);
             }
             else
             {
@@ -458,7 +476,7 @@ void FilmDelegate::reloadFilm(FilmDetails* film)
 {
     QString videoPageUrl(film->m_infoUrl);
     // Download video web page:
-    downloadUrl(videoPageUrl, film->m_infoUrl, MAPPER_STEP_CODE_1_HTML);
+    downloadUrl(videoPageUrl, m_lastRequestPageId, film->m_infoUrl, MAPPER_STEP_CODE_1_HTML);
 }
 
 bool FilmDelegate::addMovieFromUrl(const QString url, QString title)

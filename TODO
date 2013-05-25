@@ -17,10 +17,7 @@
     
 ****************************************************************************/
 
-
-Importance     Temps       Description
-Grande         Moyen	   Gestion du dossier de destination de vidéos à parfaire
-Grande         Moyen       Ajouter des crédits
+IMPORTANCE     TEMPS       DESCRIPTION
 Petite         Moyen       Retour vers le futur possible
 Grande         Moyen       Bug : quand on télécharge deux épisodes d'une même série (ex téléchat), l'un écrase l'autre...
 Grande         Moyen       Bug : quand on change de langue ou de qualité, il faut effacer le cache ou recharger toutes les vidéos....
@@ -28,7 +25,7 @@ recherche par champ texte
 Standard       Long        voir s'il est possible de récupérer d'autres infos
 
 Grande         Moyen       boutons pour mettre en pause, arrêter les téléchargements, ou annuler les demandes.
-Grande         Moyen       Quand on démarre avec des films en attente, popup + aller directement dans téléchargements
+
 Mineur         Moyen       Notifications systeme quand un film est téléchargé.
 Standard       Rapide      ne pas coder de chiffres ou de string en dur, utiliser des macros ou mieux
 Standard       Moyen       refactor pour avoir le thread dans le delegate

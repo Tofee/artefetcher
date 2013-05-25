@@ -23,6 +23,7 @@
 #include <QTimer>
 #include <QFileInfo>
 #include <QDir>
+#include <QDebug>
 
 QueueDownloader::QueueDownloader(QObject *parent)
         :m_currentDownload(NULL),m_manager(new QNetworkAccessManager(parent)), m_isWorking(false)
@@ -95,6 +96,7 @@ void QueueDownloader::downloadFinished()
     m_outputFile.close();
 
     if (m_currentDownload->error()) {
+         qDebug() << m_currentDownload->errorString();
          emit(downloadError(m_currentDownload->url().toString(), QString("Failed: %1\n").arg(m_currentDownload->errorString())));
      } else {
         // Remove .part
@@ -108,13 +110,5 @@ void QueueDownloader::downloadFinished()
 }
 
 void QueueDownloader::downloadReadyRead() {
-    if (m_previouslyDownloaded >= m_currentDownload->header(QNetworkRequest::ContentLengthHeader).toLongLong())
-    {
-        m_currentDownload->disconnect();// prevent any error message
-        m_currentDownload->abort();
-        emit(downloadFinished(m_currentDownload->url().toString()));
-    }
-    else {
-        m_outputFile.write(m_currentDownload->readAll());
-    }
+     m_outputFile.write(m_currentDownload->readAll());
 }

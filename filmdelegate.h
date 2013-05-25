@@ -70,18 +70,8 @@ public:
                                               }
                                                                                     return result; }
 
-    static QString getStreamHumanName(int i);
-    static QString getStreamLanguageCode(int i);
-    static QString getStreamQualityCode(int i);
-    static StreamType getStreamTypeByLanguageAndQuality(QString languageCode, QString qualityCode) throw (NotFoundException);
-    static QList<StreamType> &listStreamTypes();
-    static StreamType getStreamTypeByHumanName(const QString &humanName) throw (NotFoundException);
-
     void reloadFilm(FilmDetails* film);
     bool addMovieFromUrl(const QString url, QString title = QString());
-
-    static QList<QString> listLanguages();
-    static QList<QString> listQualities();
 
     void loadNextPage();
     void loadPreviousPage();
@@ -110,6 +100,15 @@ public:
         return m_currentDownloads.toList();
     }
 
+    static QString getStreamHumanName(int i);
+    static QString getStreamLanguageCode(int i);
+    static QString getStreamQualityCode(int i);
+    static StreamType getStreamTypeByLanguageAndQuality(QString languageCode, QString qualityCode) throw (NotFoundException);
+    static QList<StreamType> &listStreamTypes();
+    static StreamType getStreamTypeByHumanName(const QString &humanName) throw (NotFoundException);
+    static QList<QString> listLanguages();
+    static QList<QString> listQualities();
+
 signals:
     void playListHasBeenUpdated();
     void errorOccured(QString filmUrl, QString errorMessage);
@@ -133,7 +132,7 @@ private:
      * requestReadyToRead() is called with a MyPair key of the destinationKey and the step.
      * TODO use an enum for step
      */
-    void downloadUrl(const QString& url, const QString& destinationKey, const QString &step);
+    void downloadUrl(const QString& url, int requestPageId, const QString& destinationKey, const QString &step);
     /**
      * @brief getStreamUrlFromResponse Get the Flash stream url from the video xml page.<br/>
      * There is one page per language.
@@ -164,6 +163,8 @@ private:
      */
     bool m_initialyCatalog;
 
+    int m_lastRequestPageId;
+
 
 };
 
@@ -171,7 +172,7 @@ class MyPair : public QObject{
     Q_OBJECT
 public:
 
-    MyPair(QString s1, QString s2): first(s1), second(s2)
+    MyPair(int pageRequestId, QString s1, QString s2): pageRequestId(pageRequestId), first(s1), second(s2)
     {
         // qDebug() << "on en est a" << currentCountReference(true);
 
@@ -181,6 +182,7 @@ public:
         // qDebug() << "on en est a" << currentCountReference(false);
     }
 
+    int pageRequestId;
     QString first;
     QString second;
 private:
