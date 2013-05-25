@@ -16,17 +16,17 @@
         <translation type="obsolete">Impossible de trouver les vidéos pour les langues : %1</translation>
     </message>
     <message>
-        <location filename="filmdelegate.cpp" line="285"/>
+        <location filename="filmdelegate.cpp" line="319"/>
         <source>Cannot find the main information for the movie</source>
         <translation>Impossible d&apos;obtenir les principales informations sur la vidéo</translation>
     </message>
     <message>
-        <location filename="filmdelegate.cpp" line="311"/>
+        <location filename="filmdelegate.cpp" line="345"/>
         <source>Cannot load stream details</source>
         <translation>Flux vidéo non disponible</translation>
     </message>
     <message>
-        <location filename="filmdelegate.cpp" line="373"/>
+        <location filename="filmdelegate.cpp" line="407"/>
         <source>Cannot find the preview image</source>
         <oldsource>Cannot find the video stream in %1 %2</oldsource>
         <translation>Impossible de trouver le flux vidéo</translation>
@@ -80,7 +80,7 @@
         <translation type="obsolete">Disponible jusqu&apos;à (RAW)</translation>
     </message>
     <message>
-        <location filename="filmdelegate.cpp" line="386"/>
+        <location filename="filmdelegate.cpp" line="420"/>
         <source>Cannot load the preview image</source>
         <translation>Aperçu indisponible (2)</translation>
     </message>
@@ -88,53 +88,53 @@
 <context>
     <name>FilmDetails</name>
     <message>
-        <location filename="FilmDetails.h" line="87"/>
-        <location filename="FilmDetails.h" line="88"/>
+        <location filename="FilmDetails.h" line="106"/>
+        <location filename="FilmDetails.h" line="107"/>
         <source>First broadcast</source>
         <translation>Première diffusion</translation>
     </message>
     <message>
-        <location filename="FilmDetails.h" line="89"/>
+        <location filename="FilmDetails.h" line="108"/>
         <source>Time of the first broadcast</source>
         <translation>Heure de la première diffusion</translation>
     </message>
     <message>
-        <location filename="FilmDetails.h" line="90"/>
+        <location filename="FilmDetails.h" line="109"/>
         <source>Description</source>
         <translation>Description</translation>
     </message>
     <message>
-        <location filename="FilmDetails.h" line="91"/>
+        <location filename="FilmDetails.h" line="110"/>
         <source>Available until</source>
         <translation>Disponible jusqu&apos;à</translation>
     </message>
     <message>
-        <location filename="FilmDetails.h" line="92"/>
+        <location filename="FilmDetails.h" line="111"/>
         <source>Views</source>
         <translation>Vues</translation>
     </message>
     <message>
-        <location filename="FilmDetails.h" line="93"/>
+        <location filename="FilmDetails.h" line="112"/>
         <source>Channels</source>
         <translation>Chaîne</translation>
     </message>
     <message>
-        <location filename="FilmDetails.h" line="94"/>
+        <location filename="FilmDetails.h" line="113"/>
         <source>Rank</source>
         <translation>Note</translation>
     </message>
     <message>
-        <location filename="FilmDetails.h" line="95"/>
+        <location filename="FilmDetails.h" line="114"/>
         <source>Type</source>
         <translation>Type</translation>
     </message>
     <message>
-        <location filename="FilmDetails.h" line="96"/>
+        <location filename="FilmDetails.h" line="115"/>
         <source>RAW First Broadcast</source>
         <translation>Première diffusion (RAW)</translation>
     </message>
     <message>
-        <location filename="FilmDetails.h" line="97"/>
+        <location filename="FilmDetails.h" line="116"/>
         <source>RAW Available until</source>
         <translation>Disponible jusqu&apos;à (RAW)</translation>
     </message>
@@ -207,7 +207,7 @@
     </message>
     <message>
         <location filename="mainwindow.ui" line="175"/>
-        <location filename="mainwindow.cpp" line="359"/>
+        <location filename="mainwindow.cpp" line="382"/>
         <source>Download</source>
         <translation>Télécharger</translation>
     </message>
@@ -229,7 +229,7 @@
         <translation type="obsolete">Télécharger les vidéos</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="40"/>
+        <location filename="mainwindow.cpp" line="59"/>
         <source>Title</source>
         <translation>Titre</translation>
     </message>
@@ -242,7 +242,7 @@
         <translation type="obsolete">Vues</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="41"/>
+        <location filename="mainwindow.cpp" line="60"/>
         <source>Duration</source>
         <translation>Durée</translation>
     </message>
@@ -251,7 +251,7 @@
         <translation type="obsolete">%1, %2, %3min</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="341"/>
+        <location filename="mainwindow.cpp" line="364"/>
         <source>No film in the playlist</source>
         <translation>Aucun film dans la playlist</translation>
     </message>
@@ -272,12 +272,12 @@ Check: &lt;%1&gt;</source>
         <translation type="obsolete">Aucun film n&apos;est selectionné ou certains films ne sont pas prêts à être téléchargés. Merci de patienter pendant le chargement des informations et veuillez réessayer plus tard</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="448"/>
+        <location filename="mainwindow.cpp" line="471"/>
         <source>Cannot create the working directory %1</source>
         <translation>Impossible de créer le dossier %1</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="464"/>
+        <location filename="mainwindow.cpp" line="487"/>
         <source>Download finished.</source>
         <translation>Téléchargement terminé.</translation>
     </message>
@@ -286,7 +286,7 @@ Check: &lt;%1&gt;</source>
         <translation type="obsolete">Vitesse de téléchargement : %1 Kio/s (%2)</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="355"/>
+        <location filename="mainwindow.cpp" line="378"/>
         <source>Waiting...</source>
         <translation>En attente...</translation>
     </message>
@@ -311,7 +311,7 @@ Check: &lt;%1&gt;</source>
         <translation type="obsolete">Note</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="314"/>
+        <location filename="mainwindow.cpp" line="337"/>
         <source>&lt;b&gt; %0 : &lt;/b&gt;%1&lt;br/&gt;</source>
         <translation>&lt;b&gt; %0 : &lt;/b&gt;%1&lt;br/&gt;</translation>
     </message>
@@ -321,125 +321,131 @@ Check: &lt;%1&gt;</source>
     </message>
     <message>
         <location filename="mainwindow.ui" line="274"/>
-        <location filename="mainwindow.cpp" line="69"/>
+        <location filename="mainwindow.cpp" line="89"/>
+        <location filename="mainwindow.cpp" line="99"/>
         <source>Downloads</source>
         <translation>Téléchargements</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="63"/>
+        <location filename="mainwindow.cpp" line="82"/>
         <source>Arte selection</source>
         <translation>Sélection Arte</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="64"/>
+        <location filename="mainwindow.cpp" line="83"/>
         <source>Most recent</source>
         <translation>Les plus récentes</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="65"/>
+        <location filename="mainwindow.cpp" line="84"/>
         <source>Most seen</source>
         <translation>Les plus vues</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="66"/>
+        <location filename="mainwindow.cpp" line="85"/>
         <source>Last chance</source>
         <translation>Dernière chance</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="67"/>
+        <location filename="mainwindow.cpp" line="86"/>
         <source>All</source>
         <translation>Tout</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="68"/>
+        <location filename="mainwindow.cpp" line="87"/>
+        <source>Test</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="88"/>
         <source>By date</source>
         <translation>Par date</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="157"/>
+        <location filename="mainwindow.cpp" line="180"/>
         <source>Page %1/%2
 Total results: %3</source>
         <translation>Page %1/%2
 Total: %3 résultats</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="331"/>
+        <location filename="mainwindow.cpp" line="354"/>
         <source>%1 %2 (%3min)
 %4</source>
         <translation>%1 %2 (%3 min)
 %4</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="350"/>
+        <location filename="mainwindow.cpp" line="373"/>
         <source>Downloading...</source>
         <translation>Téléchargement...</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="353"/>
+        <location filename="mainwindow.cpp" line="376"/>
         <source>Downloaded</source>
         <translation>Téléchargé</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="420"/>
+        <location filename="mainwindow.cpp" line="443"/>
         <source>File already exists</source>
         <translation>Le fichier existe déjà</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="421"/>
+        <location filename="mainwindow.cpp" line="444"/>
         <source>A file has already the name of the film: &lt;%1&gt;.
 Do you want to continue and replace it?</source>
         <translation>Un fichier du même nom existe déjà pour le film: &lt;%1&gt;
 Voulez-vous continuer et le remplacer ?</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="432"/>
+        <location filename="mainwindow.cpp" line="455"/>
         <source>Incomplete download found</source>
         <translation>Un téléchargement incomplet a été trouvé</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="433"/>
+        <location filename="mainwindow.cpp" line="456"/>
         <source>The download of the movie &lt;%1&gt; has already been started. Do you want to continue the download?</source>
         <translation>Une partie du film &lt;%1&gt; a déjà été téléchargée. Voulez vous continuer le téléchargement ?</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="485"/>
+        <location filename="mainwindow.cpp" line="508"/>
         <source>Downloading %1
 Speed %2 kB/s  -  Remaining: %3</source>
         <translation>Téléchargement: %1
 Débit : %2  -  Temps restant : %3</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="490"/>
+        <location filename="mainwindow.cpp" line="513"/>
         <source>%1 item(s) in queue</source>
         <translation>%1 film(s) en attente</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="567"/>
+        <location filename="mainwindow.cpp" line="590"/>
         <source>Add a new Film from URL</source>
         <translation>Ajouter un nouveau film à partir d&apos;une URL</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="567"/>
+        <location filename="mainwindow.cpp" line="590"/>
         <source>Enter the URL of your arte film page</source>
         <translation>Entrez l&apos;URL de la page de votre film Arte</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="606"/>
+        <location filename="mainwindow.cpp" line="629"/>
         <source>Close the application?</source>
         <translation>Fermer l&apos;application ?</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="607"/>
+        <location filename="mainwindow.cpp" line="630"/>
         <source>Download is still in progress. Closing the application will stop them immediately and your films file may be incomplete, corrupted or not event downloaded.</source>
         <translation>Téléchargement en cours. Fermer l&apos;application arrêtera les téléchargements immédiatement et le film en cours pourrait être incomplet voire corrompu.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="608"/>
+        <location filename="mainwindow.cpp" line="631"/>
         <source>Quit anyway</source>
         <translation>Quitter quand même</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="609"/>
+        <location filename="mainwindow.cpp" line="632"/>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
@@ -452,17 +458,17 @@ Débit : %2  -  Temps restant : %3</translation>
         <translation>Préférences</translation>
     </message>
     <message>
-        <location filename="preferencedialog.ui" line="33"/>
+        <location filename="preferencedialog.ui" line="20"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pattern to generate the film filenames:&lt;br/&gt;%title: video title&lt;br/&gt;%language: language code&lt;br/&gt;%quality: stream type code (hd/sd...)&lt;/p&gt;&lt;p&gt;Example: &apos;[%quality %language] %title&apos; will create&lt;br/&gt;[HQ DE] Movie title.mp4&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Patron pour générer les noms de fichier de film :&lt;br/&gt;%title : titre de la vidéo&lt;br/&gt;%quality : code de la langue&lt;br/&gt;%language : qualité (HD/ED/SD...)&lt;/p&gt;&lt;p&gt;Exemple: &apos;[%quality %language] %title&apos; créera&lt;br/&gt;[HQ DE] Titre de film.mp4&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="preferencedialog.ui" line="40"/>
+        <location filename="preferencedialog.ui" line="34"/>
         <source>Destination:</source>
         <translation>Destination :</translation>
     </message>
     <message>
-        <location filename="preferencedialog.ui" line="20"/>
+        <location filename="preferencedialog.ui" line="41"/>
         <source>Browse...</source>
         <translation>Parcourir...</translation>
     </message>
@@ -471,7 +477,7 @@ Débit : %2  -  Temps restant : %3</translation>
         <translation type="obsolete">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Patron pour générer les noms de fichier de film :&lt;br/&gt;%1 : titre de la vidéo&lt;br/&gt;%2 : code de la langue&lt;br/&gt;%3 : type de flux (HD/SD...)&lt;/p&gt;&lt;p&gt;Exemple: [%2 %3]%1.flv&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="preferencedialog.ui" line="47"/>
+        <location filename="preferencedialog.ui" line="27"/>
         <source>Filename pattern:</source>
         <translation>Patron de nom de fichiers :</translation>
     </message>
@@ -484,9 +490,19 @@ Débit : %2  -  Temps restant : %3</translation>
         <translation type="obsolete">Flux souhaités :</translation>
     </message>
     <message>
-        <location filename="preferencedialog.cpp" line="36"/>
+        <location filename="preferencedialog.cpp" line="60"/>
         <source>Target directory</source>
         <translation>Répertoire de destination</translation>
+    </message>
+    <message>
+        <location filename="preferencedialog.cpp" line="70"/>
+        <source>Target directory does not exist</source>
+        <translation>Le répertoire de destination n&apos;existe pas</translation>
+    </message>
+    <message>
+        <location filename="preferencedialog.cpp" line="75"/>
+        <source>Filename pattern is not correct</source>
+        <translation>Patron de nom de fichiers incorrect</translation>
     </message>
 </context>
 <context>
