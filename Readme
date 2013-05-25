@@ -19,6 +19,9 @@
 
 Contact me : equincerot[at]users.sourceforge.net
 
+Thanks to:
+- toto740 for the creation of the desktop icon.
+- FredBezies, he packages for Arch.
 
 To build arteFetcher from scratch for linux, you need:
 - qt devel libraries, including qt webkit (devel)

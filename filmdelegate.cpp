@@ -238,10 +238,7 @@ void FilmDelegate::requestReadyToRead(QObject* object)
             foreach(QVariant catalogItem, list)
             {
                 ++i;
-                if (i > RESULT_PER_PAGE * (m_currentPage - 1)) {
-
-                    if (i > RESULT_PER_PAGE * m_currentPage)
-                        break;
+                if (i > RESULT_PER_PAGE * (m_currentPage - 1) && i <= RESULT_PER_PAGE * m_currentPage) {
 
                     QString url = catalogItem.toMap().value(itemStep == MAPPER_STEP_CATALOG ? "url" : "details_url").toString();
                     if (itemStep == MAPPER_STEP_CATALOG)

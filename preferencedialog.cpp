@@ -34,6 +34,11 @@ PreferenceDialog::PreferenceDialog(QWidget *parent,
 
     connect(ui->browsePushButton, SIGNAL(clicked()),
             this, SLOT(browse()));
+
+    connect(ui->destinationDirectoryLineEdit, SIGNAL(textChanged(QString)),
+            SLOT(checkIsAcceptable()));
+    connect(ui->filenamePatternLineEdit, SIGNAL(textChanged(QString)),
+            SLOT(checkIsAcceptable()));
 }
 
 PreferenceDialog::~PreferenceDialog()
@@ -52,5 +57,23 @@ void PreferenceDialog::accept()
 
 void PreferenceDialog::browse()
 {
-    m_preferences.m_destinationDir = QFileDialog::getExistingDirectory(this, tr("Target directory"), m_preferences.destinationDir());
+    QString newPath = QFileDialog::getExistingDirectory(this, tr("Target directory"), m_preferences.destinationDir());
+    if (! newPath.isEmpty())
+        ui->destinationDirectoryLineEdit->setText(newPath);
+}
+
+void PreferenceDialog::checkIsAcceptable()
+{
+    QString errorMessage;
+    if (! QDir(ui->destinationDirectoryLineEdit->text()).exists())
+    {
+        errorMessage = tr("Target directory does not exist");
+    }
+
+    if (ui->filenamePatternLineEdit->text().isEmpty() || !ui->filenamePatternLineEdit->text().contains("%title"))
+    {
+        errorMessage = tr("Filename pattern is not correct");
+    }
+    ui->errorLabel->setText(errorMessage);
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(errorMessage.isEmpty());
 }

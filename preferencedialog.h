@@ -39,6 +39,7 @@ public slots:
     void accept();
 private slots:
     void browse();
+    void checkIsAcceptable();
 private:
     Ui::PreferenceDialog *ui;
     Preferences& m_preferences;

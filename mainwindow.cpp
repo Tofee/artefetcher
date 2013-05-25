@@ -144,8 +144,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->leftPageButton, SIGNAL(clicked()),
             SLOT(previousPage()));
-
-    //connect(m_trayIcon, SIGNAL(messageClicked()), this, SLOT(messageClicked()));
     connect(m_trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
                  this, SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
 
@@ -155,6 +153,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->dateEdit->setVisible(false);
     ui->dateEdit->setDate(QDate::currentDate());
+    if (!preferences.pendingDownloads().isEmpty())
+    {
+        ui->streamComboBox->setCurrentIndex(ui->streamComboBox->findText(tr("Downloads")));
+    }
 }
 
 void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
@@ -462,7 +464,7 @@ void MainWindow::downloadFilm(int currentLine, FilmDetails* film){
             film->m_targetFileName = futureFileName;
             // 3) Check the destination directory
             QDir workingDir(workingPath);
-            if (!workingDir.exists() && ! workingDir.mkdir(workingPath))
+            if (!workingDir.exists() && ! QDir("/").mkpath(workingPath))
             {
                 statusBar()->showMessage(tr("Cannot create the working directory %1").arg(workingPath));
                 return;
