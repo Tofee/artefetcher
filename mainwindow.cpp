@@ -79,13 +79,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->qualityComboBox->addItems(FilmDelegate::listQualities());
     ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findText(preferences.selectedQuality()));
 
-    ui->streamComboBox->addItem(tr("Arte selection"), "http://www.arte.tv/guide/fr/plus7/selection.json");
-    ui->streamComboBox->addItem(tr("Most recent"), "http://www.arte.tv/guide/fr/plus7/plus_recentes.json");
-    ui->streamComboBox->addItem(tr("Most seen"), "http://www.arte.tv/guide/fr/plus7/plus_vues.json");
-    ui->streamComboBox->addItem(tr("Last chance"), "http://www.arte.tv/guide/fr/plus7/derniere_chance.json");
-    ui->streamComboBox->addItem(tr("All"), "http://www.arte.tv/guide/fr/plus7.json");
-    ui->streamComboBox->addItem(tr("By date"), DATE_STREAM_PREFIX);
-    ui->streamComboBox->addItem(tr("Downloads"), DOWNLOAD_STREAM);
+
+    loadStreamComboBox();
+
 
     ui->previewLabel->setMaximumSize(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT);
     ui->previewLabel->setMinimumSize(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT);
@@ -152,9 +148,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(m_trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
                  this, SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
 
-    //clearAndLoadTable();
-
-    this->setWindowTitle("ArteFetcher v0.1.3");
+    this->setWindowTitle("ArteFetcher v0.2.0");
 
     ui->dateEdit->setVisible(false);
     ui->dateEdit->setDate(QDate::currentDate());
@@ -173,6 +167,21 @@ void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
     default:
         ;
     }
+}
+
+void MainWindow::loadStreamComboBox() {
+    int previousIndex = ui->streamComboBox->currentIndex();
+    ui->streamComboBox->clear();
+    ui->streamComboBox->addItem(tr("Arte selection"), "http://www.arte.tv/guide/"+ preferences.selectedLanguage() + "/plus7/selection.json");
+    ui->streamComboBox->addItem(tr("Most recent"), "http://www.arte.tv/guide/"+ preferences.selectedLanguage() + "/plus7/plus_recentes.json");
+    ui->streamComboBox->addItem(tr("Most seen"), "http://www.arte.tv/guide/"+ preferences.selectedLanguage() + "/plus7/plus_vues.json");
+    ui->streamComboBox->addItem(tr("Last chance"), "http://www.arte.tv/guide/"+ preferences.selectedLanguage() + "/plus7/derniere_chance.json");
+    ui->streamComboBox->addItem(tr("All"), "http://www.arte.tv/guide/"+ preferences.selectedLanguage() + "/plus7.json");
+    //ui->streamComboBox->addItem(tr("Test"), "http://www.arte.tv/papi/tvguide/epg/live/F/L3/1.json");
+    ui->streamComboBox->addItem(tr("By date"), DATE_STREAM_PREFIX);
+    ui->streamComboBox->addItem(tr("Downloads"), DOWNLOAD_STREAM);
+    if (previousIndex >=0 )
+        ui->streamComboBox->setCurrentIndex(previousIndex);
 }
 
 void MainWindow::streamIndexLoaded(int resultCount, int currentPage, int pageCount){
@@ -204,11 +213,13 @@ bool MainWindow::isReadyForDownload(const FilmDetails * const film)
 
 void MainWindow::languageChanged(){
     preferences.m_selectedLanguage = ui->languageComboBox->currentText();
+    loadStreamComboBox();
 }
 
 void MainWindow::qualityChanged()
 {
     preferences.m_selectedQuality = ui->qualityComboBox->currentText();
+    clearAndLoadTable();
 }
 
 void MainWindow::clearAndLoadTable()
@@ -218,7 +229,8 @@ void MainWindow::clearAndLoadTable()
     if (url == DATE_STREAM_PREFIX)
     {
         dateCurrentlyShown = true;
-        url = url.append(ui->dateEdit->date().toString("yyyyMMdd"));
+        url.append(preferences.selectedLanguage()).append(":");
+        url.append(ui->dateEdit->date().toString("yyyyMMdd"));
     }
     ui->dateEdit->setVisible(dateCurrentlyShown);
     delegate->loadPlayList(url);
@@ -385,7 +397,7 @@ void MainWindow::updateCurrentDetails(){
 }
 
 
-QString MainWindow::getFileName(const QString& targetDirectory, const QString& title, const QString& remoteFilename)
+QString MainWindow::getFileName(const QString& targetDirectory, const QString& title, const QString& remoteFilename, int fileSuffixNumber)
 {
     QString extension = "flv";
     if (remoteFilename != "")
@@ -419,10 +431,14 @@ QString MainWindow::getFileName(const QString& targetDirectory, const QString& t
             .replace("%language", language)
             .replace("%quality", getStreamType().qualityCode.toUpper());
 
-    QString filename("%1%2%3.%4");
+    QString countSuffix(fileSuffixNumber > 0 ? "_" + fileSuffixNumber : "");
+
+    QString filename("%1%2%3%4.%5");
     filename = filename.arg(targetDirectory,
                             QDir::separator(),
-                            baseName, extension);
+                            baseName,
+                            countSuffix,
+                            extension);
     return filename;
 }
 
@@ -438,6 +454,23 @@ void MainWindow::downloadFilm(int currentLine, FilmDetails* film){
         }
         QString titleCellText = ui->tableWidget->item(currentLine, COLUMN_FOR_TITLE)->text();
         QString futureFileName = getFileName(workingPath, titleCellText, film->m_streamUrl);
+
+
+
+        int fileSuffixNumber = 1;
+        foreach(QString otherFilmUrl, delegate->downloadList())
+        {
+            FilmDetails* otherFilm = delegate->findFilmByUrl(otherFilmUrl);
+            if (otherFilm)
+            {
+                if (otherFilm->m_targetFileName == futureFileName)
+                {
+                    // TODO faut aussi stocker ce futureFileName dans le fichier de conf de l'appli, sinon au redémarrage, si on reprend le téléchargement dans un ordre différent, les vidéos seront mélangées.
+                    futureFileName = getFileName(workingPath, titleCellText, film->m_streamUrl, fileSuffixNumber);
+                }
+            }
+        }
+
         if (QFile(futureFileName).exists()
                 && QMessageBox::question(this, tr("File already exists"),
                                   tr("A file has already the name of the film: <%1>.\nDo you want to continue and replace it?")
@@ -461,8 +494,7 @@ void MainWindow::downloadFilm(int currentLine, FilmDetails* film){
         }
         else
         {
-            film->m_hasBeenRequested = true;
-            film->m_targetFileName = futureFileName;
+
             // 3) Check the destination directory
             QDir workingDir(workingPath);
             if (!workingDir.exists() && ! QDir("/").mkpath(workingPath))
@@ -470,6 +502,10 @@ void MainWindow::downloadFilm(int currentLine, FilmDetails* film){
                 statusBar()->showMessage(tr("Cannot create the working directory %1").arg(workingPath));
                 return;
             }
+
+
+            film->m_hasBeenRequested = true;
+            film->m_targetFileName = futureFileName;
 
             delegate->addUrlToDownloadList(film->m_infoUrl); // TODO c'est trop trop moche de faire ça. Design à revoir
             thread->addFilmToDownloadQueue(film->m_infoUrl, *film);

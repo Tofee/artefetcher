@@ -137,8 +137,12 @@ void FilmDelegate::loadPlayList(QString url)
     }
     else if (url.startsWith(DATE_STREAM_PREFIX))
     {
-        url = QString("http://www.arte.tv/guide/fr/%1.json")
-                .arg(url.mid(QString(DATE_STREAM_PREFIX).size()));
+        QStringList urlParts = url.split(":");
+        QString language = urlParts.at(2);
+        QString dateString = urlParts.at(3);
+        url = QString("http://www.arte.tv/guide/%1/%2.json")
+                .arg(language)
+                .arg(dateString);
         type = MAPPER_STEP_DATE;
 
     }
@@ -329,15 +333,34 @@ void FilmDelegate::requestReadyToRead(QObject* object)
         {
             const QString page(QString::fromUtf8(reply->readAll()));
 
+            /*
+             * Nouvelle version
+             * Quand on lit le json de premier niveau (celui mentionné dans le HTML), c'est à dire :
+             *   http://org-www.arte.tv/papi/tvguide/videos/stream/player/F/048373-005_PLUS7-F/ALL/ALL.json
+             *
+             *     avant l'URL json des vidéos qu'on trouvait dans le JSON de premier niveau était :
+             *       http://www.arte.tv/papi/tvguide/videos/stream/F/048120-000_PLUS7-F/ALL/ALL.json
+             *
+             *     maintenant on ne trouve que le lien vers ce json.
+             *
+             * Mais il n'est pas difficile de convertir un lien vers l'autre à partir du moment où on a l'ID du film (048373-005 ou 048120-000).
+             */
+
+            if (m_preferences.selectedLanguage() == "fr")
+            {
+                QString videoStreamUrl = "http://www.arte.tv/papi/tvguide/videos/stream/F/" + reply->url().toString().split("/").at(9)+"/ALL/ALL.json";
+                downloadUrl(videoStreamUrl, pageRequestId, film->m_infoUrl, QString(MAPPER_STEP_CODE_3_RTMP));
+            }
+            else
+            {
+                QString videoStreamUrl = "http://www.arte.tv/papi/tvguide/videos/stream/D/" + reply->url().toString().split("/").at(9)+"/ALL/ALL.json";
+                downloadUrl(videoStreamUrl, pageRequestId, film->m_infoUrl, QString(MAPPER_STEP_CODE_3_RTMP));
+            }
+
             QScriptEngine engine;
             QScriptValue json = engine.evaluate("JSON.parse").call(QScriptValue(),
                                                                    QScriptValueList() << QString(page));
-// // récupérer l'ID
-            // http://www.arte.tv/papi/tvguide/videos/stream/F/048373-005_PLUS7-F/ALL/ALL.json l'url de stream ressemble à ça
-//            url = http://org-www.arte.tv/papi/tvguide/videos/stream/player/F/048373-005_PLUS7-F/ALL/ALL.json
 
-//            elle affiche un json qui contient cette url http://www.arte.tv/papi/tvguide/videos/stream/F/048373-005_PLUS7-F/ALL/ALL.json
-            // et ce json indique cette URL http://artestras.vo.llnwxd.net/o35/nogeo/HBBTV/048373-005-A_SQ_2_VF_00122046_MP4-2200_AMM-HBBTV.mp4
             QMap<QString, QVariant> mymap = json.toVariant().toMap().value("videoJsonPlayer").toMap();
             if (mymap.isEmpty())
             {
@@ -357,27 +380,26 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                 addMetadataIfNotEmpty(film, mymap, "VDA", RAW_First_Broadcast); // 25/04/2013 20:50:30 +0200
                 addMetadataIfNotEmpty(film, mymap, "VRU", RAW_Available_until); // 02/05/2013 20:20:30 +0200
 
-
-                if ( mymap.value("videoIsoLang").toString().left(2).toLower() == m_preferences.selectedLanguage().toLower()) {
-                    downloadUrl(mymap.value("videoStreamUrl").toString(), pageRequestId, film->m_infoUrl, QString(MAPPER_STEP_CODE_3_RTMP));
-                }
-                else {
-                    QString expLanguage = m_preferences.selectedLanguage();
-                    QString externalLanguage = QString("%1_%2").arg(expLanguage.toLower(), expLanguage.toUpper());
-                    QString languageUrl = mymap.value("videoSwitchLang").toMap().value(externalLanguage).toString();
-                    if (!languageUrl.isEmpty())
-                        downloadUrl(languageUrl, pageRequestId, film->m_infoUrl, QString(MAPPER_STEP_CODE_3_RTMP));
-                }
-
                 if (mymap.value("videoSwitchLang").toMap().size() > 1)
                 {
                     qDebug () << "[Warning] more than german and french available";
                 }
                 emit(playListHasBeenUpdated());
+
+                QString thumbnail = mymap.value("VTU").toMap().value("IUR").toString();
+                if (!thumbnail.isEmpty())
+                {
+                    downloadUrl(thumbnail, pageRequestId, film->m_infoUrl, MAPPER_STEP_CODE_4_PREVIEW);
+                }
+                else
+                {
+                    emit(errorOccured(film->m_infoUrl,tr("Cannot find the preview image")));
+                }
             }
         }
         else if (itemStep == MAPPER_STEP_CODE_3_RTMP)
         {
+            // ce json indique cette URL http://artestras.vo.llnwxd.net/o35/nogeo/HBBTV/048373-005-A_SQ_2_VF_00122046_MP4-2200_AMM-HBBTV.mp4
             const QString page(QString::fromUtf8(reply->readAll()));
 
             QScriptEngine engine;
@@ -391,11 +413,16 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                 {
                     QString quality = stream.toMap().value("VQU").toString().toLower();
                     if (quality == m_preferences.selectedQuality())
+                    {
                         film->m_streamUrl = stream.toMap().value("VUR").toString();
+                        emit playListHasBeenUpdated();
+                        break;
+                    }
                 }
             }
 
-            emit playListHasBeenUpdated();
+            if (film->m_streamUrl.isEmpty())
+                emit(errorOccured(film->m_infoUrl,tr("Cannot find the video stream")));
 
             QString thumbnail = mymap.value("programImage").toString();
             if (!thumbnail.isEmpty())
@@ -409,15 +436,18 @@ void FilmDelegate::requestReadyToRead(QObject* object)
         }
         else if (itemStep == MAPPER_STEP_CODE_4_PREVIEW)
         {
-            film->m_preview.load(reply,"jpg");
-            if (! film->m_preview.isNull())
+            if (film->m_preview.isNull())
             {
-                film->m_preview = film->m_preview.scaled(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT, Qt::KeepAspectRatio);
-                emit playListHasBeenUpdated();
-            }
-            else
-            {
-                emit(errorOccured(film->m_infoUrl,tr("Cannot load the preview image")));
+                film->m_preview.load(reply,"jpg");
+                if (! film->m_preview.isNull())
+                {
+                    film->m_preview = film->m_preview.scaled(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT, Qt::KeepAspectRatio);
+                    emit playListHasBeenUpdated();
+                }
+                else
+                {
+                    emit(errorOccured(film->m_infoUrl,tr("Cannot load the preview image")));
+                }
             }
         }
     }

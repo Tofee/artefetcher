@@ -61,7 +61,7 @@ protected:
      * @param streamTypeId
      * @return the filename
      */
-    QString getFileName(const QString& targetDirectory, const QString &title, const QString &remoteFilename);
+    QString getFileName(const QString& targetDirectory, const QString &title, const QString &remoteFilename, int fileSuffixNumber = 0);
 
     void downloadFilm(int currentLine, FilmDetails* film);
 
@@ -99,6 +99,7 @@ private:
 
     void createOrUpdateFirstColumn(int rowNumber);
     bool isReadyForDownload(const FilmDetails * const film);
+    void loadStreamComboBox();
     
 private:
     Ui::MainWindow *ui;
