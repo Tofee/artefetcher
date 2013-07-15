@@ -100,6 +100,7 @@ private:
     void createOrUpdateFirstColumn(int rowNumber);
     bool isReadyForDownload(const FilmDetails * const film);
     void loadStreamComboBox();
+    void resizeEvent( QResizeEvent * event );
     
 private:
     Ui::MainWindow *ui;

@@ -49,6 +49,7 @@ MainWindow::MainWindow(QWidget *parent) :
     preferences.load();
 
     ui->setupUi(this);
+    this->resize(preferences.preferredWindowSize());
     m_trayIcon->show();
 
     delegate = new FilmDelegate(manager, preferences);
@@ -148,7 +149,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(m_trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
                  this, SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
 
-    this->setWindowTitle("ArteFetcher v0.2.0");
+    this->setWindowTitle("ArteFetcher v0.2.1");
 
     ui->dateEdit->setVisible(false);
     ui->dateEdit->setDate(QDate::currentDate());
@@ -200,6 +201,7 @@ StreamType MainWindow::getStreamType() const
 
 MainWindow::~MainWindow()
 {
+    preferences.setPreferredWindowSize(size());
     delete delegate;
     preferences.save();
     delete ui;
@@ -704,4 +706,9 @@ void MainWindow::downloadButtonClicked()
 
     FilmDetails *details = delegate->visibleFilms()[row];
     downloadFilm(row, details);
+}
+
+void MainWindow::resizeEvent(QResizeEvent *event) {
+    ui->previewLabel->setVisible(width() > 950);
+    event->accept();
 }

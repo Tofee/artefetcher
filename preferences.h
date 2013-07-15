@@ -23,6 +23,7 @@
 #include <QString>
 #include <QSettings>
 #include <QSet>
+#include <QSize>
 
 class IPreferences
 {
@@ -61,6 +62,16 @@ public:
         m_pendingDownloads = downloadUrls;
     }
 
+    const QSize &preferredWindowSize() const
+    {
+        return m_preferredWindowSize;
+    }
+
+    void setPreferredWindowSize(QSize newSize)
+    {
+        m_preferredWindowSize = newSize;
+    }
+
     virtual void load() = 0;
     virtual void save() = 0;
 
@@ -69,8 +80,10 @@ protected:
     QString m_selectedQuality;
     QString m_filenamePattern;
     QString m_destinationDir;
+    QSize   m_preferredWindowSize;
     QSet<QString> m_pendingDownloads;
 };
+
 
 class Preferences: public IPreferences
 {
