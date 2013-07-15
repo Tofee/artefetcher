@@ -31,7 +31,7 @@ To build arteFetcher from scratch for linux, you need:
 - make
 
 1) unzip the archive
-2) lrelease
+2) lrelease *.ts
 3) qmake
 4) make
 
