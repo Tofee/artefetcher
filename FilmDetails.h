@@ -71,7 +71,8 @@ enum MetaType {
     Rank,
     Type,
     RAW_First_Broadcast,
-    RAW_Available_until
+    RAW_Available_until,
+    Episode_name /* This is only available for series */
 };
 
 
@@ -113,7 +114,8 @@ public:
              QT_TRANSLATE_NOOP("FilmDetails","Rank"),
              QT_TRANSLATE_NOOP("FilmDetails","Type"),
              QT_TRANSLATE_NOOP("FilmDetails","RAW First Broadcast"),
-             QT_TRANSLATE_NOOP("FilmDetails","RAW Available until")
+             QT_TRANSLATE_NOOP("FilmDetails","RAW Available until"),
+             QT_TRANSLATE_NOOP("FilmDetails","Episode")
         };
 
 

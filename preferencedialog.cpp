@@ -32,6 +32,8 @@ PreferenceDialog::PreferenceDialog(QWidget *parent,
     ui->destinationDirectoryLineEdit->setText(m_preferences.m_destinationDir);
     ui->filenamePatternLineEdit->setText(m_preferences.m_filenamePattern);
 
+    ui->seriesDirectoryCheckBox->setChecked(m_preferences.m_dedicatedDirectoryForSeries);
+
     connect(ui->browsePushButton, SIGNAL(clicked()),
             this, SLOT(browse()));
 
@@ -52,6 +54,8 @@ void PreferenceDialog::accept()
     // TODO must : regarder si les caractères du pattern collent avec le systeme de fichier
     m_preferences.m_destinationDir = ui->destinationDirectoryLineEdit->text();
     m_preferences.m_filenamePattern = ui->filenamePatternLineEdit->text();
+
+    m_preferences.m_dedicatedDirectoryForSeries = ui->seriesDirectoryCheckBox->isChecked();
     QDialog::accept();
 }
 
