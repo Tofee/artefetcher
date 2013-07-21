@@ -49,6 +49,7 @@ MainWindow::MainWindow(QWidget *parent) :
     preferences.load();
 
     ui->setupUi(this);
+    this->setWindowTitle("ArteFetcher v0.2.2");
     this->resize(preferences.preferredWindowSize());
     m_trayIcon->show();
 
@@ -251,7 +252,7 @@ void MainWindow::previousPage()
     delegate->loadPreviousPage();
 }
 
-void MainWindow::createOrUpdateFirstColumn(int rowNumber)
+QTableWidgetItem* MainWindow::createOrUpdateFirstColumn(int rowNumber)
 {
     QTableWidgetItem* titleTableItem = ui->tableWidget->item(rowNumber, COLUMN_FOR_TITLE);
     if (titleTableItem== NULL)
@@ -267,7 +268,7 @@ void MainWindow::createOrUpdateFirstColumn(int rowNumber)
     FilmDetails* film = delegate->visibleFilms().at(rowNumber);
     if (film == NULL)
     {
-        return;
+        return titleTableItem;
     }
     if (film->m_isDownloading){
         titleTableItem->setIcon(QIcon(":/img/progress.png"));
@@ -279,6 +280,8 @@ void MainWindow::createOrUpdateFirstColumn(int rowNumber)
     }
 
     titleTableItem->setText(film->m_title);
+
+    return titleTableItem;
 
 }
 
@@ -314,6 +317,18 @@ void MainWindow::refreshTable()
         else
             previewItem->setIcon(QIcon(QPixmap::fromImage(film->m_preview)));
 
+
+        if (film->m_metadata.contains(Episode_name))
+        {
+            ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW)->setBackgroundColor(Qt::lightGray);
+            ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW)->setToolTip(tr("Episode: %1").arg(film->m_metadata.value(Episode_name)));
+            ui->tableWidget->item(rowNumber, COLUMN_FOR_DURATION)->setBackgroundColor(Qt::lightGray);
+            ui->tableWidget->item(rowNumber, COLUMN_FOR_DURATION)->setToolTip(tr("Episode: %1").arg(film->m_metadata.value(Episode_name)));
+            ui->tableWidget->item(rowNumber, COLUMN_FOR_TITLE)->setBackgroundColor(Qt::lightGray);
+            ui->tableWidget->item(rowNumber, COLUMN_FOR_TITLE)->setToolTip(tr("Episode: %1").arg(film->m_metadata.value(Episode_name)));
+
+        }
+
         ++rowNumber;
     }
 
@@ -331,7 +346,7 @@ const QList<MetaType>& MainWindow::listInterestingDetails() {
     if (shownMetadata.isEmpty())
     {
         shownMetadata // << Available_until
-                      << Description << First_broadcast_long << Type << Views << Rank;
+                << Description << First_broadcast_long << Type << Views << Rank << Episode_name;
     }
     return shownMetadata;
 }
@@ -386,6 +401,8 @@ void MainWindow::updateCurrentDetails(){
             ui->countryYearDurationlabel->setText(coutryYearDurationText);
         }
 
+        //qDebug() << getFileName(preferences.destinationDir(), film->title(), film->m_streamUrl, 0, film->m_metadata.value(Serie_Subtitle));
+
      }
      else
      {
@@ -414,7 +431,35 @@ void MainWindow::updateCurrentDetails(){
 }
 
 
-QString MainWindow::getFileName(const QString& targetDirectory, const QString& title, const QString& remoteFilename, int fileSuffixNumber)
+QString cleanFilenameForFileSystem(const QString filename) {
+    QString cleanedFilename(filename);
+    // TODO les caractères HTML sont à convertir (ex:&#39; => ')
+
+    cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[éèëê]")), "e");
+    cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[ÉÈËÊ]")), "E");
+    cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[ô]")), "o");
+    cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[Ô]")), "O");
+    cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[âáà]")), "a");
+    cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[ÂÁÀ]")), "A");
+    cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[îï]")), "i");
+    cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[ÎÏ]")), "I");
+    cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[û]")), "u");
+    cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[Û]")), "U");
+    cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[ç]")), "c");
+    cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[Ç]")), "C");
+    cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[ß]")), "ss");
+    cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[ä]")), "ae");
+    cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[Ä]")), "AE");
+    cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[ö]")), "oe");
+    cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[Ö]")), "OE");
+    cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[ü]")), "ue");
+    cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[Ü]")), "UE");
+    cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[/]")), "-");
+    cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[^a-zA-Z0-9 _-()]")), " ");
+    return cleanedFilename.simplified();
+}
+
+QString MainWindow::getFileName(const QString& targetDirectory, const QString& title, const QString& remoteFilename, int fileSuffixNumber, QString episodeName)
 {
     QString extension = "flv";
     if (remoteFilename != "")
@@ -424,36 +469,46 @@ QString MainWindow::getFileName(const QString& targetDirectory, const QString& t
             extension = remoteFile.suffix();
     }
 
-    // TODO les caractères HTML sont à convertir (ex:&#39; => ')
-    QString cleanedTitle(title);
-    cleanedTitle.replace(QRegExp("[éèëê]"), "e");
-    cleanedTitle.replace(QRegExp("[ô]"), "o");
-    cleanedTitle.replace(QRegExp("[à]"), "à");
-    cleanedTitle.replace(QRegExp("[îï]"), "i");
-    cleanedTitle.replace(QRegExp("[û]"), "u");
-    cleanedTitle.replace(QRegExp("[ç]"), "c");
-    cleanedTitle.replace(QRegExp("[ß]"), "ss");
-    cleanedTitle.replace(QRegExp("[ä]"), "ae");
-    cleanedTitle.replace(QRegExp("[ö]"), "oe");
-    cleanedTitle.replace(QRegExp("[ü]"), "ue");
-    cleanedTitle.replace(QRegExp("[/]"), "-");
-    cleanedTitle.replace(QRegExp("[^a-zA-Z0-9 _-()]"), " ");
-    cleanedTitle = cleanedTitle.simplified();
+    QString cleanedTitle;
 
     QString language(getStreamType().languageCode);
     language = language.replace(0, 1, language.left(1).toUpper());
 
-    QString baseName(preferences.filenamePattern());
-    baseName.replace("%title", cleanedTitle)
-            .replace("%language", language)
-            .replace("%quality", getStreamType().qualityCode.toUpper());
+    if (preferences.useDedicatedDirectoryForSeries() && !episodeName.isEmpty())
+    {
+        QRegExp episodeNumberRegExp("\\([0-9 \\-/]+\\)");
+
+        QString serieName = QString(title).replace(episodeNumberRegExp, "");
+
+        /* Get the episode suffix, like "(12/15)" to put it as prefix of the film title */
+        QString episodeNumberText;
+        if (episodeNumberRegExp.indexIn(title) >= 0)
+        {
+            episodeNumberText = episodeNumberRegExp.cap().append(" ");
+        }
+
+        QString filename = preferences.filenamePattern();;
+        filename.replace("%title", episodeNumberText.append(episodeName))
+                .replace("%language", language)
+                .replace("%quality", getStreamType().qualityCode.toUpper());
+
+        cleanedTitle = cleanFilenameForFileSystem(serieName).append(QDir::separator()).append(cleanFilenameForFileSystem(filename));
+    }
+    else
+    {
+        cleanedTitle = preferences.filenamePattern();
+        cleanedTitle.replace("%title", title)
+                .replace("%language", language)
+                .replace("%quality", getStreamType().qualityCode.toUpper());
+        cleanedTitle = cleanFilenameForFileSystem(title);
+    }
 
     QString countSuffix(fileSuffixNumber > 0 ? "_" + fileSuffixNumber : "");
 
     QString filename("%1%2%3%4.%5");
     filename = filename.arg(targetDirectory,
                             QDir::separator(),
-                            baseName,
+                            cleanedTitle,
                             countSuffix,
                             extension);
     return filename;
@@ -470,9 +525,7 @@ void MainWindow::downloadFilm(int currentLine, FilmDetails* film){
             return;
         }
         QString titleCellText = ui->tableWidget->item(currentLine, COLUMN_FOR_TITLE)->text();
-        QString futureFileName = getFileName(workingPath, titleCellText, film->m_streamUrl);
-
-
+        QString futureFileName = getFileName(workingPath, titleCellText, film->m_streamUrl, 0, film->m_metadata.value(Episode_name));
 
         int fileSuffixNumber = 1;
         foreach(QString otherFilmUrl, delegate->downloadList())
@@ -483,7 +536,7 @@ void MainWindow::downloadFilm(int currentLine, FilmDetails* film){
                 if (otherFilm->m_targetFileName == futureFileName)
                 {
                     // TODO faut aussi stocker ce futureFileName dans le fichier de conf de l'appli, sinon au redémarrage, si on reprend le téléchargement dans un ordre différent, les vidéos seront mélangées.
-                    futureFileName = getFileName(workingPath, titleCellText, film->m_streamUrl, fileSuffixNumber);
+                    futureFileName = getFileName(workingPath, titleCellText, film->m_streamUrl, fileSuffixNumber, film->m_metadata.value(Episode_name));
                 }
             }
         }
@@ -511,10 +564,8 @@ void MainWindow::downloadFilm(int currentLine, FilmDetails* film){
         }
         else
         {
-
             // 3) Check the destination directory
-            QDir workingDir(workingPath);
-            if (!workingDir.exists() && ! QDir("/").mkpath(workingPath))
+            if (!QFileInfo(futureFileName).absoluteDir().exists() && ! QDir("/").mkpath(QFileInfo(futureFileName).absolutePath()))
             {
                 statusBar()->showMessage(tr("Cannot create the working directory %1").arg(workingPath));
                 return;
@@ -714,6 +765,7 @@ void MainWindow::cellHasBeenClicked(int row, int column)
         QTableWidgetItem* titleItem = ui->tableWidget->item(row, COLUMN_FOR_TITLE);
         if (film != NULL && titleItem != NULL)
         {
+            // TODO ça ne marche pas comme ça, il faut stocker le fichier du film qu'on télécharge
             QString fileName = getFileName(preferences.destinationDir(), titleItem->text(), film->m_streamUrl);
             if (film->m_isDownloaded)
                 QDesktopServices::openUrl(QUrl::fromLocalFile(fileName));

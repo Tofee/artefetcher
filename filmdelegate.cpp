@@ -380,6 +380,8 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                 addMetadataIfNotEmpty(film, mymap, "VDA", RAW_First_Broadcast); // 25/04/2013 20:50:30 +0200
                 addMetadataIfNotEmpty(film, mymap, "VRU", RAW_Available_until); // 02/05/2013 20:20:30 +0200
 
+                addMetadataIfNotEmpty(film, mymap, "VSU", Episode_name); // if not null, it belongs to a serie
+
                 if (mymap.value("videoSwitchLang").toMap().size() > 1)
                 {
                     qDebug () << "[Warning] more than german and french available";

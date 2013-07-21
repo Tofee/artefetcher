@@ -72,6 +72,14 @@ public:
         m_preferredWindowSize = newSize;
     }
 
+    bool useDedicatedDirectoryForSeries() const {
+        return m_dedicatedDirectoryForSeries;
+    }
+
+    void setUseDedicatedDirectoryForSeries(bool useInTheFuture) {
+        m_dedicatedDirectoryForSeries = useInTheFuture;
+    }
+
     virtual void load() = 0;
     virtual void save() = 0;
 
@@ -82,6 +90,7 @@ protected:
     QString m_destinationDir;
     QSize   m_preferredWindowSize;
     QSet<QString> m_pendingDownloads;
+    bool    m_dedicatedDirectoryForSeries;
 };
 
 

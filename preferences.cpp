@@ -27,6 +27,7 @@
 #define DEF_OPT_DST_DIR          "destination_directory"
 #define DEF_OPT_PENDING_DOWNLADS "pending_downloads"
 #define DEF_OPT_PREF_WINDOW_SIZE "preferred_window_size"
+#define DEF_OPT_DEDICATED_DIR_SERIES "dedicated_dir_series"
 
 Preferences::Preferences()
 {
@@ -44,6 +45,7 @@ void Preferences::load()
     m_destinationDir = settings.value(DEF_OPT_DST_DIR, defaultWorkingPath).toString();
     m_pendingDownloads = QSet<QString>::fromList(settings.value(DEF_OPT_PENDING_DOWNLADS, QStringList()).toStringList());
     m_preferredWindowSize = settings.value(DEF_OPT_PREF_WINDOW_SIZE, QSize(960,600)).toSize();
+    m_dedicatedDirectoryForSeries = settings.value(DEF_OPT_DEDICATED_DIR_SERIES, true).toBool();
 }
 
 void Preferences::save()
@@ -54,5 +56,6 @@ void Preferences::save()
     settings.setValue(DEF_OPT_DST_DIR, m_destinationDir);
     settings.setValue(DEF_OPT_PENDING_DOWNLADS, QStringList(m_pendingDownloads.toList()));
     settings.setValue(DEF_OPT_PREF_WINDOW_SIZE, m_preferredWindowSize);
+    settings.setValue(DEF_OPT_DEDICATED_DIR_SERIES, m_dedicatedDirectoryForSeries);
     settings.sync();
 }

@@ -59,9 +59,10 @@ protected:
      * @param targetDirectory
      * @param title the title of the film
      * @param streamTypeId
+     * @param episodeName the name of the episode if the film belongs to series
      * @return the filename
      */
-    QString getFileName(const QString& targetDirectory, const QString &title, const QString &remoteFilename, int fileSuffixNumber = 0);
+    QString getFileName(const QString& targetDirectory, const QString &title, const QString &remoteFilename, int fileSuffixNumber = 0, QString episodeName = QString());
 
     void downloadFilm(int currentLine, FilmDetails* film);
 
@@ -105,7 +106,7 @@ private:
 
     void closeEvent(QCloseEvent* event);
 
-    void createOrUpdateFirstColumn(int rowNumber);
+    QTableWidgetItem *createOrUpdateFirstColumn(int rowNumber);
     bool isReadyForDownload(const FilmDetails * const film);
     void loadStreamComboBox();
     void resizeEvent( QResizeEvent * event );

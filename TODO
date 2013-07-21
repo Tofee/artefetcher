@@ -19,12 +19,10 @@
 
 IMPORTANCE     TEMPS       DESCRIPTION
 Petite         Moyen       Retour vers le futur possible
-Grande         Moyen       Bug : quand on télécharge deux épisodes d'une même série (ex téléchat), l'un écrase l'autre...
-
-recherche par champ texte
+Standard       Moyen       Recherche par champ texte
 Standard       Long        voir s'il est possible de récupérer d'autres infos
 
-Grande         Moyen       boutons pour mettre en pause, arrêter les téléchargements, ou annuler les demandes.
+Grande         Moyen       boutons pour arrêter un téléchargement en cours ou une demande en attente.
 
 Mineur         Moyen       Notifications systeme quand un film est téléchargé.
 Standard       Rapide      ne pas coder de chiffres ou de string en dur, utiliser des macros ou mieux

@@ -51,12 +51,37 @@ To build arteFetcher from scratch for linux, you need:
 Then you can launch the arteFetcher application.
 
 Release notes :
+
+v0.2.2
+  New features:
+  - now user can pause the download and continue later
+  - add a button to open the film web page in an external browser
+  - film episode are gathered in one serie directory
+  - better naming strategy for episodes
+
+  UI improvements:
+  - Remove unused menu bar and toolbar
+  - fix weird text when some metadata are missing
+  - duration shown in 00:00:00 format
+  - more icons usedfor buttons. Button text replaced by its tooltip
+  - download part is hidden if no download is in progress
+---------------------------------------------------------------
+v0.2.1
+  Fix readme instructions
+  Better compatibility for very small screen
+---------------------------------------------------------------
+v0.2.0
+  Fix critical issue with the new Arte API (no video stream were found)
+  Better language management
+  Better stream quality management
+  Temporary fix for title edit. Will be improved in the future.
+---------------------------------------------------------------
 v0.1.3
-Fix: page count is increasing when going to the next page
-Fix: continue download does not continue
-Preferences improvements
-Show Downloads page at startup if necessary
-Prevent loading old film load request
-Refresh cache movie if cover or download stream is missing
-Add credits in Readme
+  Fix: page count is increasing when going to the next page
+  Fix: continue download does not continue
+  Preferences improvements
+  Show Downloads page at startup if necessary
+  Prevent loading old film load request
+  Refresh cache movie if cover or download stream is missing
+  Add credits in Readme
 
