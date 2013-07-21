@@ -49,7 +49,7 @@ MainWindow::MainWindow(QWidget *parent) :
     preferences.load();
 
     ui->setupUi(this);
-    this->setWindowTitle("ArteFetcher v0.2.2");
+    this->setWindowTitle("ArteFetcher v0.2.3");
     this->resize(preferences.preferredWindowSize());
     m_trayIcon->show();
 
@@ -320,12 +320,20 @@ void MainWindow::refreshTable()
 
         if (film->m_metadata.contains(Episode_name))
         {
-            ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW)->setBackgroundColor(Qt::lightGray);
-            ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW)->setToolTip(tr("Episode: %1").arg(film->m_metadata.value(Episode_name)));
-            ui->tableWidget->item(rowNumber, COLUMN_FOR_DURATION)->setBackgroundColor(Qt::lightGray);
-            ui->tableWidget->item(rowNumber, COLUMN_FOR_DURATION)->setToolTip(tr("Episode: %1").arg(film->m_metadata.value(Episode_name)));
-            ui->tableWidget->item(rowNumber, COLUMN_FOR_TITLE)->setBackgroundColor(Qt::lightGray);
-            ui->tableWidget->item(rowNumber, COLUMN_FOR_TITLE)->setToolTip(tr("Episode: %1").arg(film->m_metadata.value(Episode_name)));
+            if (ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW)) {
+                ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW)->setBackgroundColor(Qt::lightGray);
+                ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW)->setToolTip(tr("Episode: %1").arg(film->m_metadata.value(Episode_name)));
+            }
+
+            if (ui->tableWidget->item(rowNumber, COLUMN_FOR_TITLE)) {
+                ui->tableWidget->item(rowNumber, COLUMN_FOR_TITLE)->setBackgroundColor(Qt::lightGray);
+                ui->tableWidget->item(rowNumber, COLUMN_FOR_TITLE)->setToolTip(tr("Episode: %1").arg(film->m_metadata.value(Episode_name)));
+            }
+
+            if (ui->tableWidget->item(rowNumber, COLUMN_FOR_DURATION)) {
+                ui->tableWidget->item(rowNumber, COLUMN_FOR_DURATION)->setBackgroundColor(Qt::lightGray);
+                ui->tableWidget->item(rowNumber, COLUMN_FOR_DURATION)->setToolTip(tr("Episode: %1").arg(film->m_metadata.value(Episode_name)));
+            }
 
         }
 
