@@ -39,6 +39,8 @@ public:
 
     int queueSize() const;
 
+    void pause();
+
 private slots:
     void startNextDownload();
 
@@ -53,6 +55,7 @@ signals:
     void downloadFinished(QString url);
     void downloadError(QString url, QString message);
     void allDownloadsFinished();
+    void paused();
 private:
 
     QNetworkReply* m_currentDownload;
@@ -62,6 +65,7 @@ private:
     QTime m_downloadTime;
     QTime m_lastNotifTime;
     bool m_isWorking;
+    bool m_isPaused;
     qint64 m_previouslyDownloaded;
 };
 

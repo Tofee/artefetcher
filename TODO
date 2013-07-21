@@ -20,7 +20,7 @@
 IMPORTANCE     TEMPS       DESCRIPTION
 Petite         Moyen       Retour vers le futur possible
 Grande         Moyen       Bug : quand on télécharge deux épisodes d'une même série (ex téléchat), l'un écrase l'autre...
-Grande         Moyen       Bug : quand on change de langue ou de qualité, il faut effacer le cache ou recharger toutes les vidéos....
+
 recherche par champ texte
 Standard       Long        voir s'il est possible de récupérer d'autres infos
 

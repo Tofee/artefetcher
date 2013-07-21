@@ -37,7 +37,7 @@
 
 #define TABLE_PREVIEW_MAX_WIDTH 100
 #define TABLE_PREVIEW_MAX_HEIGHT 100
-#define TABLE_PREVIEW_COLUMN_MARGIN 10
+#define TABLE_COLUMN_MARGIN 10
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -68,9 +68,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QFontMetrics metric(ui->tableWidget->font());
 
-    ui->tableWidget->horizontalHeader()->resizeSection(COLUMN_FOR_DURATION, metric.boundingRect("999 min.").width());
-    ui->tableWidget->horizontalHeader()->resizeSection(COLUMN_FOR_PREVIEW, TABLE_PREVIEW_MAX_WIDTH + TABLE_PREVIEW_COLUMN_MARGIN);
-    ui->tableWidget->horizontalHeader()->resizeSection(COLUMN_FOR_TITLE, metric.boundingRect("Sample of a fitting title").width());
+    ui->tableWidget->horizontalHeader()->resizeSection(COLUMN_FOR_DURATION, metric.boundingRect("00:00:00").width() + TABLE_COLUMN_MARGIN);
+    ui->tableWidget->horizontalHeader()->resizeSection(COLUMN_FOR_PREVIEW, TABLE_PREVIEW_MAX_WIDTH + TABLE_COLUMN_MARGIN);
+    ui->tableWidget->horizontalHeader()->resizeSection(COLUMN_FOR_TITLE, metric.boundingRect("Sample of fitting title").width());
     ui->tableWidget->setIconSize(QSize(TABLE_PREVIEW_MAX_WIDTH, TABLE_PREVIEW_MAX_HEIGHT));
 
     ui->progressBar->setMaximum(100);
@@ -80,16 +80,18 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->qualityComboBox->addItems(FilmDelegate::listQualities());
     ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findText(preferences.selectedQuality()));
 
-
-    loadStreamComboBox();
-
-
     ui->previewLabel->setMaximumSize(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT);
     ui->previewLabel->setMinimumSize(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT);
     ui->previewLabel->setPixmap(QPixmap(":/img/Arte.jpg").scaled(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT, Qt::KeepAspectRatio));
 
     ui->detailsGroupBox->setStyleSheet("QGroupBox { font-size: 16px; font-weight: bold; }");
 
+    changeDownloadPartVisibility(false);
+
+    ui->dateEdit->setVisible(false);
+    ui->dateEdit->setDate(QDate::currentDate());
+
+    loadStreamComboBox();
     if (!preferences.pendingDownloads().isEmpty())
     {
         ui->streamComboBox->setCurrentIndex(ui->streamComboBox->findText(tr("Downloads")));
@@ -126,9 +128,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->qualityComboBox, SIGNAL(currentIndexChanged(int)),
             SLOT(qualityChanged()));
 
-    ui->progressBar->setVisible(false);
-
-
     connect(thread, SIGNAL(signalAllFilmDownloadFinished()),
             SLOT(allFilmDownloadFinished()));
     connect(thread, SIGNAL(signalDownloadProgressed(QString,double,double, double)),
@@ -149,10 +148,14 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(m_trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
                  this, SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
 
-    this->setWindowTitle("ArteFetcher v0.2.1");
+    connect(ui->webPageButton, SIGNAL(clicked()), SLOT(webPageButtonClicked()));
 
-    ui->dateEdit->setVisible(false);
-    ui->dateEdit->setDate(QDate::currentDate());
+    connect(ui->pauseButton, SIGNAL(clicked()), thread, SLOT(pause()));
+
+    connect(thread, SIGNAL(hasBeenPaused()), SLOT(hasBeenPaused()));
+
+    clearAndLoadTable();
+
 }
 
 void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
@@ -272,7 +275,7 @@ void MainWindow::createOrUpdateFirstColumn(int rowNumber)
         if (film->m_isDownloaded)
             titleTableItem->setIcon(QIcon(":/img/finished.png"));
         else
-            titleTableItem->setIcon(QIcon(":/img/clock.png"));
+            titleTableItem->setIcon(QIcon(":/img/waiting.png"));
     }
 
     titleTableItem->setText(film->m_title);
@@ -294,7 +297,8 @@ void MainWindow::refreshTable()
         createOrUpdateFirstColumn(rowNumber);
         if (film->m_durationInMinutes > 0)
         {
-            QTableWidgetItem* item = new QTableWidgetItem(QString::number(film->m_durationInMinutes));
+            QTime duration(QTime().addSecs(film->m_durationInMinutes * 60));
+            QTableWidgetItem* item = new QTableWidgetItem(duration.toString());
             item->setFlags(item->flags()^Qt::ItemIsEditable);
             ui->tableWidget->setItem(rowNumber, COLUMN_FOR_DURATION, item);
         }
@@ -364,11 +368,22 @@ void MainWindow::updateCurrentDetails(){
         }
         ui->detailsGroupBox->setTitle(film->m_title);
         {
-            ui->countryYearDurationlabel->setText(tr("%1 %2 (%3min)\n%4")
-                                                  .arg(FilmDetails::enum2Str(First_broadcast_long))
-                                                  .arg(film->m_metadata.value(First_broadcast_long))
-                                                  .arg(QString::number(film->m_durationInMinutes))
-                                                  .arg(film->m_metadata.value(Available_until)));
+            QString coutryYearDurationText;
+            if (!film->m_metadata.value(First_broadcast_long).isEmpty())
+            {
+                coutryYearDurationText.append(tr("%1 %2 ")
+                                              .arg(FilmDetails::enum2Str(First_broadcast_long))
+                                              .arg(film->m_metadata.value(First_broadcast_long)));
+            }
+
+            coutryYearDurationText.append(tr("(%1 min)").arg(QString::number(film->m_durationInMinutes)));
+
+            if (! film->m_metadata.value(Available_until).isEmpty())
+            {
+                coutryYearDurationText.append(tr("\n%1").arg(film->m_metadata.value(Available_until)));
+            }
+
+            ui->countryYearDurationlabel->setText(coutryYearDurationText);
         }
 
      }
@@ -383,16 +398,16 @@ void MainWindow::updateCurrentDetails(){
 
      bool isDownloadButtonClickable= false;
      if (film->m_isDownloading)
-         ui->downloadButton->setText(tr("Downloading..."));
+         ui->downloadButton->setToolTip(tr("Downloading..."));
      else if (film->m_hasBeenRequested){
          if (film->m_isDownloaded)
-             ui->downloadButton->setText(tr("Downloaded"));
+             ui->downloadButton->setToolTip(tr("Downloaded"));
          else
-            ui->downloadButton->setText(tr("Waiting..."));
+            ui->downloadButton->setToolTip(tr("Waiting..."));
      }
      else
      {
-         ui->downloadButton->setText(tr("Download"));
+         ui->downloadButton->setToolTip(tr("Download"));
          isDownloadButtonClickable = isReadyForDownload(film);
      }
      ui->downloadButton->setEnabled(isDownloadButtonClickable);
@@ -517,16 +532,24 @@ void MainWindow::downloadFilm(int currentLine, FilmDetails* film){
     refreshTable();
 }
 
+void MainWindow::changeDownloadPartVisibility(bool isVisible)
+{
+    ui->progressBar->setVisible(isVisible);
+    ui->pauseButton->setVisible(isVisible);
+    ui->downloadTitleLabel->setVisible(isVisible);
+    ui->downloadSeparatorLine->setVisible(isVisible);
+}
+
 void MainWindow::allFilmDownloadFinished()
 {
-    ui->progressBar->setVisible(false);
+    changeDownloadPartVisibility(false);
     ui->downloadLabel->setText("");
     statusBar()->showMessage(tr("Download finished."));
 }
 
 void MainWindow::downloadProgressed(QString filmUrl, double progression, double speed, double remainingTime)
 {
-    ui->progressBar->setVisible(true);
+    changeDownloadPartVisibility(true);
     ui->progressBar->setValue(progression);
 
 
@@ -556,6 +579,10 @@ void MainWindow::downloadProgressed(QString filmUrl, double progression, double 
         if (filmId == ui->tableWidget->currentRow())
             updateCurrentDetails();
     }
+}
+
+void MainWindow::hasBeenPaused() {
+    ui->downloadLabel->setText(tr("Paused"));
 }
 
 void MainWindow::filmDownloaded(QString filmUrl)
@@ -708,7 +735,19 @@ void MainWindow::downloadButtonClicked()
     downloadFilm(row, details);
 }
 
+void MainWindow::webPageButtonClicked()
+{
+    int row = ui->tableWidget->currentRow();
+
+    FilmDetails * film = delegate->visibleFilms()[row];
+    if (film != NULL)
+    {
+        QDesktopServices::openUrl(QUrl(film->m_infoUrl));
+    }
+}
+
 void MainWindow::resizeEvent(QResizeEvent *event) {
     ui->previewLabel->setVisible(width() > 950);
     event->accept();
 }
+

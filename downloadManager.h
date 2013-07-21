@@ -36,6 +36,10 @@ signals:
     void signalAllFilmDownloadFinished();
     void signalDownloadProgressed(QString key,double,double, double);
     void signalDownloadFinished(QString key);
+    void hasBeenPaused();
+
+public slots:
+    void pause();
 
 private slots:
     void downloadProgressed(QString url, qint64 loadedSize, qint64 totalSize, double kbytesPerSecond, double remainingTimeInSecond);
@@ -45,6 +49,7 @@ private slots:
     void downloadError(QString url, QString message);
 
     void allDownloadsFinished();
+
 
 
 private:

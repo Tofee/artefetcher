@@ -29,6 +29,7 @@ DownloadManager::DownloadManager(QObject *parent)
         connect(&m_downloader, SIGNAL(downloadFinished(QString)), SLOT(downloadFinished(QString)));
         connect(&m_downloader, SIGNAL(downloadError(QString,QString)), SLOT(downloadError(QString,QString)));
         connect(&m_downloader, SIGNAL(allDownloadsFinished()), SLOT(allDownloadsFinished()));
+        connect(&m_downloader, SIGNAL(paused()), SIGNAL(hasBeenPaused()));
     }
 
 void DownloadManager::addFilmToDownloadQueue(QString key, const FilmDetails& details){
@@ -64,4 +65,6 @@ void DownloadManager::allDownloadsFinished(){
     emit(signalAllFilmDownloadFinished());
 }
 
-
+void DownloadManager::pause() {
+    m_downloader.pause();
+}

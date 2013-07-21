@@ -26,7 +26,7 @@
 #include <QDebug>
 
 QueueDownloader::QueueDownloader(QObject *parent)
-        :m_currentDownload(NULL),m_manager(new QNetworkAccessManager(parent)), m_isWorking(false)
+    :m_currentDownload(NULL),m_manager(new QNetworkAccessManager(parent)), m_isWorking(false), m_isPaused(false)
 {
 }
 
@@ -44,6 +44,9 @@ int QueueDownloader::queueSize() const {
 }
 
 void QueueDownloader::startNextDownload(){
+    if (m_isPaused)
+        return;
+
     m_isWorking = true;
     m_downloadTime.restart();
 
@@ -96,14 +99,16 @@ void QueueDownloader::downloadFinished()
     m_outputFile.close();
 
     if (m_currentDownload->error()) {
-         qDebug() << m_currentDownload->errorString();
-         emit(downloadError(m_currentDownload->url().toString(), QString("Failed: %1\n").arg(m_currentDownload->errorString())));
-     } else {
-        // Remove .part
+        if (!m_isPaused) {
+            qDebug() << m_currentDownload->errorString();
+            emit(downloadError(m_currentDownload->url().toString(), QString("Failed: %1\n").arg(m_currentDownload->errorString())));
+        }
+    } else {
+        // Remove .part extension
         QFileInfo info(m_outputFile.fileName());
         m_outputFile.rename(info.absolutePath() + QDir::separator() + info.completeBaseName());
-         emit(downloadFinished(m_currentDownload->url().toString()));
-     }
+        emit(downloadFinished(m_currentDownload->url().toString()));
+    }
 
      m_currentDownload->deleteLater();
      startNextDownload();
@@ -111,4 +116,22 @@ void QueueDownloader::downloadFinished()
 
 void QueueDownloader::downloadReadyRead() {
      m_outputFile.write(m_currentDownload->readAll());
+}
+
+void QueueDownloader::pause() {
+    m_isPaused = !m_isPaused;
+    if (m_isPaused)
+    {
+        QFileInfo info(m_outputFile.fileName());
+        QString outputFileWithoutPartExtension(info.absolutePath() + QDir::separator() + info.completeBaseName());
+        QPair<QUrl, QString> currentDownload(m_currentDownload->url(), outputFileWithoutPartExtension);
+        m_pendingDonwloads.push_front(currentDownload);
+        m_currentDownload->abort();
+        m_outputFile.close();
+        emit(paused());
+    }
+    if (m_isWorking && !m_isPaused)
+    {
+        startNextDownload();
+    }
 }

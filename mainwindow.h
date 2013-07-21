@@ -67,40 +67,50 @@ protected:
 
 
 private slots:
-    void refreshTable();
-    void updateCurrentDetails();
-
-    void allFilmDownloadFinished();
-    void downloadProgressed(QString filmUrl, double progression, double speed, double remainingTime);
-    void filmDownloaded(QString filmUrl);
-
-    void reloadCurrentRow();
-    void addFilmManuallyFromUrl();
-    void errorOccured(QString filmUrl, QString errorMessage);
-    void showPreferences();
-    void cellHasBeenClicked(int row, int column);
-
-    void languageChanged();
-    void qualityChanged();
-    void clearAndLoadTable();
-
-    void downloadButtonClicked();
-
-    void nextPage();
-    void previousPage();
-    void streamIndexLoaded(int resultCount, int currentPage, int pageCount);
-
-    const QList<MetaType> &listInterestingDetails();
 
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
 
+    void refreshTable();
+    void clearAndLoadTable();
+    void reloadCurrentRow();
+    void updateCurrentDetails();
+
+    /* Triggered by the downloader*/
+    void allFilmDownloadFinished();
+    void downloadProgressed(QString filmUrl, double progression, double speed, double remainingTime);
+    void filmDownloaded(QString filmUrl);
+    void hasBeenPaused();
+
+    /* User actions */
+    void downloadButtonClicked();
+    void webPageButtonClicked();
+    void cellHasBeenClicked(int row, int column);
+
+    void nextPage();
+    void previousPage();
+
+    void addFilmManuallyFromUrl();
+
+    void showPreferences();
+    void languageChanged();
+    void qualityChanged();
+
+    /* Film delegate */
+    void errorOccured(QString filmUrl, QString errorMessage);
+    void streamIndexLoaded(int resultCount, int currentPage, int pageCount);
+
 private:
+
+    const QList<MetaType> &listInterestingDetails();
+
     void closeEvent(QCloseEvent* event);
 
     void createOrUpdateFirstColumn(int rowNumber);
     bool isReadyForDownload(const FilmDetails * const film);
     void loadStreamComboBox();
     void resizeEvent( QResizeEvent * event );
+
+    void changeDownloadPartVisibility(bool isVisible);
     
 private:
     Ui::MainWindow *ui;
