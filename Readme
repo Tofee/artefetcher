@@ -51,7 +51,9 @@ To build arteFetcher from scratch for linux, you need:
 Then you can launch the arteFetcher application.
 
 Release notes :
-
+v0.2.3
+  Fix segmentation fault (crash when listing a serie movie without duration)
+---------------------------------------------------------------
 v0.2.2
   New features:
   - now user can pause the download and continue later

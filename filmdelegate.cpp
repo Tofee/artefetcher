@@ -345,17 +345,18 @@ void FilmDelegate::requestReadyToRead(QObject* object)
              *
              * Mais il n'est pas difficile de convertir un lien vers l'autre à partir du moment où on a l'ID du film (048373-005 ou 048120-000).
              */
+            if (reply->url().toString().split("/").size() < 10)
+            {
+                reply->deleteLater();
+                return;
+            }
+            QString filmCode = reply->url().toString().split("/").at(9);
 
-            if (m_preferences.selectedLanguage() == "fr")
-            {
-                QString videoStreamUrl = "http://www.arte.tv/papi/tvguide/videos/stream/F/" + reply->url().toString().split("/").at(9)+"/ALL/ALL.json";
-                downloadUrl(videoStreamUrl, pageRequestId, film->m_infoUrl, QString(MAPPER_STEP_CODE_3_RTMP));
-            }
-            else
-            {
-                QString videoStreamUrl = "http://www.arte.tv/papi/tvguide/videos/stream/D/" + reply->url().toString().split("/").at(9)+"/ALL/ALL.json";
-                downloadUrl(videoStreamUrl, pageRequestId, film->m_infoUrl, QString(MAPPER_STEP_CODE_3_RTMP));
-            }
+            QString videoStreamUrl = "http://www.arte.tv/papi/tvguide/videos/stream/";
+            videoStreamUrl.append(m_preferences.selectedLanguage() == "fr" ? "F/" : "D/");
+            videoStreamUrl.append(filmCode);
+            videoStreamUrl.append("/ALL/ALL.json");
+            downloadUrl(videoStreamUrl, pageRequestId, film->m_infoUrl, QString(MAPPER_STEP_CODE_3_RTMP));
 
             QScriptEngine engine;
             QScriptValue json = engine.evaluate("JSON.parse").call(QScriptValue(),

@@ -340,7 +340,7 @@ void MainWindow::refreshTable()
         ++rowNumber;
     }
 
-    if (previousCount <= 0 && details.size() > 0 )
+    if (ui->tableWidget->currentRow() < 0 && details.size() > 0 )
     {
         ui->tableWidget->setCurrentCell(0,0);
     }
@@ -698,6 +698,8 @@ void MainWindow::reloadCurrentRow()
     if (ui->tableWidget->rowCount() <=0)
         return;
     int currentRow = ui->tableWidget->currentRow();
+    if (currentRow < 0)
+        return;
     QTableWidgetItem* titleWidgetItem = ui->tableWidget->item(currentRow, COLUMN_FOR_TITLE);
     if (titleWidgetItem != NULL)
     {
@@ -790,6 +792,8 @@ void MainWindow::cellHasBeenClicked(int row, int column)
 void MainWindow::downloadButtonClicked()
 {
     int row = ui->tableWidget->currentRow();
+    if (row < 0)
+        return;
 
     FilmDetails *details = delegate->visibleFilms()[row];
     downloadFilm(row, details);
@@ -798,6 +802,8 @@ void MainWindow::downloadButtonClicked()
 void MainWindow::webPageButtonClicked()
 {
     int row = ui->tableWidget->currentRow();
+    if (row < 0)
+        return;
 
     FilmDetails * film = delegate->visibleFilms()[row];
     if (film != NULL)
