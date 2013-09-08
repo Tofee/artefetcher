@@ -12,6 +12,7 @@
         <file>web.png</file>
         <file>locked.png</file>
         <file>cancelled.png</file>
+        <file>error.png</file>
     </qresource>
     <qresource prefix="/translation">
         <file>arteFetcher_de.qm</file>

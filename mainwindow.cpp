@@ -151,6 +151,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(thread, SIGNAL(hasBeenPaused()), SLOT(hasBeenPaused()));
     connect(ui->cancelProgressingDownloadButton, SIGNAL(clicked()),
             thread, SLOT(cancelDownloadInProgress()));
+    connect(thread, SIGNAL(signalDownloadError(QString,QString)),
+            SLOT(downloadError(QString,QString)));
 
     connect(ui->downloadButton, SIGNAL(clicked()), SLOT(downloadButtonClicked()));
     connect(ui->cancelSelectedFilmButton, SIGNAL(clicked()),
@@ -233,7 +235,7 @@ bool MainWindow::isReadyForDownload(const FilmDetails * const film)
 {
     return film && !film->m_title.isEmpty()
             && !film->m_streamUrl.isEmpty() &&
-            (film->m_downloadStatus == NONE || film->m_downloadStatus == CANCELLED);
+            (film->m_downloadStatus == NONE || film->m_downloadStatus == CANCELLED || film->m_downloadStatus == ERROR);
 }
 
 void MainWindow::languageChanged(){
@@ -296,24 +298,35 @@ QTableWidgetItem* MainWindow::createOrUpdateTitleColumn(int rowNumber)
         return titleTableItem;
     }
 
+    titleTableItem->setToolTip("");
     titleTableItem->setIcon(QIcon());
     if (! film->m_errors.empty())
     {
         titleTableItem->setIcon(QIcon(":/img/warning.png"));
         titleTableItem->setToolTip(film->m_errors.join("\n"));
+    } else if (film->m_downloadStatus == ERROR)
+    {
+        titleTableItem->setToolTip(tr("Previous download failed."));
     }
 
     if (film->m_metadata.contains(Episode_name))
     {
-        titleTableItem->setToolTip(
-                    ui->tableWidget->item(rowNumber, COLUMN_FOR_TITLE)->text().prepend(
-                    tr("Episode: %1").arg(film->m_metadata.value(Episode_name))));
+        QString newTooltip = tr("Episode: %1").arg(film->m_metadata.value(Episode_name));
+        QString previousTooltip = titleTableItem->toolTip();
+        if (!previousTooltip.isEmpty())
+        {
+            newTooltip.append("\n\n").append(previousTooltip);
+        }
+        titleTableItem->setToolTip(newTooltip);
     }
 
     if (isTeaserFromOriginalMovie(*film)) {
         titleTableItem->setIcon(QIcon(":/img/locked.png"));
     }
     switch (film->m_downloadStatus){
+    case ERROR:
+        titleTableItem->setIcon(QIcon(":/img/error.png"));
+        break;
     case CANCELLED:
         titleTableItem->setIcon(QIcon(":/img/cancelled.png"));
         break;
@@ -492,6 +505,8 @@ void MainWindow::updateCurrentDetails(){
      case CANCELLED:
          ui->downloadButton->setToolTip(tr("Cancelled"));
          break;
+     case ERROR:
+         ui->downloadButton->setToolTip(tr("Download error"));
      }
 
 }
@@ -630,13 +645,6 @@ void MainWindow::downloadFilm(int currentLine, FilmDetails* film){
         }
         else
         {
-            // 3) Check the destination directory
-            if (!QFileInfo(futureFileName).absoluteDir().exists() && ! QDir("/").mkpath(QFileInfo(futureFileName).absolutePath()))
-            {
-                statusBar()->showMessage(tr("Cannot create the working directory %1").arg(workingPath));
-                return;
-            }
-
             film->m_downloadStatus = REQUESTED;
             film->m_targetFileName = futureFileName;
 
@@ -662,7 +670,8 @@ void MainWindow::cancelSelectedFilmDownload()
     FilmDetails* film = getCurrentFilm();
     if (film == NULL || film->m_downloadStatus == CANCELLED
             || film->m_downloadStatus == DOWNLOADED
-            || film->m_downloadStatus == NONE)
+            || film->m_downloadStatus == NONE
+            || film->m_downloadStatus == ERROR)
         return;
     thread->cancelDownload(film->m_infoUrl);
 }
@@ -713,6 +722,16 @@ void MainWindow::downloadCancelled(QString filmUrl)
     if (film)
     {
         film->m_downloadStatus = CANCELLED;
+        refreshTable();
+    }
+}
+
+void MainWindow::downloadError(QString filmUrl, QString errorMsg){
+    FilmDetails* film = delegate->findFilmByUrl(filmUrl);
+    if (film)
+    {
+        film->m_errors.append(tr("Download error: %1").arg(errorMsg));
+        film->m_downloadStatus = ERROR;
         refreshTable();
     }
 }

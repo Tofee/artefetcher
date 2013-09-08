@@ -39,6 +39,7 @@ signals:
     void signalDownloadProgressed(QString key,double,double, double);
     void signalDownloadFinished(QString key);
     void signalDownloadCancelled(QString key);
+    void signalDownloadError(QString key, QString message);
     void hasBeenPaused();
 
 public slots:

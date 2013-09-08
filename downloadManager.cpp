@@ -72,7 +72,9 @@ void DownloadManager::downloadFinished(QString url)
 
 void DownloadManager::downloadError(QString url, QString message)
 {
-    qDebug() << "Download error" << url << message;
+    QString key = m_keysForSignalByUrl.value(url);
+    emit(signalDownloadError(key, message));
+    qDebug() << "Download error for " << url << ": " << message;
 }
 
 void DownloadManager::allDownloadsFinished(){

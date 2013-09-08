@@ -77,7 +77,7 @@ enum MetaType {
 };
 
 enum EDownloadStatus {
-    NONE, REQUESTED, DOWNLOADING, DOWNLOADED, CANCELLED
+    NONE, REQUESTED, DOWNLOADING, DOWNLOADED, CANCELLED, ERROR
 };
 
 class FilmDetails {

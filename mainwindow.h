@@ -82,6 +82,7 @@ private slots:
     void filmDownloaded(QString filmUrl);
     void hasBeenPaused();
     void downloadCancelled(QString filmUrl);
+    void downloadError(QString filmUrl, QString errorMsg);
 
     /* User actions */
     void downloadButtonClicked();

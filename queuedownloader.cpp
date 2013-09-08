@@ -57,6 +57,16 @@ void QueueDownloader::startNextDownload(){
     }
     QPair<QUrl, QString> downloadToStart = m_pendingDonwloads.dequeue();
 
+    // Check the destination directory
+    QFileInfo destFileInfo(downloadToStart.second);
+    if (!destFileInfo.absoluteDir().exists() && ! QDir("/").mkpath(destFileInfo.absolutePath()))
+    {
+        emit(downloadError(downloadToStart.first.toString(),
+                           tr("Cannot create the working directory %1").arg(destFileInfo.absolutePath())));
+        return;
+    }
+
+
     m_outputFile.setFileName(QString(downloadToStart.second).append(TEMP_FILE_PREFIX));
 
     if (!m_outputFile.open(QIODevice::WriteOnly|QIODevice::Append)) {

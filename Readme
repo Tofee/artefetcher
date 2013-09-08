@@ -30,6 +30,7 @@ Icons:
 arteFetcher.png:designed by toto740, used with his agreement
 cancelled.png:/usr/share/icons/oxygen/16x16/actions/dialog-cancel.png:LGPL-2.1+
 download.png:/usr/share/icons/oxygen/32x32/actions/arrow-down-double.png:LGPL-2.1+
+error.png:/usr/share/icons/oxygen/16x16/status/dialog-error.png:LGPL-2.1+
 finished.png:/usr/share/icons/oxygen/16x16/status/task-complete.png:LGPL-2.1+
 locked.png:/usr/share/icons/oxygen/16x16/actions/document-encrypt.png:LGPL-2.1+
 pause.png:/usr/share/icons/oxygen/32x32/actions/media-playback-pause.png:LGPL-2.1+
