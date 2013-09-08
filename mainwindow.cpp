@@ -49,7 +49,7 @@ MainWindow::MainWindow(QWidget *parent) :
     preferences.load();
 
     ui->setupUi(this);
-    this->setWindowTitle("ArteFetcher v0.2.3");
+    this->setWindowTitle("ArteFetcher v0.3.0");
     this->resize(preferences.preferredWindowSize());
     m_trayIcon->show();
 
@@ -134,6 +134,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->dateEdit, SIGNAL(dateChanged(QDate)),
             SLOT(clearAndLoadTable()));
+    connect(ui->searchButton, SIGNAL(clicked()),
+            SLOT(clearAndLoadTable()));
 
     connect(ui->languageComboBox, SIGNAL(currentIndexChanged(int)),
             SLOT(languageChanged()));
@@ -205,6 +207,7 @@ void MainWindow::loadStreamComboBox() {
     //ui->streamComboBox->addItem(tr("Test"), "http://www.arte.tv/papi/tvguide/epg/live/F/L3/1.json");
     ui->streamComboBox->addItem(tr("By date"), DATE_STREAM_PREFIX);
     ui->streamComboBox->addItem(tr("Downloads"), DOWNLOAD_STREAM);
+    //ui->streamComboBox->addItem(tr("Search"), SEARCH_PREFIX);
     if (previousIndex >=0 )
         ui->streamComboBox->setCurrentIndex(previousIndex);
 }
@@ -253,12 +256,19 @@ void MainWindow::clearAndLoadTable()
 {
     QString url = ui->streamComboBox->itemData(ui->streamComboBox->currentIndex()).toString();
     bool dateCurrentlyShown = false;
+    bool searchEditShown = false;
     if (url == DATE_STREAM_PREFIX)
     {
         dateCurrentlyShown = true;
         url.append(preferences.selectedLanguage()).append(":");
         url.append(ui->dateEdit->date().toString("yyyyMMdd"));
+    } else if (url == SEARCH_PREFIX) {
+        searchEditShown = true;
+        url.append(preferences.selectedLanguage()).append(":");
+        url.append(ui->searchEdit->text());
     }
+    ui->searchEdit->setVisible(searchEditShown);
+    ui->searchButton->setVisible(searchEditShown);
     ui->dateEdit->setVisible(dateCurrentlyShown);
     delegate->loadPlayList(url);
 }
@@ -500,6 +510,7 @@ void MainWindow::updateCurrentDetails(){
      {
      case NONE:
          ui->downloadButton->setToolTip(tr("Download"));
+         break;
      case DOWNLOADING:
          ui->downloadButton->setToolTip(tr("Downloading..."));
          break;
@@ -759,27 +770,31 @@ void MainWindow::filmDownloaded(QString filmUrl)
         QFileInfo filmFile(film->m_targetFileName);
 
         // Save metadata
-        QFile metadataFile(filmFile.absolutePath() + QDir::separator() + filmFile.completeBaseName() + ".info");
-        metadataFile.open(QFile::WriteOnly|QFile::Text);
-        QTextStream stream (&metadataFile);
-        stream<< film->m_title << "\n";
+        if (preferences.saveMetaInInfoFile()) {
+            QFile metadataFile(filmFile.absolutePath() + QDir::separator() + filmFile.completeBaseName() + ".info");
+            metadataFile.open(QFile::WriteOnly|QFile::Text);
+            QTextStream stream (&metadataFile);
+            stream<< film->m_title << "\n";
 
-        foreach (MetaType key, listInterestingDetails())
-        {
-            QString value = film->m_metadata.value(key);
-            stream << FilmDetails::enum2Str(key) << ": " << value << "\n";
+            foreach (MetaType key, listInterestingDetails())
+            {
+                QString value = film->m_metadata.value(key);
+                stream << FilmDetails::enum2Str(key) << ": " << value << "\n";
+            }
+            stream<< film->m_summary;
+
+            stream.flush();
+            metadataFile.close();
         }
-        stream<< film->m_summary;
-
-        stream.flush();
-        metadataFile.close();
 
         // Save preview picture
-        QFile picture(filmFile.absolutePath() + QDir::separator() + filmFile.completeBaseName() + ".png");
-        picture.open(QFile::WriteOnly);
-        QImageWriter writer(&picture, "PNG");
-        writer.write(film->m_preview);
-        picture.close();
+        if (preferences.saveImagePreview()) {
+            QFile picture(filmFile.absolutePath() + QDir::separator() + filmFile.completeBaseName() + ".png");
+            picture.open(QFile::WriteOnly);
+            QImageWriter writer(&picture, "PNG");
+            writer.write(film->m_preview);
+            picture.close();
+        }
     }
 
     int filmId = delegate->getLineForUrl(filmUrl);

@@ -34,6 +34,9 @@ PreferenceDialog::PreferenceDialog(QWidget *parent,
 
     ui->seriesDirectoryCheckBox->setChecked(m_preferences.m_dedicatedDirectoryForSeries);
 
+    ui->metaInfoCheckBox->setChecked(m_preferences.m_saveMetaInInfoFile);
+    ui->imagePreviewCheckBox->setChecked(m_preferences.m_saveImagePreview);
+
     connect(ui->browsePushButton, SIGNAL(clicked()),
             this, SLOT(browse()));
 
@@ -56,6 +59,10 @@ void PreferenceDialog::accept()
     m_preferences.m_filenamePattern = ui->filenamePatternLineEdit->text();
 
     m_preferences.m_dedicatedDirectoryForSeries = ui->seriesDirectoryCheckBox->isChecked();
+
+    m_preferences.m_saveMetaInInfoFile = ui->metaInfoCheckBox->isChecked();
+    m_preferences.m_saveImagePreview = ui->imagePreviewCheckBox->isChecked();
+
     QDialog::accept();
 }
 

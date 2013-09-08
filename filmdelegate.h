@@ -32,6 +32,7 @@
 
 #define DOWNLOAD_STREAM     "about:downloads"
 #define DATE_STREAM_PREFIX  "about:date:"
+#define SEARCH_PREFIX       "about:search:"
 
 class FilmDetails;
 class QNetworkAccessManager;

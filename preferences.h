@@ -80,6 +80,22 @@ public:
         m_dedicatedDirectoryForSeries = useInTheFuture;
     }
 
+    bool saveImagePreview() const {
+        return m_saveImagePreview;
+    }
+
+    void setSaveImagePreview(bool newValue) {
+        m_saveImagePreview = newValue;
+    }
+
+    bool saveMetaInInfoFile() const {
+        return m_saveMetaInInfoFile;
+    }
+
+    void setSaveMetaInInfoFile(bool newValue) {
+        m_saveMetaInInfoFile = newValue;
+    }
+
     virtual void load() = 0;
     virtual void save() = 0;
 
@@ -91,6 +107,8 @@ protected:
     QSize   m_preferredWindowSize;
     QSet<QString> m_pendingDownloads;
     bool    m_dedicatedDirectoryForSeries;
+    bool    m_saveImagePreview;
+    bool    m_saveMetaInInfoFile;
 };
 
 
