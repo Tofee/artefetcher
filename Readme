@@ -54,6 +54,27 @@ To build arteFetcher from scratch for linux, you need:
 Then you can launch the arteFetcher application.
 
 Release notes :
+v0.3.0
+  New features:
+   - can cancell any requested film
+   - indicates whether the video is a teaser or a full length video
+   - some video information where missing when doing a 2-app-launch
+   - error messages are kept and shown
+   - Preferences: now preview and info files are optional
+  UI:
+   - better size for the table (fix for older Qt themes)
+   - force date format for date edit
+   - better tooltips and translations
+   - fix bad grey background in duration column
+   - bad video filename in popup when being about to erase an existing movie
+   - fix pagination issue for download stream
+  Fixes:
+   - bad title for non-serie video
+   - directory creation now delayed to the start of the download
+   - segfault
+  Internal:
+   - add a new download status (enum) to FilmDetails
+---------------------------------------------------------------
 v0.2.3
   Fix segmentation fault (crash when listing a serie movie without duration)
 ---------------------------------------------------------------
