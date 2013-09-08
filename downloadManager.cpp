@@ -30,6 +30,7 @@ DownloadManager::DownloadManager(QObject *parent)
         connect(&m_downloader, SIGNAL(downloadError(QString,QString)), SLOT(downloadError(QString,QString)));
         connect(&m_downloader, SIGNAL(allDownloadsFinished()), SLOT(allDownloadsFinished()));
         connect(&m_downloader, SIGNAL(paused()), SIGNAL(hasBeenPaused()));
+        connect(&m_downloader, SIGNAL(downloadCancelled(QString)), SLOT(downloadCancelled(QString)));
     }
 
 void DownloadManager::addFilmToDownloadQueue(QString key, const FilmDetails& details){
@@ -41,6 +42,11 @@ void DownloadManager::addFilmToDownloadQueue(QString key, const FilmDetails& det
         m_keysForSignalByUrl.insert(details.m_streamUrl, key);
         }
 }
+
+void DownloadManager::cancelDownloadInProgress() {
+    m_downloader.cancelDownloadInProgress();
+}
+
 int DownloadManager::queueSize() const {
     return m_downloader.queueSize();
 }
@@ -67,4 +73,9 @@ void DownloadManager::allDownloadsFinished(){
 
 void DownloadManager::pause() {
     m_downloader.pause();
+}
+
+void DownloadManager::downloadCancelled(QString url) {
+    QString key = m_keysForSignalByUrl.value(url);
+    emit(signalDownloadCancelled(key));
 }

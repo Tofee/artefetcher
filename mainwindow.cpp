@@ -67,12 +67,23 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
 
-    QFontMetrics metric(ui->tableWidget->font());
 
-    ui->tableWidget->horizontalHeader()->resizeSection(COLUMN_FOR_DURATION, metric.boundingRect("00:00:00").width() + TABLE_COLUMN_MARGIN);
-    ui->tableWidget->horizontalHeader()->resizeSection(COLUMN_FOR_PREVIEW, TABLE_PREVIEW_MAX_WIDTH + TABLE_COLUMN_MARGIN);
-    ui->tableWidget->horizontalHeader()->resizeSection(COLUMN_FOR_TITLE, metric.boundingRect("Sample of fitting title").width());
-    ui->tableWidget->setIconSize(QSize(TABLE_PREVIEW_MAX_WIDTH, TABLE_PREVIEW_MAX_HEIGHT));
+    {
+        QFontMetrics metric(ui->tableWidget->font());
+        int totalColumnWidths(25 /* Initial size, at least the vscroll bar width*/);
+        int nextColumn = (metric.boundingRect("00:00:00").width() + TABLE_COLUMN_MARGIN);
+        totalColumnWidths+=nextColumn;
+        ui->tableWidget->horizontalHeader()->resizeSection(COLUMN_FOR_DURATION, nextColumn);
+
+        totalColumnWidths += (nextColumn = TABLE_PREVIEW_MAX_WIDTH + TABLE_COLUMN_MARGIN);
+        ui->tableWidget->horizontalHeader()->resizeSection(COLUMN_FOR_PREVIEW,  nextColumn);
+
+        totalColumnWidths += (nextColumn = metric.boundingRect("Sample of fitting title").width());
+        ui->tableWidget->horizontalHeader()->resizeSection(COLUMN_FOR_TITLE,    nextColumn);
+
+        ui->tableWidget->setIconSize(QSize(TABLE_PREVIEW_MAX_WIDTH, TABLE_PREVIEW_MAX_HEIGHT));
+        ui->tableWidget->setMinimumSize(totalColumnWidths, 0);
+    }
 
     ui->progressBar->setMaximum(100);
 
@@ -135,6 +146,11 @@ MainWindow::MainWindow(QWidget *parent) :
             SLOT(downloadProgressed(QString,double,double, double)));
     connect(thread, SIGNAL(signalDownloadFinished(QString)),
             SLOT(filmDownloaded(QString)));
+    connect(thread, SIGNAL(signalDownloadCancelled(QString)),
+            SLOT(downloadCancelled(QString)));
+    connect(thread, SIGNAL(hasBeenPaused()), SLOT(hasBeenPaused()));
+    connect(ui->cancelProgressingDownloadButton, SIGNAL(clicked()),
+            thread, SLOT(cancelDownloadInProgress()));
 
     connect(ui->downloadButton, SIGNAL(clicked()), SLOT(downloadButtonClicked()));
 
@@ -153,7 +169,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->pauseButton, SIGNAL(clicked()), thread, SLOT(pause()));
 
-    connect(thread, SIGNAL(hasBeenPaused()), SLOT(hasBeenPaused()));
+
 
     clearAndLoadTable();
 
@@ -252,7 +268,14 @@ void MainWindow::previousPage()
     delegate->loadPreviousPage();
 }
 
-QTableWidgetItem* MainWindow::createOrUpdateFirstColumn(int rowNumber)
+
+bool isTeaserFromOriginalMovie(const FilmDetails& film)
+{
+    return !film.m_metadata.value(Preview_Or_ArteP7).isEmpty()
+                                     && "ARTE+7" != film.m_metadata.value(Preview_Or_ArteP7);
+}
+
+QTableWidgetItem* MainWindow::createOrUpdateTitleColumn(int rowNumber)
 {
     QTableWidgetItem* titleTableItem = ui->tableWidget->item(rowNumber, COLUMN_FOR_TITLE);
     if (titleTableItem== NULL)
@@ -266,9 +289,29 @@ QTableWidgetItem* MainWindow::createOrUpdateFirstColumn(int rowNumber)
     ui->tableWidget->verticalHeader()->resizeSection(rowNumber, 5*(metric.lineSpacing()));
 
     FilmDetails* film = delegate->visibleFilms().at(rowNumber);
-    if (film == NULL)
-    {
+    if (film == NULL) {
         return titleTableItem;
+    }
+
+    titleTableItem->setIcon(QIcon());
+    if (! film->m_errors.empty())
+    {
+        titleTableItem->setIcon(QIcon(":/img/warning.png"));
+        titleTableItem->setToolTip(film->m_errors.join("\n"));
+    }
+
+    if (film->m_metadata.contains(Episode_name))
+    {
+        titleTableItem->setToolTip(
+                    ui->tableWidget->item(rowNumber, COLUMN_FOR_TITLE)->text().prepend(
+                    tr("Episode: %1").arg(film->m_metadata.value(Episode_name))));
+    }
+
+    if (isTeaserFromOriginalMovie(*film)) {
+        titleTableItem->setIcon(QIcon(":/img/locked.png"));
+    }
+    if (film->m_hasBeenCancelled) {
+        titleTableItem->setIcon(QIcon(":/img/cancelled.png"));
     }
     if (film->m_isDownloading){
         titleTableItem->setIcon(QIcon(":/img/progress.png"));
@@ -290,14 +333,13 @@ void MainWindow::refreshTable()
 
     QList<FilmDetails*> details = delegate->visibleFilms();
 
-    int previousCount = ui->tableWidget->rowCount();
     ui->tableWidget->setRowCount(details.size());
 
     FilmDetails* film;
     int rowNumber = 0;
     foreach (film, details)
     {
-        createOrUpdateFirstColumn(rowNumber);
+        createOrUpdateTitleColumn(rowNumber);
         if (film->m_durationInMinutes > 0)
         {
             QTime duration(QTime().addSecs(film->m_durationInMinutes * 60));
@@ -318,24 +360,21 @@ void MainWindow::refreshTable()
             previewItem->setIcon(QIcon(QPixmap::fromImage(film->m_preview)));
 
 
-        if (film->m_metadata.contains(Episode_name))
-        {
+        bool isEpisode=film->m_metadata.contains(Episode_name);
+
             if (ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW)) {
-                ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW)->setBackgroundColor(Qt::lightGray);
+                ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW)->setBackgroundColor(isEpisode ? Qt::lightGray : Qt::white);
                 ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW)->setToolTip(tr("Episode: %1").arg(film->m_metadata.value(Episode_name)));
             }
 
             if (ui->tableWidget->item(rowNumber, COLUMN_FOR_TITLE)) {
-                ui->tableWidget->item(rowNumber, COLUMN_FOR_TITLE)->setBackgroundColor(Qt::lightGray);
-                ui->tableWidget->item(rowNumber, COLUMN_FOR_TITLE)->setToolTip(tr("Episode: %1").arg(film->m_metadata.value(Episode_name)));
+                ui->tableWidget->item(rowNumber, COLUMN_FOR_TITLE)->setBackgroundColor(isEpisode ? Qt::lightGray : Qt::white);
             }
 
             if (ui->tableWidget->item(rowNumber, COLUMN_FOR_DURATION)) {
-                ui->tableWidget->item(rowNumber, COLUMN_FOR_DURATION)->setBackgroundColor(Qt::lightGray);
+                ui->tableWidget->item(rowNumber, COLUMN_FOR_DURATION)->setBackgroundColor(isEpisode ? Qt::lightGray : Qt::white);
                 ui->tableWidget->item(rowNumber, COLUMN_FOR_DURATION)->setToolTip(tr("Episode: %1").arg(film->m_metadata.value(Episode_name)));
             }
-
-        }
 
         ++rowNumber;
     }
@@ -359,6 +398,7 @@ const QList<MetaType>& MainWindow::listInterestingDetails() {
     return shownMetadata;
 }
 
+
 void MainWindow::updateCurrentDetails(){
 
     int rowBegin = ui->tableWidget->currentRow();
@@ -370,6 +410,8 @@ void MainWindow::updateCurrentDetails(){
      FilmDetails* film = details.at(rowBegin);
      if (rowBegin >=0 && rowBegin < ui->tableWidget->rowCount())
      {
+        ui->detailsGroupBox->setTitle(film->m_title);
+
         QString prefix;
 
         foreach(MetaType key, listInterestingDetails()){
@@ -389,9 +431,11 @@ void MainWindow::updateCurrentDetails(){
             ui->previewLabel->setPixmap(QPixmap(":/img/Arte.jpg").scaled(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT, Qt::KeepAspectRatio));
             ui->previewLabel->setDisabled(true);
         }
-        ui->detailsGroupBox->setTitle(film->m_title);
+
         {
             QString coutryYearDurationText;
+            if (isTeaserFromOriginalMovie(*film))
+                coutryYearDurationText.append(tr("The related video is a teaser of the original movie.\n"));
             if (!film->m_metadata.value(First_broadcast_long).isEmpty())
             {
                 coutryYearDurationText.append(tr("%1 %2 ")
@@ -408,9 +452,9 @@ void MainWindow::updateCurrentDetails(){
 
             ui->countryYearDurationlabel->setText(coutryYearDurationText);
         }
+        ui->extractIconLabel->setVisible(isTeaserFromOriginalMovie(*film));
 
-        //qDebug() << getFileName(preferences.destinationDir(), film->title(), film->m_streamUrl, 0, film->m_metadata.value(Serie_Subtitle));
-
+        qDebug() << film->m_metadata.value(Preview_Or_ArteP7) << film->m_streamUrl;
      }
      else
      {
@@ -508,7 +552,7 @@ QString MainWindow::getFileName(const QString& targetDirectory, const QString& t
         cleanedTitle.replace("%title", title)
                 .replace("%language", language)
                 .replace("%quality", getStreamType().qualityCode.toUpper());
-        cleanedTitle = cleanFilenameForFileSystem(title);
+        cleanedTitle = cleanFilenameForFileSystem(cleanedTitle);
     }
 
     QString countSuffix(fileSuffixNumber > 0 ? "_" + fileSuffixNumber : "");
@@ -551,8 +595,8 @@ void MainWindow::downloadFilm(int currentLine, FilmDetails* film){
 
         if (QFile(futureFileName).exists()
                 && QMessageBox::question(this, tr("File already exists"),
-                                  tr("A file has already the name of the film: <%1>.\nDo you want to continue and replace it?")
-                                         .arg(titleCellText),
+                                  tr("A file with the same name already exists:\n%1\nDo you want to continue and replace it?")
+                                         .arg(futureFileName),
                                   QMessageBox::Yes,
                                   QMessageBox::No)
                     == QMessageBox::No)
@@ -581,6 +625,7 @@ void MainWindow::downloadFilm(int currentLine, FilmDetails* film){
 
 
             film->m_hasBeenRequested = true;
+            film->m_hasBeenCancelled = false;
             film->m_targetFileName = futureFileName;
 
             delegate->addUrlToDownloadList(film->m_infoUrl); // TODO c'est trop trop moche de faire ça. Design à revoir
@@ -597,6 +642,12 @@ void MainWindow::changeDownloadPartVisibility(bool isVisible)
     ui->pauseButton->setVisible(isVisible);
     ui->downloadTitleLabel->setVisible(isVisible);
     ui->downloadSeparatorLine->setVisible(isVisible);
+    ui->cancelProgressingDownloadButton->setVisible(isVisible);
+}
+
+void MainWindow::cancelSelectedFilmDownload()
+{
+
 }
 
 void MainWindow::allFilmDownloadFinished()
@@ -634,9 +685,21 @@ void MainWindow::downloadProgressed(QString filmUrl, double progression, double 
 
     if (filmId >= 0)
     {
-        createOrUpdateFirstColumn(filmId);
+        createOrUpdateTitleColumn(filmId);
         if (filmId == ui->tableWidget->currentRow())
             updateCurrentDetails();
+    }
+}
+void MainWindow::downloadCancelled(QString filmUrl)
+{
+    FilmDetails* film = delegate->findFilmByUrl(filmUrl);
+    if (film)
+    {
+        film->m_isDownloading = false;
+        film->m_isDownloaded = false;
+        film->m_hasBeenRequested = false;
+        film->m_hasBeenCancelled = true;
+        refreshTable();
     }
 }
 
@@ -719,25 +782,13 @@ void MainWindow::addFilmManuallyFromUrl()
 
 void MainWindow::errorOccured(QString filmUrl, QString errorMessage)
 {
-    int filmId = delegate->getLineForUrl(filmUrl);
-    if (ui->tableWidget->rowCount() <= filmId)
+    FilmDetails * film = delegate->findFilmByUrl(filmUrl);
+    if (!film)
         return;
-    QTableWidgetItem *cell = ui->tableWidget->item(filmId, COLUMN_FOR_TITLE);
-    if (cell == NULL)
-    {
-        qDebug() << errorMessage;
-        return;
-    }
-    if(cell->icon().isNull())
-    {
-        cell->setIcon(QIcon(":/img/warning.png"));
-        cell->setToolTip(errorMessage);
-    }
-    else
-    {
-        if (! cell->toolTip().contains(errorMessage))
-            cell->setToolTip(cell->toolTip().append("\n").append(errorMessage));
-    }
+    film->m_errors.append(errorMessage);
+    qDebug() << errorMessage;
+
+    refreshTable();
 }
 
 void MainWindow::showPreferences()

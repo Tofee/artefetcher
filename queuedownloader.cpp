@@ -135,3 +135,12 @@ void QueueDownloader::pause() {
         startNextDownload();
     }
 }
+
+void QueueDownloader::cancelDownloadInProgress() {
+    if (m_currentDownload)
+    {
+        QUrl url = m_currentDownload->url();
+        m_currentDownload->abort();
+        emit downloadCancelled(url.toString());
+    }
+}

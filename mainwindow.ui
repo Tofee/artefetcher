@@ -38,7 +38,11 @@
        <widget class="QComboBox" name="streamComboBox"/>
       </item>
       <item>
-       <widget class="QDateEdit" name="dateEdit"/>
+       <widget class="QDateEdit" name="dateEdit">
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
+        </property>
+       </widget>
       </item>
       <item>
        <spacer name="horizontalSpacer_4">
@@ -150,6 +154,16 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_4">
            <item>
+            <widget class="QLabel" name="extractIconLabel">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="pixmap">
+              <pixmap resource="resources.qrc">:/img/locked.png</pixmap>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QLabel" name="countryYearDurationlabel">
              <property name="text">
               <string/>
@@ -172,7 +186,7 @@
            <item>
             <widget class="QPushButton" name="downloadButton">
              <property name="toolTip">
-              <string>Download</string>
+              <string>Download this video</string>
              </property>
              <property name="icon">
               <iconset resource="resources.qrc">
@@ -183,7 +197,7 @@
            <item>
             <widget class="QPushButton" name="reloadFilmButton">
              <property name="toolTip">
-              <string>Refresh details</string>
+              <string>Refresh the video information</string>
              </property>
              <property name="icon">
               <iconset resource="resources.qrc">
@@ -194,7 +208,7 @@
            <item>
             <widget class="QPushButton" name="webPageButton">
              <property name="toolTip">
-              <string>Web page</string>
+              <string>Open the video page in an external browser</string>
              </property>
              <property name="icon">
               <iconset resource="resources.qrc">
@@ -225,7 +239,7 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>323</width>
+                <width>355</width>
                 <height>515</height>
                </rect>
               </property>
@@ -315,11 +329,22 @@
            <item>
             <widget class="QPushButton" name="pauseButton">
              <property name="toolTip">
-              <string>Pause</string>
+              <string>Pause all downloads</string>
              </property>
              <property name="icon">
               <iconset resource="resources.qrc">
                <normaloff>:/img/pause.png</normaloff>:/img/pause.png</iconset>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="cancelProgressingDownloadButton">
+             <property name="toolTip">
+              <string>Cancel the download in progress</string>
+             </property>
+             <property name="icon">
+              <iconset resource="resources.qrc">
+               <normaloff>:/img/cancelled.png</normaloff>:/img/cancelled.png</iconset>
              </property>
             </widget>
            </item>
@@ -351,20 +376,17 @@
       </item>
       <item row="0" column="0" colspan="4">
        <widget class="QTableWidget" name="tableWidget">
-        <property name="minimumSize">
-         <size>
-          <width>320</width>
-          <height>0</height>
-         </size>
-        </property>
         <property name="horizontalScrollBarPolicy">
          <enum>Qt::ScrollBarAlwaysOff</enum>
         </property>
         <property name="editTriggers">
          <set>QAbstractItemView::DoubleClicked</set>
         </property>
-        <property name="alternatingRowColors">
-         <bool>true</bool>
+        <property name="selectionMode">
+         <enum>QAbstractItemView::SingleSelection</enum>
+        </property>
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectRows</enum>
         </property>
         <property name="showGrid">
          <bool>false</bool>

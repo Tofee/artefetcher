@@ -81,11 +81,13 @@ private slots:
     void downloadProgressed(QString filmUrl, double progression, double speed, double remainingTime);
     void filmDownloaded(QString filmUrl);
     void hasBeenPaused();
+    void downloadCancelled(QString filmUrl);
 
     /* User actions */
     void downloadButtonClicked();
     void webPageButtonClicked();
     void cellHasBeenClicked(int row, int column);
+    void cancelSelectedFilmDownload();
 
     void nextPage();
     void previousPage();
@@ -106,7 +108,7 @@ private:
 
     void closeEvent(QCloseEvent* event);
 
-    QTableWidgetItem *createOrUpdateFirstColumn(int rowNumber);
+    QTableWidgetItem *createOrUpdateTitleColumn(int rowNumber);
     bool isReadyForDownload(const FilmDetails * const film);
     void loadStreamComboBox();
     void resizeEvent( QResizeEvent * event );

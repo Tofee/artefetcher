@@ -380,7 +380,7 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                 addMetadataIfNotEmpty(film, mymap, "VCG", Type);
                 addMetadataIfNotEmpty(film, mymap, "VDA", RAW_First_Broadcast); // 25/04/2013 20:50:30 +0200
                 addMetadataIfNotEmpty(film, mymap, "VRU", RAW_Available_until); // 02/05/2013 20:20:30 +0200
-
+                addMetadataIfNotEmpty(film, mymap, "VTX", Preview_Or_ArteP7); // EXTRAIT (AUSSCHNITT in german) or ARTE+7
                 addMetadataIfNotEmpty(film, mymap, "VSU", Episode_name); // if not null, it belongs to a serie
 
                 if (mymap.value("videoSwitchLang").toMap().size() > 1)
@@ -509,6 +509,7 @@ void FilmDelegate::reloadFilm(FilmDetails* film)
 {
     QString videoPageUrl(film->m_infoUrl);
     // Download video web page:
+    film->m_errors.clear();
     downloadUrl(videoPageUrl, m_lastRequestPageId, film->m_infoUrl, MAPPER_STEP_CODE_1_HTML);
 }
 

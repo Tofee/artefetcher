@@ -72,7 +72,8 @@ enum MetaType {
     Type,
     RAW_First_Broadcast,
     RAW_Available_until,
-    Episode_name /* This is only available for series */
+    Episode_name /* This is only available for series */,
+    Preview_Or_ArteP7
 };
 
 
@@ -96,10 +97,13 @@ public:
     bool m_hasBeenRequested;
     bool m_isDownloaded;
     bool m_isDownloading;
+    bool m_hasBeenCancelled;
+
     QString m_streamUrl;
     // Full path of the future downloaded film.
     QString m_targetFileName;
 
+    QStringList m_errors;
 
     QString title() const { return m_title; }
     static const QString enum2Str(MetaType t){
@@ -115,7 +119,8 @@ public:
              QT_TRANSLATE_NOOP("FilmDetails","Type"),
              QT_TRANSLATE_NOOP("FilmDetails","RAW First Broadcast"),
              QT_TRANSLATE_NOOP("FilmDetails","RAW Available until"),
-             QT_TRANSLATE_NOOP("FilmDetails","Episode")
+             QT_TRANSLATE_NOOP("FilmDetails","Episode"),
+             QT_TRANSLATE_NOOP("FilmDetails","Broadcast type")
         };
 
 

@@ -41,6 +41,8 @@ public:
 
     void pause();
 
+    void cancelDownloadInProgress();
+
 private slots:
     void startNextDownload();
 
@@ -48,14 +50,16 @@ private slots:
 
     void downloadFinished();
 
-    void downloadReadyRead() ;
+    void downloadReadyRead();
 
 signals:
     void downloadProgressed(QString url, qint64 loadedSize, qint64 totalSize, double kbytesPerSecond, double remainingTimeInSecond);
     void downloadFinished(QString url);
     void downloadError(QString url, QString message);
+    void downloadCancelled(QString url);
     void allDownloadsFinished();
     void paused();
+
 private:
 
     QNetworkReply* m_currentDownload;
