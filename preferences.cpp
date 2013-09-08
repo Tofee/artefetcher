@@ -28,6 +28,8 @@
 #define DEF_OPT_PENDING_DOWNLADS "pending_downloads"
 #define DEF_OPT_PREF_WINDOW_SIZE "preferred_window_size"
 #define DEF_OPT_DEDICATED_DIR_SERIES "dedicated_dir_series"
+#define DEF_OPT_SAVE_IMAGE_PREVIEW "save_image_preview"
+#define DEF_OPT_SAVE_META_INFO   "save_meta_info"
 
 Preferences::Preferences()
 {
@@ -46,6 +48,8 @@ void Preferences::load()
     m_pendingDownloads = QSet<QString>::fromList(settings.value(DEF_OPT_PENDING_DOWNLADS, QStringList()).toStringList());
     m_preferredWindowSize = settings.value(DEF_OPT_PREF_WINDOW_SIZE, QSize(960,600)).toSize();
     m_dedicatedDirectoryForSeries = settings.value(DEF_OPT_DEDICATED_DIR_SERIES, true).toBool();
+    m_saveImagePreview = settings.value(DEF_OPT_SAVE_IMAGE_PREVIEW, true).toBool();
+    m_saveMetaInInfoFile = settings.value(DEF_OPT_SAVE_META_INFO, true).toBool();
 }
 
 void Preferences::save()
@@ -57,5 +61,7 @@ void Preferences::save()
     settings.setValue(DEF_OPT_PENDING_DOWNLADS, QStringList(m_pendingDownloads.toList()));
     settings.setValue(DEF_OPT_PREF_WINDOW_SIZE, m_preferredWindowSize);
     settings.setValue(DEF_OPT_DEDICATED_DIR_SERIES, m_dedicatedDirectoryForSeries);
+    settings.setValue(DEF_OPT_SAVE_IMAGE_PREVIEW, m_saveImagePreview);
+    settings.setValue(DEF_OPT_SAVE_META_INFO, m_saveMetaInInfoFile);
     settings.sync();
 }

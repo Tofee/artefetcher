@@ -35,6 +35,7 @@
 #define VIDEO_URL_PREFIX "http://videos.arte.tv/fr/videos/"
 
 #define MAPPER_STEP_DATE "DATE"
+#define MAPPER_STEP_SEARCH "SEARCH"
 #define MAPPER_STEP_CATALOG "CATALOG"
 #define MAPPER_STEP_CODE_1_HTML "HTML"
 #define MAPPER_STEP_CODE_2_XML "XML"
@@ -160,6 +161,27 @@ void FilmDelegate::loadPlayList(QString url)
                 .arg(dateString);
         type = MAPPER_STEP_DATE;
 
+    } else if (url.startsWith(SEARCH_PREFIX))
+    {
+        QStringList urlParts = url.split(":");
+        QString language = urlParts.at(2);
+        QString search = urlParts.at(3);
+        if (search.isEmpty())
+        {
+            m_visibleFilms.clear();
+            emit(streamIndexLoaded(m_visibleFilms.size(), 1, 1));
+            emit(playListHasBeenUpdated());
+            return;
+        }
+        if (language.toLower() == "fr"){
+            url = QString("http://www.arte.tv/guide/fr/resultats-de-recherche?keyword=%1")
+                .arg(search);
+        }
+        else {
+            url = QString("http://www.arte.tv/guide/de/suchergebnisse?keyword=%1")
+                .arg(search);
+        }
+        type = MAPPER_STEP_SEARCH;
     }
     m_currentPage = 1;
     m_lastPlaylistUrl = url;
@@ -255,8 +277,38 @@ void FilmDelegate::requestReadyToRead(QObject* object)
 
     if (itemName.isEmpty())
     {
-        if (itemStep == MAPPER_STEP_CATALOG || itemStep == MAPPER_STEP_DATE) {
+        if (itemStep ==  MAPPER_STEP_SEARCH)
+        {
+            // result count: <div class="span4 mini">      <strong>
+            // Current page:
+            // each href of the video-placeholder
             const QString page(QString::fromUtf8(reply->readAll()));
+            QRegExp regexp("<a class=\"video-placeholder\" href=\"([^\"]+)\"");
+            regexp.setMinimal(true);
+
+            int pos = 0;
+            int count = 0;
+            while ((pos = regexp.indexIn(page, pos)) != -1) {
+                 ++count;
+                 pos += regexp.matchedLength();
+                 QString newUrl = regexp.cap(1);
+                 if (newUrl.isEmpty()) {
+                     continue;
+                 }
+                 if (!m_films.contains(newUrl))
+                 {
+                     addMovieFromUrl(newUrl);
+                 }
+                 else {
+                     m_visibleFilms << newUrl;
+                 }
+                 emit(playListHasBeenUpdated());
+             }
+
+        }
+        else if (itemStep == MAPPER_STEP_CATALOG || itemStep == MAPPER_STEP_DATE) {
+            const QString page(QString::fromUtf8(reply->readAll()));
+
             QScriptEngine engine;
             QScriptValue json = engine.evaluate("JSON.parse").call(QScriptValue(),
                                                                    QScriptValueList() << QString(page));

@@ -45,6 +45,16 @@
        </widget>
       </item>
       <item>
+       <widget class="QLineEdit" name="searchEdit"/>
+      </item>
+      <item>
+       <widget class="QPushButton" name="searchButton">
+        <property name="text">
+         <string>Search</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="horizontalSpacer_4">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -423,5 +433,22 @@
  <resources>
   <include location="resources.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>searchEdit</sender>
+   <signal>returnPressed()</signal>
+   <receiver>searchButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>286</x>
+     <y>11</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>376</x>
+     <y>13</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

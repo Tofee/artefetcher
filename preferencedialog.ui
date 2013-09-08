@@ -6,18 +6,37 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>521</width>
-    <height>229</height>
+    <width>517</width>
+    <height>329</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Preferences</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="4" column="3">
-    <widget class="QLabel" name="label_4">
+   <item row="0" column="2">
+    <widget class="QLineEdit" name="destinationDirectoryLineEdit"/>
+   </item>
+   <item row="2" column="2" colspan="2">
+    <widget class="QLineEdit" name="filenamePatternLineEdit"/>
+   </item>
+   <item row="8" column="0" colspan="4">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0" colspan="4">
+    <widget class="QCheckBox" name="seriesDirectoryCheckBox">
+     <property name="toolTip">
+      <string>When a movie belongs to series, a folder will be created for the serie and all episodes will be gathered in this directory.</string>
+     </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pattern to generate the film filenames:&lt;br/&gt;%title: video title&lt;br/&gt;%language: language code&lt;br/&gt;%quality: stream type code (hd/sd...)&lt;/p&gt;&lt;p&gt;Example: '[%quality %language] %title' will create&lt;br/&gt;[HQ DE] Movie title.mp4&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>Place films belonging to series into a dedicated directory</string>
      </property>
     </widget>
    </item>
@@ -35,30 +54,46 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="4">
+   <item row="7" column="0" colspan="4">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>After a successful video download</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QCheckBox" name="imagePreviewCheckBox">
+        <property name="text">
+         <string>Save an image preview
+(filename.png)</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="metaInfoCheckBox">
+        <property name="text">
+         <string>Save the video information (title, type, summary...)
+(filename.info)</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="0" column="3">
     <widget class="QPushButton" name="browsePushButton">
      <property name="text">
       <string>Browse...</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="3" colspan="2">
-    <widget class="QLineEdit" name="filenamePatternLineEdit"/>
-   </item>
-   <item row="0" column="3">
-    <widget class="QLineEdit" name="destinationDirectoryLineEdit"/>
-   </item>
-   <item row="7" column="0" colspan="5">
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   <item row="4" column="2">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pattern to generate the film filenames:&lt;br/&gt;%title: video title&lt;br/&gt;%language: language code&lt;br/&gt;%quality: stream type code (hd/sd...)&lt;/p&gt;&lt;p&gt;Example: '[%quality %language] %title' will create&lt;br/&gt;[HQ DE] Movie title.mp4&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="0" colspan="5">
+   <item row="5" column="0" colspan="4">
     <widget class="QLabel" name="errorLabel">
      <property name="palette">
       <palette>
@@ -105,16 +140,6 @@
      </property>
      <property name="text">
       <string/>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="0" colspan="5">
-    <widget class="QCheckBox" name="seriesDirectoryCheckBox">
-     <property name="toolTip">
-      <string>When a movie belongs to series, a folder will be created for the serie and all episodes will be gathered in this directory.</string>
-     </property>
-     <property name="text">
-      <string>Place films belonging to series into a dedicated directory</string>
      </property>
     </widget>
    </item>
