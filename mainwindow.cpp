@@ -230,7 +230,8 @@ MainWindow::~MainWindow()
 bool MainWindow::isReadyForDownload(const FilmDetails * const film)
 {
     return !film->m_title.isEmpty()
-            && !film->m_streamUrl.isEmpty() && !film->m_isDownloading;
+            && !film->m_streamUrl.isEmpty() &&
+            (film->m_downloadStatus == NONE || film->m_downloadStatus == CANCELLED);
 }
 
 void MainWindow::languageChanged(){
@@ -310,16 +311,19 @@ QTableWidgetItem* MainWindow::createOrUpdateTitleColumn(int rowNumber)
     if (isTeaserFromOriginalMovie(*film)) {
         titleTableItem->setIcon(QIcon(":/img/locked.png"));
     }
-    if (film->m_hasBeenCancelled) {
+    switch (film->m_downloadStatus){
+    case CANCELLED:
         titleTableItem->setIcon(QIcon(":/img/cancelled.png"));
-    }
-    if (film->m_isDownloading){
+        break;
+    case DOWNLOADING:
         titleTableItem->setIcon(QIcon(":/img/progress.png"));
-    } else if (film->m_hasBeenRequested) {
-        if (film->m_isDownloaded)
-            titleTableItem->setIcon(QIcon(":/img/finished.png"));
-        else
-            titleTableItem->setIcon(QIcon(":/img/waiting.png"));
+        break;
+    case REQUESTED:
+        titleTableItem->setIcon(QIcon(":/img/waiting.png"));
+        break;
+    case DOWNLOADED:
+        titleTableItem->setIcon(QIcon(":/img/finished.png"));
+        break;
     }
 
     titleTableItem->setText(film->m_title);
@@ -465,21 +469,24 @@ void MainWindow::updateCurrentDetails(){
          ui->countryYearDurationlabel->setText("");
      }
 
-     bool isDownloadButtonClickable= false;
-     if (film->m_isDownloading)
-         ui->downloadButton->setToolTip(tr("Downloading..."));
-     else if (film->m_hasBeenRequested){
-         if (film->m_isDownloaded)
-             ui->downloadButton->setToolTip(tr("Downloaded"));
-         else
-            ui->downloadButton->setToolTip(tr("Waiting..."));
-     }
-     else
+     switch(film->m_downloadStatus)
      {
+     case NONE:
          ui->downloadButton->setToolTip(tr("Download"));
-         isDownloadButtonClickable = isReadyForDownload(film);
+     case DOWNLOADING:
+         ui->downloadButton->setToolTip(tr("Downloading..."));
+         break;
+     case REQUESTED:
+         ui->downloadButton->setToolTip(tr("Waiting..."));
+         break;
+     case DOWNLOADED:
+         ui->downloadButton->setToolTip(tr("Downloaded"));
+         break;
+     case CANCELLED:
+         ui->downloadButton->setToolTip(tr("Cancelled"));
+         break;
      }
-     ui->downloadButton->setEnabled(isDownloadButtonClickable);
+     ui->downloadButton->setEnabled(isReadyForDownload(film));
 }
 
 
@@ -603,7 +610,7 @@ void MainWindow::downloadFilm(int currentLine, FilmDetails* film){
         {
             // TODO on ne gère pas l'écrasement du film, il faut supprimer l'ancien film si on répond yes !!
             // Il faut revoir chacun des cas... on peut être dans plusieurs cas à la fois
-            film->m_hasBeenRequested = false;
+            film->m_downloadStatus = CANCELLED;
         }
         else if (QFile(QString(futureFileName).append(TEMP_FILE_PREFIX)).exists()
                  && QMessageBox::question(this, tr("Incomplete download found"),
@@ -612,7 +619,7 @@ void MainWindow::downloadFilm(int currentLine, FilmDetails* film){
                                           QMessageBox::Yes,
                                           QMessageBox::No) == QMessageBox::No)
         {
-            film->m_hasBeenRequested = false;
+            film->m_downloadStatus = CANCELLED;
         }
         else
         {
@@ -623,9 +630,7 @@ void MainWindow::downloadFilm(int currentLine, FilmDetails* film){
                 return;
             }
 
-
-            film->m_hasBeenRequested = true;
-            film->m_hasBeenCancelled = false;
+            film->m_downloadStatus = REQUESTED;
             film->m_targetFileName = futureFileName;
 
             delegate->addUrlToDownloadList(film->m_infoUrl); // TODO c'est trop trop moche de faire ça. Design à revoir
@@ -668,7 +673,7 @@ void MainWindow::downloadProgressed(QString filmUrl, double progression, double 
     if (film)
     {
         filmFileName = film->m_targetFileName;
-        film->m_isDownloading = true;
+        film->m_downloadStatus = DOWNLOADING;
     }
 
     QString remainingTimeString;
@@ -695,10 +700,7 @@ void MainWindow::downloadCancelled(QString filmUrl)
     FilmDetails* film = delegate->findFilmByUrl(filmUrl);
     if (film)
     {
-        film->m_isDownloading = false;
-        film->m_isDownloaded = false;
-        film->m_hasBeenRequested = false;
-        film->m_hasBeenCancelled = true;
+        film->m_downloadStatus = CANCELLED;
         refreshTable();
     }
 }
@@ -714,8 +716,7 @@ void MainWindow::filmDownloaded(QString filmUrl)
     if (film)
     {
         // All of that should be done in the delegate!!
-        film->m_isDownloaded = true;
-        film->m_isDownloading = false;
+        film->m_downloadStatus = DOWNLOADED;
 
         QFileInfo filmFile(film->m_targetFileName);
 
@@ -822,15 +823,15 @@ void MainWindow::cellHasBeenClicked(int row, int column)
         return;
     }
     try{
-        FilmDetails * film = delegate->visibleFilms()[row];
+        /*FilmDetails * film = delegate->visibleFilms()[row];
         QTableWidgetItem* titleItem = ui->tableWidget->item(row, COLUMN_FOR_TITLE);
         if (film != NULL && titleItem != NULL)
         {
             // TODO ça ne marche pas comme ça, il faut stocker le fichier du film qu'on télécharge
             QString fileName = getFileName(preferences.destinationDir(), titleItem->text(), film->m_streamUrl);
-            if (film->m_isDownloaded)
+            if (film->m_downloadStatus == DOWNLOADED)
                 QDesktopServices::openUrl(QUrl::fromLocalFile(fileName));
-        }
+        }*/
 
     } catch (NotFoundException&)
     {

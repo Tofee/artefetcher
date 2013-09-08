@@ -76,6 +76,9 @@ enum MetaType {
     Preview_Or_ArteP7
 };
 
+enum EDownloadStatus {
+    NONE, REQUESTED, DOWNLOADING, DOWNLOADED, CANCELLED
+};
 
 class FilmDetails {
 
@@ -94,10 +97,7 @@ public:
 
     QMap<MetaType, QString> m_metadata;
 
-    bool m_hasBeenRequested;
-    bool m_isDownloaded;
-    bool m_isDownloading;
-    bool m_hasBeenCancelled;
+    EDownloadStatus m_downloadStatus;
 
     QString m_streamUrl;
     // Full path of the future downloaded film.
