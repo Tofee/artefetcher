@@ -415,7 +415,8 @@ const QList<MetaType>& MainWindow::listInterestingDetails() {
     if (shownMetadata.isEmpty())
     {
         shownMetadata // << Available_until
-                << Description << First_broadcast_long << Type << Views << Rank << Episode_name;
+                << Description //<< First_broadcast_long
+                << Type << Views << Rank << Episode_name;
     }
     return shownMetadata;
 }
@@ -445,6 +446,7 @@ void MainWindow::updateCurrentDetails(){
          ui->countryYearDurationlabel->setText("");
          return;
      }
+     ui->previewLabel->setVisible(true);
     ui->detailsGroupBox->setTitle(film->m_title);
 
     QString prefix;
@@ -471,18 +473,23 @@ void MainWindow::updateCurrentDetails(){
         QString coutryYearDurationText;
         if (isTeaserFromOriginalMovie(*film))
             coutryYearDurationText.append(tr("The related video is a teaser of the original movie.\n"));
-        if (!film->m_metadata.value(First_broadcast_long).isEmpty())
-        {
-            coutryYearDurationText.append(tr("%1 %2 ")
-                                          .arg(FilmDetails::enum2Str(First_broadcast_long))
-                                          .arg(film->m_metadata.value(First_broadcast_long)));
+
+        if (film->m_durationInMinutes > 0) {
+            coutryYearDurationText.append(tr("(%1 min)\n").arg(QString::number(film->m_durationInMinutes)));
         }
 
-        coutryYearDurationText.append(tr("(%1 min)").arg(QString::number(film->m_durationInMinutes)));
-
-        if (! film->m_metadata.value(Available_until).isEmpty())
+        if (!film->m_metadata.value(RAW_First_Broadcast).isEmpty())
         {
-            coutryYearDurationText.append(tr("\n%1").arg(film->m_metadata.value(Available_until)));
+            QDateTime firstBroadcast = QDateTime::fromString(film->m_metadata.value(RAW_First_Broadcast), "dd/MM/yyyy HH:mm:ss +0200");
+            coutryYearDurationText.append(tr("%1 %2 ")
+                                          .arg(FilmDetails::enum2Str(RAW_First_Broadcast))
+                                          .arg(firstBroadcast.toString(Qt::DefaultLocaleShortDate)));
+        }
+
+        if (! film->m_metadata.value(RAW_Available_until).isEmpty())
+        {
+            QDateTime availableUntil = QDateTime::fromString(film->m_metadata.value(RAW_Available_until), "dd/MM/yyyy HH:mm:ss +0200");
+            coutryYearDurationText.append(tr("\nAvailable until %1").arg(availableUntil.toString(Qt::DefaultLocaleShortDate)));
         }
 
         ui->countryYearDurationlabel->setText(coutryYearDurationText);

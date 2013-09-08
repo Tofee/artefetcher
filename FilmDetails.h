@@ -61,11 +61,11 @@ public:
 };
 
 enum MetaType {
-    First_broadcast,
-    First_broadcast_long,
-    First_broadcast_time,
+//    First_broadcast, // useless, see RAW_First_Broadcast
+//    First_broadcast_long, // useless, see RAW_First_Broadcast
+//    First_broadcast_time, // useless, see RAW_First_Broadcast
     Description,
-    Available_until,
+//    Available_until, // useless, see RAW_Available_until
     Views,
     Channels,
     Rank,
@@ -108,17 +108,17 @@ public:
     QString title() const { return m_title; }
     static const QString enum2Str(MetaType t){
         static const char* enum2Str[] = {
-             QT_TRANSLATE_NOOP("FilmDetails","First broadcast"),
-             QT_TRANSLATE_NOOP("FilmDetails","First broadcast"),
-             QT_TRANSLATE_NOOP("FilmDetails","Time of the first broadcast"),
+//             QT_TRANSLATE_NOOP("FilmDetails","First broadcast"),
+//             QT_TRANSLATE_NOOP("FilmDetails","First broadcast"),
+//             QT_TRANSLATE_NOOP("FilmDetails","Time of the first broadcast"),
              QT_TRANSLATE_NOOP("FilmDetails","Description"),
-             QT_TRANSLATE_NOOP("FilmDetails","Available until"),
+//             QT_TRANSLATE_NOOP("FilmDetails","Available until"),
              QT_TRANSLATE_NOOP("FilmDetails","Views"),
              QT_TRANSLATE_NOOP("FilmDetails","Channels"),
              QT_TRANSLATE_NOOP("FilmDetails","Rank"),
              QT_TRANSLATE_NOOP("FilmDetails","Type"),
-             QT_TRANSLATE_NOOP("FilmDetails","RAW First Broadcast"),
-             QT_TRANSLATE_NOOP("FilmDetails","RAW Available until"),
+             QT_TRANSLATE_NOOP("FilmDetails","First Broadcast"),
+             QT_TRANSLATE_NOOP("FilmDetails","Available until"),
              QT_TRANSLATE_NOOP("FilmDetails","Episode"),
              QT_TRANSLATE_NOOP("FilmDetails","Broadcast type")
         };
