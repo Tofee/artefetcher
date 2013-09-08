@@ -32,6 +32,8 @@ public:
     void addFilmToDownloadQueue(QString key, const FilmDetails& details);
     int queueSize() const;
 
+    void cancelDownload(QString key);
+
 signals:
     void signalAllFilmDownloadFinished();
     void signalDownloadProgressed(QString key,double,double, double);
@@ -53,8 +55,6 @@ private slots:
     void allDownloadsFinished();
 
     void downloadCancelled(QString url);
-
-
 
 private:
     // Keys sent in emitted signals, indexed by their URL

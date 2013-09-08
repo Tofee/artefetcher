@@ -35,16 +35,24 @@ DownloadManager::DownloadManager(QObject *parent)
 
 void DownloadManager::addFilmToDownloadQueue(QString key, const FilmDetails& details){
 
-        if (details.m_hasBeenRequested)
-        {
-
+    if (details.m_downloadStatus == REQUESTED)
+    {
         m_downloader.addDownload(details.m_streamUrl, details.m_targetFileName);
         m_keysForSignalByUrl.insert(details.m_streamUrl, key);
-        }
+    }
 }
 
 void DownloadManager::cancelDownloadInProgress() {
     m_downloader.cancelDownloadInProgress();
+}
+
+void DownloadManager::cancelDownload(QString key){
+    QString streamUrl = m_keysForSignalByUrl.key(key);
+    if (streamUrl.isEmpty())
+    {
+        return;
+    }
+    m_downloader.cancelDownload(streamUrl);
 }
 
 int DownloadManager::queueSize() const {

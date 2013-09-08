@@ -101,8 +101,8 @@ FilmDelegate::~FilmDelegate()
     foreach (QString dlUrl, m_currentDownloads)
     {
         FilmDetails* film = findFilmByUrl(dlUrl);
-        if (film && (film->m_isDownloading
-                    || (film->m_hasBeenRequested && !film->m_isDownloaded)))
+        if (film && (film->m_downloadStatus == REQUESTED
+                    || film->m_downloadStatus == DOWNLOADING))
         {
             pendingDownloads << dlUrl;
         }

@@ -43,6 +43,8 @@ public:
 
     void cancelDownloadInProgress();
 
+    void cancelDownload(QString url);
+
 private slots:
     void startNextDownload();
 
@@ -64,7 +66,7 @@ private:
 
     QNetworkReply* m_currentDownload;
     QNetworkAccessManager* m_manager;
-    QQueue<QPair<QUrl, QString> > m_pendingDonwloads;
+    QQueue<QPair<QUrl, QString> > m_pendingDonwloads; /// Queue of pair of remote url/local filename
     QFile m_outputFile;
     QTime m_downloadTime;
     QTime m_lastNotifTime;

@@ -114,6 +114,8 @@ private:
     void resizeEvent( QResizeEvent * event );
 
     void changeDownloadPartVisibility(bool isVisible);
+
+    FilmDetails* getCurrentFilm() const;
     
 private:
     Ui::MainWindow *ui;

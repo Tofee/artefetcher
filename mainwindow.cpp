@@ -153,6 +153,8 @@ MainWindow::MainWindow(QWidget *parent) :
             thread, SLOT(cancelDownloadInProgress()));
 
     connect(ui->downloadButton, SIGNAL(clicked()), SLOT(downloadButtonClicked()));
+    connect(ui->cancelSelectedFilmButton, SIGNAL(clicked()),
+            SLOT(cancelSelectedFilmDownload()));
 
     connect(delegate, SIGNAL(streamIndexLoaded(int,int,int)),
             SLOT(streamIndexLoaded(int,int,int)));
@@ -229,7 +231,7 @@ MainWindow::~MainWindow()
 
 bool MainWindow::isReadyForDownload(const FilmDetails * const film)
 {
-    return !film->m_title.isEmpty()
+    return film && !film->m_title.isEmpty()
             && !film->m_streamUrl.isEmpty() &&
             (film->m_downloadStatus == NONE || film->m_downloadStatus == CANCELLED);
 }
@@ -324,6 +326,9 @@ QTableWidgetItem* MainWindow::createOrUpdateTitleColumn(int rowNumber)
     case DOWNLOADED:
         titleTableItem->setIcon(QIcon(":/img/finished.png"));
         break;
+    case NONE:
+    default:
+        break;
     }
 
     titleTableItem->setText(film->m_title);
@@ -402,72 +407,74 @@ const QList<MetaType>& MainWindow::listInterestingDetails() {
     return shownMetadata;
 }
 
-
-void MainWindow::updateCurrentDetails(){
-
+FilmDetails* MainWindow::getCurrentFilm() const {
     int rowBegin = ui->tableWidget->currentRow();
 
-     QList<FilmDetails*> details = delegate->visibleFilms();
-     if (rowBegin < 0 || rowBegin >= details.size())
-         return;
+    QList<FilmDetails*> details = delegate->visibleFilms();
+    if (rowBegin < 0 || rowBegin >= details.size())
+        return NULL;
 
-     FilmDetails* film = details.at(rowBegin);
-     if (rowBegin >=0 && rowBegin < ui->tableWidget->rowCount())
-     {
-        ui->detailsGroupBox->setTitle(film->m_title);
+    return details.at(rowBegin);
+}
 
-        QString prefix;
 
-        foreach(MetaType key, listInterestingDetails()){
-            if (film->m_metadata.contains(key) && film->m_metadata.value(key) != "0")
-                    prefix.append(tr("<b> %0 : </b>%1<br/>").arg(FilmDetails::enum2Str(key)).arg(film->m_metadata.value(key)));
-        }
-
-        prefix.append("<br/>");
-        ui->summaryLabel->setText(prefix.append(film->m_summary));
-        if (!film->m_preview.isNull())
-        {
-            ui->previewLabel->setPixmap(QPixmap::fromImage(film->m_preview));
-            ui->previewLabel->setEnabled(true);
-        }
-        else
-        {
-            ui->previewLabel->setPixmap(QPixmap(":/img/Arte.jpg").scaled(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT, Qt::KeepAspectRatio));
-            ui->previewLabel->setDisabled(true);
-        }
-
-        {
-            QString coutryYearDurationText;
-            if (isTeaserFromOriginalMovie(*film))
-                coutryYearDurationText.append(tr("The related video is a teaser of the original movie.\n"));
-            if (!film->m_metadata.value(First_broadcast_long).isEmpty())
-            {
-                coutryYearDurationText.append(tr("%1 %2 ")
-                                              .arg(FilmDetails::enum2Str(First_broadcast_long))
-                                              .arg(film->m_metadata.value(First_broadcast_long)));
-            }
-
-            coutryYearDurationText.append(tr("(%1 min)").arg(QString::number(film->m_durationInMinutes)));
-
-            if (! film->m_metadata.value(Available_until).isEmpty())
-            {
-                coutryYearDurationText.append(tr("\n%1").arg(film->m_metadata.value(Available_until)));
-            }
-
-            ui->countryYearDurationlabel->setText(coutryYearDurationText);
-        }
-        ui->extractIconLabel->setVisible(isTeaserFromOriginalMovie(*film));
-
-        qDebug() << film->m_metadata.value(Preview_Or_ArteP7) << film->m_streamUrl;
-     }
-     else
+void MainWindow::updateCurrentDetails(){
+     FilmDetails* film = getCurrentFilm();
+     ui->downloadButton->setEnabled(isReadyForDownload(film));
+     ui->cancelSelectedFilmButton->setEnabled(film != NULL &&
+             (film->m_downloadStatus == DOWNLOADING || film->m_downloadStatus == REQUESTED));
+     if (film == NULL)
      {
          ui->summaryLabel->setText(tr("No film in the playlist"));
          ui->previewLabel->setPixmap(QPixmap());
          ui->previewLabel->setVisible(false);
          ui->detailsGroupBox->setTitle("");
          ui->countryYearDurationlabel->setText("");
+         return;
      }
+    ui->detailsGroupBox->setTitle(film->m_title);
+
+    QString prefix;
+
+    foreach(MetaType key, listInterestingDetails()){
+        if (film->m_metadata.contains(key) && film->m_metadata.value(key) != "0")
+                prefix.append(tr("<b> %0 : </b>%1<br/>").arg(FilmDetails::enum2Str(key)).arg(film->m_metadata.value(key)));
+    }
+
+    prefix.append("<br/>");
+    ui->summaryLabel->setText(prefix.append(film->m_summary));
+    if (!film->m_preview.isNull())
+    {
+        ui->previewLabel->setPixmap(QPixmap::fromImage(film->m_preview));
+        ui->previewLabel->setEnabled(true);
+    }
+    else
+    {
+        ui->previewLabel->setPixmap(QPixmap(":/img/Arte.jpg").scaled(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT, Qt::KeepAspectRatio));
+        ui->previewLabel->setDisabled(true);
+    }
+
+    {
+        QString coutryYearDurationText;
+        if (isTeaserFromOriginalMovie(*film))
+            coutryYearDurationText.append(tr("The related video is a teaser of the original movie.\n"));
+        if (!film->m_metadata.value(First_broadcast_long).isEmpty())
+        {
+            coutryYearDurationText.append(tr("%1 %2 ")
+                                          .arg(FilmDetails::enum2Str(First_broadcast_long))
+                                          .arg(film->m_metadata.value(First_broadcast_long)));
+        }
+
+        coutryYearDurationText.append(tr("(%1 min)").arg(QString::number(film->m_durationInMinutes)));
+
+        if (! film->m_metadata.value(Available_until).isEmpty())
+        {
+            coutryYearDurationText.append(tr("\n%1").arg(film->m_metadata.value(Available_until)));
+        }
+
+        ui->countryYearDurationlabel->setText(coutryYearDurationText);
+    }
+    ui->extractIconLabel->setVisible(isTeaserFromOriginalMovie(*film));
 
      switch(film->m_downloadStatus)
      {
@@ -486,7 +493,7 @@ void MainWindow::updateCurrentDetails(){
          ui->downloadButton->setToolTip(tr("Cancelled"));
          break;
      }
-     ui->downloadButton->setEnabled(isReadyForDownload(film));
+
 }
 
 
@@ -652,7 +659,12 @@ void MainWindow::changeDownloadPartVisibility(bool isVisible)
 
 void MainWindow::cancelSelectedFilmDownload()
 {
-
+    FilmDetails* film = getCurrentFilm();
+    if (film == NULL || film->m_downloadStatus == CANCELLED
+            || film->m_downloadStatus == DOWNLOADED
+            || film->m_downloadStatus == NONE)
+        return;
+    thread->cancelDownload(film->m_infoUrl);
 }
 
 void MainWindow::allFilmDownloadFinished()
@@ -816,7 +828,7 @@ void MainWindow::closeEvent(QCloseEvent* event)
     event->accept();
 }
 
-void MainWindow::cellHasBeenClicked(int row, int column)
+void MainWindow::cellHasBeenClicked(int /*row*/, int column)
 {
     if (ui->progressBar->isVisible() || column != COLUMN_FOR_TITLE)
     {

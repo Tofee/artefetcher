@@ -98,10 +98,10 @@ void QueueDownloader::downloadFinished()
 {
     m_outputFile.close();
 
-    if (m_currentDownload->error()) {
+    if (m_currentDownload->error() && m_currentDownload->errorString() != "Operation canceled") {
         if (!m_isPaused) {
             qDebug() << m_currentDownload->errorString();
-            emit(downloadError(m_currentDownload->url().toString(), QString("Failed: %1\n").arg(m_currentDownload->errorString())));
+            emit(downloadError(m_currentDownload->url().toString(), QString("Failed: %1").arg(m_currentDownload->errorString())));
         }
     } else {
         // Remove .part extension
@@ -142,5 +142,23 @@ void QueueDownloader::cancelDownloadInProgress() {
         QUrl url = m_currentDownload->url();
         m_currentDownload->abort();
         emit downloadCancelled(url.toString());
+    }
+}
+
+void QueueDownloader::cancelDownload(QString urlToCancel) {
+    if (m_currentDownload && m_currentDownload->url().toString() == urlToCancel)
+    {
+        cancelDownloadInProgress();
+        return;
+    }
+    QPair<QUrl, QString> pair;
+    foreach (pair, m_pendingDonwloads)
+    {
+        if (pair.first.toString() == urlToCancel)
+        {
+            m_pendingDonwloads.removeOne(pair);
+            emit downloadCancelled(urlToCancel);
+            return;
+        }
     }
 }

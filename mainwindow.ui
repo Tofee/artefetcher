@@ -184,6 +184,20 @@
             </spacer>
            </item>
            <item>
+            <widget class="QPushButton" name="cancelSelectedFilmButton">
+             <property name="toolTip">
+              <string>Cancel the download of the selected film</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="resources.qrc">
+               <normaloff>:/img/cancelled.png</normaloff>:/img/cancelled.png</iconset>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QPushButton" name="downloadButton">
              <property name="toolTip">
               <string>Download this video</string>
