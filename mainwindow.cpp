@@ -70,7 +70,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     {
         QFontMetrics metric(ui->tableWidget->font());
-        int totalColumnWidths(25 /* Initial size, at least the vscroll bar width*/);
+        int totalColumnWidths(QApplication::style()->pixelMetric(QStyle::PM_ScrollBarExtent) + 8 /* Initial size, at least the vscroll bar width*/);
         int nextColumn = (metric.boundingRect("00:00:00").width() + TABLE_COLUMN_MARGIN);
         totalColumnWidths+=nextColumn;
         ui->tableWidget->horizontalHeader()->resizeSection(COLUMN_FOR_DURATION, nextColumn);

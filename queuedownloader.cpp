@@ -108,8 +108,8 @@ void QueueDownloader::downloadFinished()
 {
     m_outputFile.close();
 
-    if (m_currentDownload->error() && m_currentDownload->errorString() != "Operation canceled") {
-        if (!m_isPaused) {
+    if (m_currentDownload->error()) {
+        if (!m_isPaused && m_currentDownload->errorString() != "Operation canceled") {
             qDebug() << m_currentDownload->errorString();
             emit(downloadError(m_currentDownload->url().toString(), QString("Failed: %1").arg(m_currentDownload->errorString())));
         }
