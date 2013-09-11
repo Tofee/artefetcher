@@ -31,16 +31,16 @@ QueueDownloader::QueueDownloader(QObject *parent)
 }
 
 void QueueDownloader::addDownload(QUrl url, QString filename) {
-    if (m_pendingDonwloads.isEmpty() && ! m_isWorking)
+    if (m_pendingDownloads.isEmpty() && ! m_isWorking)
              QTimer::singleShot(0, this, SLOT(startNextDownload()));
 
     QPair<QUrl, QString> newDownload(url, filename);
-    m_pendingDonwloads.enqueue(newDownload);
+    m_pendingDownloads.enqueue(newDownload);
 
 }
 
 int QueueDownloader::queueSize() const {
-    return m_pendingDonwloads.size();
+    return m_pendingDownloads.size();
 }
 
 void QueueDownloader::startNextDownload(){
@@ -50,12 +50,12 @@ void QueueDownloader::startNextDownload(){
     m_isWorking = true;
     m_downloadTime.restart();
 
-    if (m_pendingDonwloads.isEmpty()){
+    if (m_pendingDownloads.isEmpty()){
         emit(allDownloadsFinished());
         m_isWorking = false;
         return;
     }
-    QPair<QUrl, QString> downloadToStart = m_pendingDonwloads.dequeue();
+    QPair<QUrl, QString> downloadToStart = m_pendingDownloads.dequeue();
 
     // Check the destination directory
     QFileInfo destFileInfo(downloadToStart.second);
@@ -135,7 +135,7 @@ void QueueDownloader::pause() {
         QFileInfo info(m_outputFile.fileName());
         QString outputFileWithoutPartExtension(info.absolutePath() + QDir::separator() + info.completeBaseName());
         QPair<QUrl, QString> currentDownload(m_currentDownload->url(), outputFileWithoutPartExtension);
-        m_pendingDonwloads.push_front(currentDownload);
+        m_pendingDownloads.push_front(currentDownload);
         m_currentDownload->abort();
         m_outputFile.close();
         emit(paused());
@@ -162,11 +162,11 @@ void QueueDownloader::cancelDownload(QString urlToCancel) {
         return;
     }
     QPair<QUrl, QString> pair;
-    foreach (pair, m_pendingDonwloads)
+    foreach (pair, m_pendingDownloads)
     {
         if (pair.first.toString() == urlToCancel)
         {
-            m_pendingDonwloads.removeOne(pair);
+            m_pendingDownloads.removeOne(pair);
             emit downloadCancelled(urlToCancel);
             return;
         }

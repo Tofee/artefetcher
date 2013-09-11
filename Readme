@@ -22,6 +22,7 @@ Contact me : equincerot[at]users.sourceforge.net
 Thanks to:
 - toto740 for the creation of the desktop icon.
 - FredBezies, he packages for Arch.
+- Loïc Minier, for the patches and the debian packaging
 
 Icons:
 /* Each icon used is described in this format:
@@ -54,6 +55,11 @@ To build arteFetcher from scratch for linux, you need:
 Then you can launch the arteFetcher application.
 
 Release notes :
+v0.3.1
+  Minor changes:
+   - new icon set
+   - apply patches from Loïc Minier
+---------------------------------------------------------------
 v0.3.0
   New features:
    - can cancell any requested film

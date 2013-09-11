@@ -122,7 +122,7 @@ FilmDelegate::~FilmDelegate()
             pendingDownloads << dlUrl;
         }
     }
-    m_preferences.setPendingDonwloads(pendingDownloads);
+    m_preferences.setPendingDownloads(pendingDownloads);
 
     FilmDetails* film;
     foreach(film, m_films)

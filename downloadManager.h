@@ -16,8 +16,8 @@
     along with ArteFetcher.  If not, see <http://www.gnu.org/licenses/>.
     
 ****************************************************************************/
-#ifndef RTMPTHREAD_H
-#define RTMPTHREAD_H
+#ifndef DOWNLOADMANAGER_H
+#define DOWNLOADMANAGER_H
 
 #include <queuedownloader.h>
 #include <FilmDetails.h>
@@ -65,4 +65,4 @@ private:
 };
 
 
-#endif // RTMPTHREAD_H
+#endif // DOWNLOADMANAGER_H

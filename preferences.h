@@ -58,7 +58,7 @@ public:
     {
         return m_pendingDownloads;
     }
-    void setPendingDonwloads(QSet<QString> downloadUrls){
+    void setPendingDownloads(QSet<QString> downloadUrls){
         m_pendingDownloads = downloadUrls;
     }
 

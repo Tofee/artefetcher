@@ -20,6 +20,7 @@
 #include "preferencedialog.h"
 #include "ui_preferencedialog.h"
 #include <QtGui>
+#include <QFileDialog>
 
 PreferenceDialog::PreferenceDialog(QWidget *parent,
                                    Preferences& preferences) :

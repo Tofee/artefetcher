@@ -25,7 +25,10 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QIcon>
+#include <QInputDialog>
 #include <QList>
+#include <QMessageBox>
+
 #include <preferencedialog.h>
 #include <filmdelegate.h>
 #include <FilmDetails.h>
@@ -51,7 +54,7 @@ MainWindow::MainWindow(QWidget *parent) :
     preferences.load();
 
     ui->setupUi(this);
-    this->setWindowTitle("ArteFetcher v0.3.0");
+    this->setWindowTitle("ArteFetcher v0.3.1");
     this->resize(preferences.preferredWindowSize());
     m_trayIcon->show();
 
