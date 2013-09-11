@@ -39,12 +39,14 @@
 #define TABLE_PREVIEW_MAX_HEIGHT 100
 #define TABLE_COLUMN_MARGIN 10
 
+#define DEFAULT_FILM_ICON ":/img/unknown"
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     manager(new QNetworkAccessManager(this)),
         thread (new DownloadManager(this)),
-        m_trayIcon(new QSystemTrayIcon(QIcon(":/img/arte-tv.png"), this))
+        m_trayIcon(new QSystemTrayIcon(QIcon(":/img/icon"), this))
 {
     preferences.load();
 
@@ -94,7 +96,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->previewLabel->setMaximumSize(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT);
     ui->previewLabel->setMinimumSize(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT);
-    ui->previewLabel->setPixmap(QPixmap(":/img/Arte.jpg").scaled(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT, Qt::KeepAspectRatio));
+    ui->previewLabel->setPixmap(QPixmap(DEFAULT_FILM_ICON).scaled(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT, Qt::KeepAspectRatio));
 
     ui->detailsGroupBox->setStyleSheet("QGroupBox { font-size: 16px; font-weight: bold; }");
 
@@ -312,7 +314,7 @@ QTableWidgetItem* MainWindow::createOrUpdateTitleColumn(int rowNumber)
     titleTableItem->setIcon(QIcon());
     if (! film->m_errors.empty())
     {
-        titleTableItem->setIcon(QIcon(":/img/warning.png"));
+        titleTableItem->setIcon(QIcon(":/img/warning"));
         titleTableItem->setToolTip(film->m_errors.join("\n"));
     } else if (film->m_downloadStatus == ERROR)
     {
@@ -331,23 +333,23 @@ QTableWidgetItem* MainWindow::createOrUpdateTitleColumn(int rowNumber)
     }
 
     if (isTeaserFromOriginalMovie(*film)) {
-        titleTableItem->setIcon(QIcon(":/img/locked.png"));
+        titleTableItem->setIcon(QIcon(":/img/locked"));
     }
     switch (film->m_downloadStatus){
     case ERROR:
-        titleTableItem->setIcon(QIcon(":/img/error.png"));
+        titleTableItem->setIcon(QIcon(":/img/error"));
         break;
     case CANCELLED:
-        titleTableItem->setIcon(QIcon(":/img/cancelled.png"));
+        titleTableItem->setIcon(QIcon(":/img/cancelled"));
         break;
     case DOWNLOADING:
-        titleTableItem->setIcon(QIcon(":/img/progress.png"));
+        titleTableItem->setIcon(QIcon(":/img/progress"));
         break;
     case REQUESTED:
-        titleTableItem->setIcon(QIcon(":/img/waiting.png"));
+        titleTableItem->setIcon(QIcon(":/img/waiting"));
         break;
     case DOWNLOADED:
-        titleTableItem->setIcon(QIcon(":/img/finished.png"));
+        titleTableItem->setIcon(QIcon(":/img/finished"));
         break;
     case NONE:
     default:
@@ -387,7 +389,7 @@ void MainWindow::refreshTable()
             ui->tableWidget->setItem(rowNumber, COLUMN_FOR_PREVIEW, previewItem);
         }
         if (film->m_preview.isNull())
-            previewItem->setIcon(QIcon(QPixmap(":/img/Arte.jpg").scaled(TABLE_PREVIEW_MAX_WIDTH, TABLE_PREVIEW_MAX_HEIGHT, Qt::KeepAspectRatio)));
+            previewItem->setIcon(QIcon(QPixmap(DEFAULT_FILM_ICON).scaled(TABLE_PREVIEW_MAX_WIDTH, TABLE_PREVIEW_MAX_HEIGHT, Qt::KeepAspectRatio)));
         else
             previewItem->setIcon(QIcon(QPixmap::fromImage(film->m_preview)));
 
@@ -475,7 +477,7 @@ void MainWindow::updateCurrentDetails(){
     }
     else
     {
-        ui->previewLabel->setPixmap(QPixmap(":/img/Arte.jpg").scaled(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT, Qt::KeepAspectRatio));
+        ui->previewLabel->setPixmap(QPixmap(DEFAULT_FILM_ICON).scaled(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT, Qt::KeepAspectRatio));
         ui->previewLabel->setDisabled(true);
     }
 

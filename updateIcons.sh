@@ -13,7 +13,7 @@ do
     license=`rpm -q --queryformat '%{LICENSE}\n' $rpmFile`
     echo "$targetFile (RPM: $rpmFile)"
     
-    cp $sourceFile $targetFile
+    cp $sourceFile img/$targetFile
     if [[ $oldLicense != $license ]]
     then
       echo "Warning !!"

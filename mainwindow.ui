@@ -21,7 +21,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="resources.qrc">
-    <normaloff>:/img/arte-tv.png</normaloff>:/img/arte-tv.png</iconset>
+    <normaloff>:/img/icon</normaloff>:/img/icon</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -169,7 +169,7 @@
               <string/>
              </property>
              <property name="pixmap">
-              <pixmap resource="resources.qrc">:/img/locked.png</pixmap>
+              <pixmap resource="resources.qrc">:/img/locked</pixmap>
              </property>
             </widget>
            </item>
@@ -203,7 +203,7 @@
              </property>
              <property name="icon">
               <iconset resource="resources.qrc">
-               <normaloff>:/img/cancelled.png</normaloff>:/img/cancelled.png</iconset>
+               <normaloff>:/img/cancelled</normaloff>:/img/cancelled</iconset>
              </property>
             </widget>
            </item>
@@ -214,7 +214,7 @@
              </property>
              <property name="icon">
               <iconset resource="resources.qrc">
-               <normaloff>:/img/download.png</normaloff>:/img/download.png</iconset>
+               <normaloff>:/img/download</normaloff>:/img/download</iconset>
              </property>
             </widget>
            </item>
@@ -225,7 +225,7 @@
              </property>
              <property name="icon">
               <iconset resource="resources.qrc">
-               <normaloff>:/img/refresh.png</normaloff>:/img/refresh.png</iconset>
+               <normaloff>:/img/refresh</normaloff>:/img/refresh</iconset>
              </property>
             </widget>
            </item>
@@ -236,7 +236,7 @@
              </property>
              <property name="icon">
               <iconset resource="resources.qrc">
-               <normaloff>:/img/web.png</normaloff>:/img/web.png</iconset>
+               <normaloff>:/img/web</normaloff>:/img/web</iconset>
              </property>
             </widget>
            </item>
@@ -357,7 +357,7 @@
              </property>
              <property name="icon">
               <iconset resource="resources.qrc">
-               <normaloff>:/img/pause.png</normaloff>:/img/pause.png</iconset>
+               <normaloff>:/img/pause</normaloff>:/img/pause</iconset>
              </property>
             </widget>
            </item>
@@ -368,7 +368,7 @@
              </property>
              <property name="icon">
               <iconset resource="resources.qrc">
-               <normaloff>:/img/cancelled.png</normaloff>:/img/cancelled.png</iconset>
+               <normaloff>:/img/cancelled</normaloff>:/img/cancelled</iconset>
              </property>
             </widget>
            </item>

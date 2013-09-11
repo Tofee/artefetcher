@@ -1,18 +1,18 @@
 <RCC>
     <qresource prefix="/img">
-        <file>warning.png</file>
-        <file>finished.png</file>
-        <file>progress.png</file>
-        <file>arte-tv.png</file>
-        <file>Arte.jpg</file>
-        <file>waiting.png</file>
-        <file>download.png</file>
-        <file>refresh.png</file>
-        <file>pause.png</file>
-        <file>web.png</file>
-        <file>locked.png</file>
-        <file>cancelled.png</file>
-        <file>error.png</file>
+        <file alias="warning">img/warning.png</file>
+        <file alias="finished">img/finished.png</file>
+        <file alias="progress">img/progress.png</file>
+        <file alias="waiting">img/waiting.png</file>
+        <file alias="download">img/download.png</file>
+        <file alias="refresh">img/refresh.png</file>
+        <file alias="pause">img/pause.png</file>
+        <file alias="web">img/web.png</file>
+        <file alias="locked">img/locked.png</file>
+        <file alias="cancelled">img/cancelled.png</file>
+        <file alias="error">img/error.png</file>
+        <file alias="icon">img/arteFetcher_ico.png</file>
+        <file alias="unknown">img/unknown_image.png</file>
     </qresource>
     <qresource prefix="/translation">
         <file>arteFetcher_de.qm</file>
