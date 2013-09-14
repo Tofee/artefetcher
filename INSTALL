@@ -1,0 +1,11 @@
+To build arteFetcher from scratch for linux, you need:
+- qt devel libraries, including qt webkit (devel)
+- gcc-c++
+- make
+
+1) unzip the archive
+2) lrelease *.ts
+3) qmake
+4) make
+
+Then you can launch the arteFetcher application.

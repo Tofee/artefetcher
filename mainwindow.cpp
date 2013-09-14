@@ -54,7 +54,7 @@ MainWindow::MainWindow(QWidget *parent) :
     preferences.load();
 
     ui->setupUi(this);
-    this->setWindowTitle("ArteFetcher v0.3.1");
+    this->setWindowTitle("ArteFetcher v. " + QApplication::applicationVersion());
     this->resize(preferences.preferredWindowSize());
     m_trayIcon->show();
 

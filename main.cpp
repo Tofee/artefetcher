@@ -27,6 +27,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    a.setApplicationVersion(APP_VERSION);
     QTranslator translator;
     translator.load(":/translation/arteFetcher_de.qm");
     translator.load(":/translation/arteFetcher_fr.qm");

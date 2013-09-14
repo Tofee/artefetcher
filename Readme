@@ -1,60 +1,27 @@
-/****************************************************************************
+ArteFetcher is a tool to download a video from the Arte+7 broadcast website.
 
-    This file is part of ArteFetcher.
-
-    ArteFetcher is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    ArteFetcher is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with ArteFetcher.  If not, see <http://www.gnu.org/licenses/>.
-    
-****************************************************************************/
-
-Contact me : equincerot[at]users.sourceforge.net
+Author: Emmanuel Quincerot <equincerot[at]users.sourceforge.net>
 
 Thanks to:
-- toto740 for the creation of the desktop icon.
 - FredBezies, he packages for Arch.
 - Loïc Minier, for the patches and the debian packaging
 
-Icons:
-/* Each icon used is described in this format:
- * file:filename in rpm:license:rpm name
- */
-arteFetcher.png:designed by toto740, used with his agreement
-cancelled.png:/usr/share/icons/oxygen/16x16/actions/dialog-cancel.png:LGPL-2.1+
-download.png:/usr/share/icons/oxygen/16x16/actions/arrow-down-double.png:LGPL-2.1+
-directory.png:/usr/share/icons/oxygen/16x16/apps/document.png:LGPL-2.1+
-error.png:/usr/share/icons/oxygen/16x16/status/dialog-error.png:LGPL-2.1+
-finished.png:/usr/share/icons/oxygen/16x16/status/task-complete.png:LGPL-2.1+
-locked.png:/usr/share/icons/oxygen/16x16/actions/document-encrypt.png:LGPL-2.1+
-pause.png:/usr/share/icons/oxygen/16x16/actions/media-playback-pause.png:LGPL-2.1+
-play.png:/usr/share/icons/oxygen/16x16/actions/media-playback-start.png:LGPL-2.1+
-progress.png:/usr/share/icons/oxygen/16x16/status/task-delegate.png:LGPL-2.1+
-refresh.png:/usr/share/icons/oxygen/16x16/actions/view-refresh.png:LGPL-2.1+
-waiting.png:/usr/share/icons/oxygen/16x16/status/task-ongoing.png:LGPL-2.1+
-warning.png:/usr/share/icons/oxygen/16x16/status/dialog-warning.png:LGPL-2.1+
-web.png:/usr/share/icons/oxygen/16x16/places/repository.png:LGPL-2.1+
 
+*****************************************************************************
+ArteFetcher is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-To build arteFetcher from scratch for linux, you need:
-- qt devel libraries, including qt webkit (devel)
-- gcc-c++
-- make
+ArteFetcher is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-1) unzip the archive
-2) lrelease *.ts
-3) qmake
-4) make
+You should have received a copy of the GNU General Public License
+along with ArteFetcher.  If not, see <http://www.gnu.org/licenses/>.
+*****************************************************************************
 
-Then you can launch the arteFetcher application.
 
 Release notes :
 v0.3.1
