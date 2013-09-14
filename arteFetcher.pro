@@ -29,7 +29,8 @@ SOURCES += main.cpp\
     preferencedialog.cpp \
     preferences.cpp \
     downloadManager.cpp \
-    queuedownloader.cpp
+    queuedownloader.cpp \
+    aboutdialog.cpp
 
 HEADERS  += mainwindow.h \
     FilmDetails.h \
@@ -37,12 +38,14 @@ HEADERS  += mainwindow.h \
     preferencedialog.h \
     preferences.h \
     downloadManager.h \
-    queuedownloader.h
+    queuedownloader.h \
+    aboutdialog.h
 TRANSLATIONS    = arteFetcher_de.ts \
                   arteFetcher_fr.ts
 
 FORMS    += mainwindow.ui \
-    preferencedialog.ui
+    preferencedialog.ui \
+    aboutdialog.ui
 
 INCLUDEPATH += /usr/lib64
 DEPENDPATH += /usr/lib64

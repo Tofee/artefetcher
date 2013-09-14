@@ -2,9 +2,11 @@
 * Each icon used is described in this pattern *
 * file:filename in rpm:rpm-name:license       *
 ***********************************************
+about.png:/usr/share/icons/oxygen/16x16/actions/documentinfo.png:oxygen-icon-theme:LGPL-2.1+
 arteFetcher.png:designed by Emmanuel Quincerot, under licence GPL-3
 arteFetcher_ico.png:designed by Emmanuel Quincerot, under licence GPL-3
 cancelled.png:/usr/share/icons/oxygen/16x16/actions/dialog-cancel.png:oxygen-icon-theme:LGPL-2.1+
+configure.png:/usr/share/icons/oxygen/16x16/actions/configure.png:oxygen-icon-theme:LGPL-2.1+
 download.png:/usr/share/icons/oxygen/16x16/actions/arrow-down-double.png:oxygen-icon-theme:LGPL-2.1+
 directory.png:/usr/share/icons/oxygen/16x16/apps/document.png:oxygen-icon-theme:LGPL-2.1+
 error.png:/usr/share/icons/oxygen/16x16/status/dialog-error.png:oxygen-icon-theme:LGPL-2.1+

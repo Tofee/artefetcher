@@ -33,6 +33,7 @@
 #include <filmdelegate.h>
 #include <FilmDetails.h>
 #include <downloadManager.h>
+#include <aboutdialog.h>
 
 #define COLUMN_FOR_TITLE 1
 #define COLUMN_FOR_DURATION 2
@@ -54,7 +55,7 @@ MainWindow::MainWindow(QWidget *parent) :
     preferences.load();
 
     ui->setupUi(this);
-    this->setWindowTitle("ArteFetcher v. " + QApplication::applicationVersion());
+    this->setWindowTitle("Arte Fetcher v." + QApplication::applicationVersion());
     this->resize(preferences.preferredWindowSize());
     m_trayIcon->show();
 
@@ -141,6 +142,8 @@ MainWindow::MainWindow(QWidget *parent) :
             SLOT(playFilm()));
     connect(ui->openDirectoryButton, SIGNAL(clicked()),
             SLOT(openFilmDirectory()));
+    connect(ui->aboutButton, SIGNAL(clicked()),
+            SLOT(showAboutWindow()));
 
     connect(ui->dateEdit, SIGNAL(dateChanged(QDate)),
             SLOT(clearAndLoadTable()));
@@ -705,6 +708,10 @@ void MainWindow::openFilmDirectory() {
 
     QFileInfo filmFile(film->m_targetFileName);
     QDesktopServices::openUrl(QUrl::fromLocalFile(filmFile.absolutePath()));
+}
+void MainWindow::showAboutWindow() {
+    AboutDialog popup(this);
+    popup.exec();
 }
 
 void MainWindow::allFilmDownloadFinished()

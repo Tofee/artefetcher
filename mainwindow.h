@@ -90,6 +90,7 @@ private slots:
     void cancelSelectedFilmDownload();
     void playFilm();
     void openFilmDirectory();
+    void showAboutWindow();
 
     void nextPage();
     void previousPage();

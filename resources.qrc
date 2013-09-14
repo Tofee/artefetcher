@@ -15,9 +15,15 @@
         <file alias="unknown">img/unknown_image.png</file>
         <file alias="play">img/play.png</file>
         <file alias="directory">img/directory.png</file>
+        <file alias="about">img/about.png</file>
+        <file alias="configure">img/configure.png</file>
+        <file alias="arteFetcher">img/arteFetcher.png</file>
     </qresource>
     <qresource prefix="/translation">
         <file>arteFetcher_de.qm</file>
         <file>arteFetcher_fr.qm</file>
+    </qresource>
+    <qresource prefix="/doc">
+        <file>Readme</file>
     </qresource>
 </RCC>
