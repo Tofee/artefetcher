@@ -140,6 +140,11 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->streamComboBox, SIGNAL(currentIndexChanged(int)),
             SLOT(clearAndLoadTable()));
 
+    connect(ui->playButton, SIGNAL(clicked()),
+            SLOT(playFilm()));
+    connect(ui->openDirectoryButton, SIGNAL(clicked()),
+            SLOT(openFilmDirectory()));
+
     connect(ui->dateEdit, SIGNAL(dateChanged(QDate)),
             SLOT(clearAndLoadTable()));
     connect(ui->searchButton, SIGNAL(clicked()),
@@ -456,6 +461,8 @@ void MainWindow::updateCurrentDetails(){
      FilmDetails* film = getCurrentFilm();
      bool hasDownloadStarted = film && (film->m_downloadStatus == DOWNLOADING || film->m_downloadStatus == DOWNLOADED || film->m_downloadStatus == ERROR);
 
+     ui->openDirectoryButton->setVisible(hasDownloadStarted);
+     ui->playButton->setVisible(hasDownloadStarted);
      ui->downloadButton->setVisible(isReadyForDownload(film));
      ui->cancelSelectedFilmButton->setVisible(film != NULL &&
              (film->m_downloadStatus == DOWNLOADING || film->m_downloadStatus == REQUESTED));
@@ -682,6 +689,28 @@ void MainWindow::cancelSelectedFilmDownload()
             || film->m_downloadStatus == ERROR)
         return;
     thread->cancelDownload(film->m_infoUrl);
+}
+
+void MainWindow::playFilm() {
+    FilmDetails* film = getCurrentFilm();
+    if (film == NULL)
+        return;
+
+    QString filePath = film->m_targetFileName;
+    if (film->m_downloadStatus != DOWNLOADED)
+    {
+        filePath.append(".part");
+    }
+    QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
+}
+
+void MainWindow::openFilmDirectory() {
+    FilmDetails* film = getCurrentFilm();
+    if (film == NULL || film->m_downloadStatus == ERROR)
+        return;
+
+    QFileInfo filmFile(film->m_targetFileName);
+    QDesktopServices::openUrl(QUrl::fromLocalFile(filmFile.absolutePath()));
 }
 
 void MainWindow::allFilmDownloadFinished()

@@ -208,6 +208,34 @@
             </widget>
            </item>
            <item>
+            <widget class="QPushButton" name="openDirectoryButton">
+             <property name="toolTip">
+              <string>Open the directory containing the video</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="resources.qrc">
+               <normaloff>:/img/directory</normaloff>:/img/directory</iconset>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="playButton">
+             <property name="toolTip">
+              <string>Play the video</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="resources.qrc">
+               <normaloff>:/img/play</normaloff>:/img/play</iconset>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QPushButton" name="downloadButton">
              <property name="toolTip">
               <string>Download this video</string>

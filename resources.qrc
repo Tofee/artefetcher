@@ -13,6 +13,8 @@
         <file alias="error">img/error.png</file>
         <file alias="icon">img/arteFetcher_ico.png</file>
         <file alias="unknown">img/unknown_image.png</file>
+        <file alias="play">img/play.png</file>
+        <file alias="directory">img/directory.png</file>
     </qresource>
     <qresource prefix="/translation">
         <file>arteFetcher_de.qm</file>

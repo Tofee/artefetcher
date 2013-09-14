@@ -89,6 +89,8 @@ private slots:
     void webPageButtonClicked();
     void cellHasBeenClicked(int row, int column);
     void cancelSelectedFilmDownload();
+    void playFilm();
+    void openFilmDirectory();
 
     void nextPage();
     void previousPage();
