@@ -67,6 +67,8 @@ MainWindow::MainWindow(QWidget *parent) :
            << tr("Duration")
     ;
 
+    ui->qualityLabel->setToolTip(ui->qualityComboBox->toolTip());
+
     ui->tableWidget->setColumnCount(header.size());
     ui->tableWidget->setHorizontalHeaderLabels(header);
     ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -452,8 +454,10 @@ FilmDetails* MainWindow::getCurrentFilm() const {
 
 void MainWindow::updateCurrentDetails(){
      FilmDetails* film = getCurrentFilm();
-     ui->downloadButton->setEnabled(isReadyForDownload(film));
-     ui->cancelSelectedFilmButton->setEnabled(film != NULL &&
+     bool hasDownloadStarted = film && (film->m_downloadStatus == DOWNLOADING || film->m_downloadStatus == DOWNLOADED || film->m_downloadStatus == ERROR);
+
+     ui->downloadButton->setVisible(isReadyForDownload(film));
+     ui->cancelSelectedFilmButton->setVisible(film != NULL &&
              (film->m_downloadStatus == DOWNLOADING || film->m_downloadStatus == REQUESTED));
      if (film == NULL)
      {
@@ -464,7 +468,8 @@ void MainWindow::updateCurrentDetails(){
          ui->countryYearDurationlabel->setText("");
          return;
      }
-     ui->previewLabel->setVisible(true);
+
+    ui->previewLabel->setVisible(true);
     ui->detailsGroupBox->setTitle(film->m_title);
 
     QString prefix;
@@ -479,12 +484,10 @@ void MainWindow::updateCurrentDetails(){
     if (!film->m_preview.isNull())
     {
         ui->previewLabel->setPixmap(QPixmap::fromImage(film->m_preview));
-        ui->previewLabel->setEnabled(true);
     }
     else
     {
         ui->previewLabel->setPixmap(QPixmap(DEFAULT_FILM_ICON).scaled(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT, Qt::KeepAspectRatio));
-        ui->previewLabel->setDisabled(true);
     }
 
     {
@@ -513,27 +516,6 @@ void MainWindow::updateCurrentDetails(){
         ui->countryYearDurationlabel->setText(coutryYearDurationText);
     }
     ui->extractIconLabel->setVisible(isTeaserFromOriginalMovie(*film));
-
-     switch(film->m_downloadStatus)
-     {
-     case NONE:
-         ui->downloadButton->setToolTip(tr("Download"));
-         break;
-     case DOWNLOADING:
-         ui->downloadButton->setToolTip(tr("Downloading..."));
-         break;
-     case REQUESTED:
-         ui->downloadButton->setToolTip(tr("Waiting..."));
-         break;
-     case DOWNLOADED:
-         ui->downloadButton->setToolTip(tr("Downloaded"));
-         break;
-     case CANCELLED:
-         ui->downloadButton->setToolTip(tr("Cancelled"));
-         break;
-     case ERROR:
-         ui->downloadButton->setToolTip(tr("Download error"));
-     }
 
 }
 
