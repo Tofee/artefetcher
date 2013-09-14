@@ -399,6 +399,7 @@ void MainWindow::refreshTable()
         if (previewItem == NULL)
         {
             previewItem = new QTableWidgetItem();
+            previewItem->setFlags(previewItem->flags()^Qt::ItemIsEditable);
             ui->tableWidget->setItem(rowNumber, COLUMN_FOR_PREVIEW, previewItem);
         }
         if (film->m_preview.isNull())
