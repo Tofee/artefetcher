@@ -55,7 +55,6 @@ PreferenceDialog::~PreferenceDialog()
 
 void PreferenceDialog::accept()
 {
-    // TODO must : regarder si les caractères du pattern collent avec le systeme de fichier
     m_preferences.m_destinationDir = ui->destinationDirectoryLineEdit->text();
     m_preferences.m_filenamePattern = ui->filenamePatternLineEdit->text();
 

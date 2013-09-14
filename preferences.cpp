@@ -42,7 +42,6 @@ void Preferences::load()
 
     m_selectedLanguage = settings.value(DEF_OPT_STR_LANGUAGE, FilmDelegate::listLanguages().first()).toString();
     m_selectedQuality = settings.value(DEF_OPT_STR_QUALITY, FilmDelegate::listQualities().first()).toString();
-    // TODO "[]" are forbidden in fat32
     m_filenamePattern = settings.value(DEF_OPT_FILENAME_PATTERN, "[%language %quality] %title").toString();
     m_destinationDir = settings.value(DEF_OPT_DST_DIR, defaultWorkingPath).toString();
     m_pendingDownloads = QSet<QString>::fromList(settings.value(DEF_OPT_PENDING_DOWNLADS, QStringList()).toStringList());

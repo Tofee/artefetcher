@@ -134,9 +134,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->settingsButton, SIGNAL(clicked()),
             SLOT(showPreferences()));
 
-    connect(ui->tableWidget, SIGNAL(cellClicked(int,int)),
-            SLOT(cellHasBeenClicked(int, int)));
-
     connect(ui->streamComboBox, SIGNAL(currentIndexChanged(int)),
             SLOT(clearAndLoadTable()));
 
@@ -530,8 +527,6 @@ void MainWindow::updateCurrentDetails(){
 
 QString cleanFilenameForFileSystem(const QString filename) {
     QString cleanedFilename(filename);
-    // TODO les caractères HTML sont à convertir (ex:&#39; => ')
-
     cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[éèëê]")), "e");
     cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[ÉÈËÊ]")), "E");
     cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[ô]")), "o");
@@ -646,8 +641,6 @@ void MainWindow::downloadFilm(int currentLine, FilmDetails* film){
                                   QMessageBox::No)
                     == QMessageBox::No)
         {
-            // TODO on ne gère pas l'écrasement du film, il faut supprimer l'ancien film si on répond yes !!
-            // Il faut revoir chacun des cas... on peut être dans plusieurs cas à la fois
             film->m_downloadStatus = CANCELLED;
         }
         else if (QFile(QString(futureFileName).append(TEMP_FILE_PREFIX)).exists()
@@ -888,31 +881,6 @@ void MainWindow::closeEvent(QCloseEvent* event)
     }
     event->accept();
 }
-
-void MainWindow::cellHasBeenClicked(int /*row*/, int column)
-{
-    if (ui->progressBar->isVisible() || column != COLUMN_FOR_TITLE)
-    {
-        return;
-    }
-    try{
-        /*FilmDetails * film = delegate->visibleFilms()[row];
-        QTableWidgetItem* titleItem = ui->tableWidget->item(row, COLUMN_FOR_TITLE);
-        if (film != NULL && titleItem != NULL)
-        {
-            // TODO ça ne marche pas comme ça, il faut stocker le fichier du film qu'on télécharge
-            QString fileName = getFileName(preferences.destinationDir(), titleItem->text(), film->m_streamUrl);
-            if (film->m_downloadStatus == DOWNLOADED)
-                QDesktopServices::openUrl(QUrl::fromLocalFile(fileName));
-        }*/
-
-    } catch (NotFoundException&)
-    {
-        return;
-    }
-
-}
-
 
 void MainWindow::downloadButtonClicked()
 {

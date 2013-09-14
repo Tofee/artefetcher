@@ -447,7 +447,7 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                 addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_AVAILABILITY,      RAW_Available_until); // 02/05/2013 20:20:30 +0200
                 addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_VIDEO_TYPE,        Preview_Or_ArteP7); // EXTRAIT (AUSSCHNITT in german) or ARTE+7
                 addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_VSU,               Episode_name); // if not null, it belongs to a serie
-                addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_VIEWS,             Views); // TODO different from the one in the catalog: this is just a number
+                addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_VIEWS,             Views); // different from the one in the catalog: this is just a number
                 addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_RANK,              Rank);
                 addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_DESCRIPTION,       Description);
 
@@ -547,8 +547,7 @@ QString FilmDelegate::getStreamUrlFromResponse(const QString& page, const QStrin
 
 StreamType FilmDelegate::getStreamTypeByHumanName(const QString& humanName) throw (NotFoundException)
 {
-    StreamType current("","","");// TODO c'est pas beau
-    foreach (current, listStreamTypes())
+    foreach (StreamType current, listStreamTypes())
     {
         if (current.humanCode == humanName)
             return current;
