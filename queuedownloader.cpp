@@ -26,7 +26,7 @@
 #include <QDebug>
 
 QueueDownloader::QueueDownloader(QObject *parent)
-    :m_currentDownload(NULL),m_manager(new QNetworkAccessManager(parent)), m_isWorking(false), m_isPaused(false)
+    :m_currentDownload(NULL),m_manager(new QNetworkAccessManager(parent)), m_lastNotifTime(0,0), m_isWorking(false), m_isPaused(false)
 {
 }
 
