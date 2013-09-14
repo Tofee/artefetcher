@@ -72,6 +72,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
 
+    ui->progressBar->setMaximum(100); // Required for Qt5
 
     {
         QFontMetrics metric(ui->tableWidget->font());
@@ -379,7 +380,9 @@ void MainWindow::refreshTable()
         createOrUpdateTitleColumn(rowNumber);
         if (film->m_durationInMinutes > 0)
         {
-            QTime duration(QTime().addSecs(film->m_durationInMinutes * 60));
+
+            QTime duration(0,0);
+            duration = duration.addSecs(film->m_durationInMinutes * 60);
             QTableWidgetItem* item = new QTableWidgetItem(duration.toString());
             item->setFlags(item->flags()^Qt::ItemIsEditable);
             ui->tableWidget->setItem(rowNumber, COLUMN_FOR_DURATION, item);
