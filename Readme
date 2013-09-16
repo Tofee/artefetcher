@@ -24,6 +24,9 @@ along with ArteFetcher.  If not, see <http://www.gnu.org/licenses/>.
 
 
 Release notes :
+v0.3.3
+  Add proxy support
+---------------------------------------------------------------
 v0.3.2
   Migration to Qt5 (Qt4 still supported)
   UI:
