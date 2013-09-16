@@ -36,6 +36,12 @@ PreferenceDialog::PreferenceDialog(QWidget *parent) :
     ui->metaInfoCheckBox->setChecked(Preferences::getInstance()->m_saveMetaInInfoFile);
     ui->imagePreviewCheckBox->setChecked(Preferences::getInstance()->m_saveImagePreview);
 
+    ui->proxyCheckBox->setChecked(Preferences::getInstance()->m_proxyEnabled);
+    ui->proxyHttpUrlLineEdit->setText(Preferences::getInstance()->m_proxyHttpUrl);
+    ui->proxyHttpPortSpinBox->setValue(Preferences::getInstance()->m_proxyHttpPort);
+
+    updateProxyConfigVisibility();
+
     connect(ui->browsePushButton, SIGNAL(clicked()),
             this, SLOT(browse()));
 
@@ -43,6 +49,9 @@ PreferenceDialog::PreferenceDialog(QWidget *parent) :
             SLOT(checkIsAcceptable()));
     connect(ui->filenamePatternLineEdit, SIGNAL(textChanged(QString)),
             SLOT(checkIsAcceptable()));
+
+    connect(ui->proxyCheckBox, SIGNAL(clicked()),
+            SLOT(updateProxyConfigVisibility()));
 }
 
 PreferenceDialog::~PreferenceDialog()
@@ -61,6 +70,9 @@ void PreferenceDialog::accept()
     Preferences::getInstance()->m_saveMetaInInfoFile = ui->metaInfoCheckBox->isChecked();
     Preferences::getInstance()->m_saveImagePreview = ui->imagePreviewCheckBox->isChecked();
 
+    Preferences::getInstance()->m_proxyEnabled = ui->proxyCheckBox->isChecked();
+    Preferences::getInstance()->m_proxyHttpUrl = ui->proxyHttpUrlLineEdit->text();
+    Preferences::getInstance()->m_proxyHttpPort = ui->proxyHttpPortSpinBox->value();
 
     QDialog::accept();
 }
@@ -86,4 +98,13 @@ void PreferenceDialog::checkIsAcceptable()
     }
     ui->errorLabel->setText(errorMessage);
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(errorMessage.isEmpty());
+}
+
+void PreferenceDialog::updateProxyConfigVisibility() {
+    bool toBeVisible = ui->proxyCheckBox->isChecked();
+
+    ui->proxyHttpUrlLabel->setVisible(toBeVisible);
+    ui->proxyHttpUrlLineEdit->setVisible(toBeVisible);
+    ui->proxyHttpPortLabel->setVisible(toBeVisible);
+    ui->proxyHttpPortSpinBox->setVisible(toBeVisible);
 }

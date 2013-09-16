@@ -22,6 +22,7 @@
 
 #include <QMainWindow>
 #include <QList>
+#include <QNetworkProxy>
 #include <QSystemTrayIcon>
 
 #include <preferences.h>
@@ -119,6 +120,8 @@ private:
     void changeDownloadPartVisibility(bool isVisible);
 
     FilmDetails* getCurrentFilm() const;
+
+    void applyProxySettings();
     
 private:
     Ui::MainWindow *ui;
@@ -127,6 +130,7 @@ private:
     Qt::CheckState m_pressedItemCheckState;
     int m_pressedItemRow;
 
+    QNetworkProxy m_userDefinedProxy;
 
     DownloadManager* thread;
     QSystemTrayIcon *m_trayIcon;

@@ -110,6 +110,11 @@ protected:
     bool    m_dedicatedDirectoryForSeries;
     bool    m_saveImagePreview;
     bool    m_saveMetaInInfoFile;
+
+    /* Proxy : */
+    bool    m_proxyEnabled;
+    QString m_proxyHttpUrl;
+    short   m_proxyHttpPort;
 };
 
 

@@ -51,6 +51,7 @@ MainWindow::MainWindow(QWidget *parent) :
         m_trayIcon(new QSystemTrayIcon(QIcon(":/img/icon"), this))
 {
     Preferences::getInstance()->load();
+    applyProxySettings();
 
     ui->setupUi(this);
 
@@ -867,8 +868,26 @@ void MainWindow::errorOccured(QString filmUrl, QString errorMessage)
 
 void MainWindow::showPreferences()
 {
-    PreferenceDialog dial(this, preferences);
-    dial.exec();
+    PreferenceDialog dial(this);
+    if (QDialog::Accepted == dial.exec())
+    {
+        applyProxySettings();
+        clearAndLoadTable();
+    }
+}
+
+void MainWindow::applyProxySettings() {
+    if (!Preferences::getInstance()->m_proxyEnabled)
+    {
+        QNetworkProxy::setApplicationProxy(QNetworkProxy::NoProxy);
+    }
+    else
+    {
+        m_userDefinedProxy.setType(QNetworkProxy::HttpProxy);
+        m_userDefinedProxy.setHostName(Preferences::getInstance()->m_proxyHttpUrl);
+        m_userDefinedProxy.setPort(Preferences::getInstance()->m_proxyHttpPort);
+        QNetworkProxy::setApplicationProxy(m_userDefinedProxy);
+    }
 }
 
 void MainWindow::closeEvent(QCloseEvent* event)
