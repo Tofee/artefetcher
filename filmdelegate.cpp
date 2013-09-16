@@ -102,12 +102,12 @@ QList<StreamType>& FilmDelegate::listStreamTypes()
     return streamTypes;
 }
 
-FilmDelegate::FilmDelegate(QNetworkAccessManager * in_manager, Preferences &pref)
-    :m_manager(in_manager), m_signalMapper(new QSignalMapper(this)), m_preferences(pref), m_lastRequestPageId(0)
+FilmDelegate::FilmDelegate(QNetworkAccessManager * in_manager)
+    :m_manager(in_manager), m_signalMapper(new QSignalMapper(this)), m_lastRequestPageId(0)
 {
     connect(m_signalMapper, SIGNAL(mapped(QObject*)),
             this, SLOT(requestReadyToRead(QObject*)));
-    m_currentDownloads = m_preferences.pendingDownloads();
+    m_currentDownloads = Preferences::getInstance()->pendingDownloads();
 }
 
 FilmDelegate::~FilmDelegate()
@@ -122,7 +122,7 @@ FilmDelegate::~FilmDelegate()
             pendingDownloads << dlUrl;
         }
     }
-    m_preferences.setPendingDownloads(pendingDownloads);
+    Preferences::getInstance()->setPendingDownloads(pendingDownloads);
 
     FilmDetails* film;
     foreach(film, m_films)
@@ -418,7 +418,7 @@ void FilmDelegate::requestReadyToRead(QObject* object)
             QString filmCode = reply->url().toString().split("/").at(9);
 
             QString videoStreamUrl = "http://www.arte.tv/papi/tvguide/videos/stream/";
-            videoStreamUrl.append(m_preferences.selectedLanguage() == "fr" ? "F/" : "D/");
+            videoStreamUrl.append(Preferences::getInstance()->selectedLanguage() == "fr" ? "F/" : "D/");
             videoStreamUrl.append(filmCode);
             videoStreamUrl.append("/ALL/ALL.json");
             downloadUrl(videoStreamUrl, pageRequestId, film->m_infoUrl, QString(MAPPER_STEP_CODE_3_RTMP));
@@ -496,7 +496,7 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                 if (type == "HBBTV")
                 {
                     QString quality = stream.toMap().value("VQU").toString().toLower();
-                    if (quality == m_preferences.selectedQuality())
+                    if (quality == Preferences::getInstance()->selectedQuality())
                     {
                         film->m_streamUrl = stream.toMap().value("VUR").toString();
                         emit playListHasBeenUpdated();

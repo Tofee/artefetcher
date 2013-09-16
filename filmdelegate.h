@@ -56,7 +56,7 @@ class FilmDelegate: public QObject
 {
     Q_OBJECT
 public:
-    FilmDelegate(QNetworkAccessManager*, Preferences &pref);
+    FilmDelegate(QNetworkAccessManager*);
     virtual ~FilmDelegate();
     /**
      * Call this method to launch the request.
@@ -157,7 +157,6 @@ private:
     QSignalMapper* m_signalMapper;
     int m_currentPage;
     QString m_lastPlaylistUrl;
-    Preferences& m_preferences;
     /**
      * @brief m_initialyCatalog is true if the initial request is a catalog fetch,
      * i.e. is not a date fetch

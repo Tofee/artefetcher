@@ -21,15 +21,17 @@
 #include <QDir>
 #include <filmdelegate.h>
 
-#define DEF_OPT_STR_LANGUAGE     "stream_language"
-#define DEF_OPT_STR_QUALITY      "stream_quality"
-#define DEF_OPT_FILENAME_PATTERN "filename_pattern"
-#define DEF_OPT_DST_DIR          "destination_directory"
-#define DEF_OPT_PENDING_DOWNLADS "pending_downloads"
-#define DEF_OPT_PREF_WINDOW_SIZE "preferred_window_size"
-#define DEF_OPT_DEDICATED_DIR_SERIES "dedicated_dir_series"
-#define DEF_OPT_SAVE_IMAGE_PREVIEW "save_image_preview"
-#define DEF_OPT_SAVE_META_INFO   "save_meta_info"
+#define DEF_OPT_STR_LANGUAGE          "stream_language"
+#define DEF_OPT_STR_QUALITY           "stream_quality"
+#define DEF_OPT_FILENAME_PATTERN      "filename_pattern"
+#define DEF_OPT_DST_DIR               "destination_directory"
+#define DEF_OPT_PENDING_DOWNLADS      "pending_downloads"
+#define DEF_OPT_PREF_WINDOW_SIZE      "preferred_window_size"
+#define DEF_OPT_DEDICATED_DIR_SERIES  "dedicated_dir_series"
+#define DEF_OPT_SAVE_IMAGE_PREVIEW    "save_image_preview"
+#define DEF_OPT_SAVE_META_INFO        "save_meta_info"
+
+Preferences *Preferences::_singleton = NULL;
 
 Preferences::Preferences()
 {

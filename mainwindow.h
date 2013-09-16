@@ -22,10 +22,10 @@
 
 #include <QMainWindow>
 #include <QList>
+#include <QSystemTrayIcon>
 
 #include <preferences.h>
 #include <filmdelegate.h>
-#include <QSystemTrayIcon>
 
 class QNetworkReply;
 class QNetworkAccessManager;
@@ -34,6 +34,7 @@ class QTableWidgetItem;
 class DownloadManager;
 class FilmDetails;
 class QSystemTrayIcon;
+
 namespace Ui {
 class MainWindow;
 }
@@ -46,7 +47,6 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 protected:
-    //void lockWidgets(bool lock);
 
     /**
      * @brief getStreamIdForColumn
@@ -124,7 +124,6 @@ private:
     Ui::MainWindow *ui;
     QNetworkAccessManager* manager;
     FilmDelegate* delegate;
-    Preferences preferences;
     Qt::CheckState m_pressedItemCheckState;
     int m_pressedItemRow;
 

@@ -32,17 +32,16 @@ class PreferenceDialog : public QDialog
     Q_OBJECT
     
 public:
-    explicit PreferenceDialog(QWidget *parent,
-                              Preferences& preferences);
+    explicit PreferenceDialog(QWidget *parent);
     ~PreferenceDialog();
 public slots:
     void accept();
 private slots:
     void browse();
     void checkIsAcceptable();
+    void updateProxyConfigVisibility();
 private:
     Ui::PreferenceDialog *ui;
-    Preferences& m_preferences;
 };
 
 #endif // PREFERENCEDIALOG_H

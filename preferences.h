@@ -32,6 +32,7 @@ public:
     friend class MainWindow;
 
     IPreferences(){}
+    virtual ~IPreferences(){}
 
     /**
      * @brief selectedStreams
@@ -114,12 +115,34 @@ protected:
 
 class Preferences: public IPreferences
 {
-public:
+private:
     Preferences();
+public:
     void load();
     void save();
+
+    static Preferences* getInstance() {
+        if (_singleton == NULL)
+        {
+            _singleton = new Preferences();
+        }
+        return _singleton;
+    }
+
+    static void killInstance() {
+        if (_singleton != NULL)
+        {
+            delete _singleton;
+            _singleton = NULL;
+        }
+    }
+
 private:
     QSettings settings;
+
+private:
+    static Preferences* _singleton;
+
 };
 
 #endif // PREFERENCES_H

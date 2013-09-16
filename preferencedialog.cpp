@@ -22,21 +22,19 @@
 #include <QtGui>
 #include <QFileDialog>
 
-PreferenceDialog::PreferenceDialog(QWidget *parent,
-                                   Preferences& preferences) :
+PreferenceDialog::PreferenceDialog(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::PreferenceDialog),
-    m_preferences(preferences)
+    ui(new Ui::PreferenceDialog)
 {
     ui->setupUi(this);
 
-    ui->destinationDirectoryLineEdit->setText(m_preferences.m_destinationDir);
-    ui->filenamePatternLineEdit->setText(m_preferences.m_filenamePattern);
+    ui->destinationDirectoryLineEdit->setText(Preferences::getInstance()->m_destinationDir);
+    ui->filenamePatternLineEdit->setText(Preferences::getInstance()->m_filenamePattern);
 
-    ui->seriesDirectoryCheckBox->setChecked(m_preferences.m_dedicatedDirectoryForSeries);
+    ui->seriesDirectoryCheckBox->setChecked(Preferences::getInstance()->m_dedicatedDirectoryForSeries);
 
-    ui->metaInfoCheckBox->setChecked(m_preferences.m_saveMetaInInfoFile);
-    ui->imagePreviewCheckBox->setChecked(m_preferences.m_saveImagePreview);
+    ui->metaInfoCheckBox->setChecked(Preferences::getInstance()->m_saveMetaInInfoFile);
+    ui->imagePreviewCheckBox->setChecked(Preferences::getInstance()->m_saveImagePreview);
 
     connect(ui->browsePushButton, SIGNAL(clicked()),
             this, SLOT(browse()));
@@ -55,20 +53,21 @@ PreferenceDialog::~PreferenceDialog()
 
 void PreferenceDialog::accept()
 {
-    m_preferences.m_destinationDir = ui->destinationDirectoryLineEdit->text();
-    m_preferences.m_filenamePattern = ui->filenamePatternLineEdit->text();
+    Preferences::getInstance()->m_destinationDir = ui->destinationDirectoryLineEdit->text();
+    Preferences::getInstance()->m_filenamePattern = ui->filenamePatternLineEdit->text();
 
-    m_preferences.m_dedicatedDirectoryForSeries = ui->seriesDirectoryCheckBox->isChecked();
+    Preferences::getInstance()->m_dedicatedDirectoryForSeries = ui->seriesDirectoryCheckBox->isChecked();
 
-    m_preferences.m_saveMetaInInfoFile = ui->metaInfoCheckBox->isChecked();
-    m_preferences.m_saveImagePreview = ui->imagePreviewCheckBox->isChecked();
+    Preferences::getInstance()->m_saveMetaInInfoFile = ui->metaInfoCheckBox->isChecked();
+    Preferences::getInstance()->m_saveImagePreview = ui->imagePreviewCheckBox->isChecked();
+
 
     QDialog::accept();
 }
 
 void PreferenceDialog::browse()
 {
-    QString newPath = QFileDialog::getExistingDirectory(this, tr("Target directory"), m_preferences.destinationDir());
+    QString newPath = QFileDialog::getExistingDirectory(this, tr("Target directory"), Preferences::getInstance()->destinationDir());
     if (! newPath.isEmpty())
         ui->destinationDirectoryLineEdit->setText(newPath);
 }

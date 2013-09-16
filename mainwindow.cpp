@@ -19,15 +19,13 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+
 #include <QDir>
-#include <QtGui>
-#include <QSqlDatabase>
-#include <QSqlQuery>
-#include <QSqlError>
 #include <QIcon>
 #include <QInputDialog>
 #include <QList>
 #include <QMessageBox>
+#include <QtGui>
 
 #include <preferencedialog.h>
 #include <filmdelegate.h>
@@ -52,14 +50,15 @@ MainWindow::MainWindow(QWidget *parent) :
         thread (new DownloadManager(this)),
         m_trayIcon(new QSystemTrayIcon(QIcon(":/img/icon"), this))
 {
-    preferences.load();
+    Preferences::getInstance()->load();
 
     ui->setupUi(this);
+
     this->setWindowTitle("Arte Fetcher v." + QApplication::applicationVersion());
-    this->resize(preferences.preferredWindowSize());
+    this->resize(Preferences::getInstance()->preferredWindowSize());
     m_trayIcon->show();
 
-    delegate = new FilmDelegate(manager, preferences);
+    delegate = new FilmDelegate(manager);
 
     QStringList header;
     header
@@ -97,9 +96,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->progressBar->setMaximum(100);
 
     ui->languageComboBox->addItems(FilmDelegate::listLanguages());
-    ui->languageComboBox->setCurrentIndex(ui->languageComboBox->findText(preferences.selectedLanguage()));
+    ui->languageComboBox->setCurrentIndex(ui->languageComboBox->findText(Preferences::getInstance()->selectedLanguage()));
     ui->qualityComboBox->addItems(FilmDelegate::listQualities());
-    ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findText(preferences.selectedQuality()));
+    ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findText(Preferences::getInstance()->selectedQuality()));
 
     ui->previewLabel->setMaximumSize(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT);
     ui->previewLabel->setMinimumSize(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT);
@@ -113,7 +112,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->dateEdit->setDate(QDate::currentDate());
 
     loadStreamComboBox();
-    if (!preferences.pendingDownloads().isEmpty())
+    if (!Preferences::getInstance()->pendingDownloads().isEmpty())
     {
         ui->streamComboBox->setCurrentIndex(ui->streamComboBox->findText(tr("Downloads")));
     }
@@ -212,11 +211,11 @@ void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
 void MainWindow::loadStreamComboBox() {
     int previousIndex = ui->streamComboBox->currentIndex();
     ui->streamComboBox->clear();
-    ui->streamComboBox->addItem(tr("Arte selection"), "http://www.arte.tv/guide/"+ preferences.selectedLanguage() + "/plus7/selection.json");
-    ui->streamComboBox->addItem(tr("Most recent"), "http://www.arte.tv/guide/"+ preferences.selectedLanguage() + "/plus7/plus_recentes.json");
-    ui->streamComboBox->addItem(tr("Most seen"), "http://www.arte.tv/guide/"+ preferences.selectedLanguage() + "/plus7/plus_vues.json");
-    ui->streamComboBox->addItem(tr("Last chance"), "http://www.arte.tv/guide/"+ preferences.selectedLanguage() + "/plus7/derniere_chance.json");
-    ui->streamComboBox->addItem(tr("All"), "http://www.arte.tv/guide/"+ preferences.selectedLanguage() + "/plus7.json");
+    ui->streamComboBox->addItem(tr("Arte selection"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->selectedLanguage() + "/plus7/selection.json");
+    ui->streamComboBox->addItem(tr("Most recent"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->selectedLanguage() + "/plus7/plus_recentes.json");
+    ui->streamComboBox->addItem(tr("Most seen"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->selectedLanguage() + "/plus7/plus_vues.json");
+    ui->streamComboBox->addItem(tr("Last chance"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->selectedLanguage() + "/plus7/derniere_chance.json");
+    ui->streamComboBox->addItem(tr("All"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->selectedLanguage() + "/plus7.json");
     //ui->streamComboBox->addItem(tr("Test"), "http://www.arte.tv/papi/tvguide/epg/live/F/L3/1.json");
     ui->streamComboBox->addItem(tr("By date"), DATE_STREAM_PREFIX);
     ui->streamComboBox->addItem(tr("Downloads"), DOWNLOAD_STREAM);
@@ -235,15 +234,16 @@ void MainWindow::streamIndexLoaded(int resultCount, int currentPage, int pageCou
 
 StreamType MainWindow::getStreamType() const
 {
-    return FilmDelegate::getStreamTypeByLanguageAndQuality(preferences.m_selectedLanguage, preferences.m_selectedQuality);
+    return FilmDelegate::getStreamTypeByLanguageAndQuality(Preferences::getInstance()->m_selectedLanguage, Preferences::getInstance()->m_selectedQuality);
 }
 
 
 MainWindow::~MainWindow()
 {
-    preferences.setPreferredWindowSize(size());
+    Preferences::getInstance()->setPreferredWindowSize(size());
     delete delegate;
-    preferences.save();
+    Preferences::getInstance()->save();
+    Preferences::getInstance()->killInstance();
     delete ui;
 }
 
@@ -255,13 +255,13 @@ bool MainWindow::isReadyForDownload(const FilmDetails * const film)
 }
 
 void MainWindow::languageChanged(){
-    preferences.m_selectedLanguage = ui->languageComboBox->currentText();
+    Preferences::getInstance()->m_selectedLanguage = ui->languageComboBox->currentText();
     loadStreamComboBox();
 }
 
 void MainWindow::qualityChanged()
 {
-    preferences.m_selectedQuality = ui->qualityComboBox->currentText();
+    Preferences::getInstance()->m_selectedQuality = ui->qualityComboBox->currentText();
     clearAndLoadTable();
 }
 
@@ -273,11 +273,11 @@ void MainWindow::clearAndLoadTable()
     if (url == DATE_STREAM_PREFIX)
     {
         dateCurrentlyShown = true;
-        url.append(preferences.selectedLanguage()).append(":");
+        url.append(Preferences::getInstance()->selectedLanguage()).append(":");
         url.append(ui->dateEdit->date().toString("yyyyMMdd"));
     } else if (url == SEARCH_PREFIX) {
         searchEditShown = true;
-        url.append(preferences.selectedLanguage()).append(":");
+        url.append(Preferences::getInstance()->selectedLanguage()).append(":");
         url.append(ui->searchEdit->text());
     }
     ui->searchEdit->setVisible(searchEditShown);
@@ -569,7 +569,7 @@ QString MainWindow::getFileName(const QString& targetDirectory, const QString& t
     QString language(getStreamType().languageCode);
     language = language.replace(0, 1, language.left(1).toUpper());
 
-    if (preferences.useDedicatedDirectoryForSeries() && !episodeName.isEmpty())
+    if (Preferences::getInstance()->useDedicatedDirectoryForSeries() && !episodeName.isEmpty())
     {
         QRegExp episodeNumberRegExp("\\([0-9 \\-/]+\\)");
 
@@ -582,7 +582,7 @@ QString MainWindow::getFileName(const QString& targetDirectory, const QString& t
             episodeNumberText = episodeNumberRegExp.cap().append(" ");
         }
 
-        QString filename = preferences.filenamePattern();;
+        QString filename = Preferences::getInstance()->filenamePattern();;
         filename.replace("%title", episodeNumberText.append(episodeName))
                 .replace("%language", language)
                 .replace("%quality", getStreamType().qualityCode.toUpper());
@@ -591,7 +591,7 @@ QString MainWindow::getFileName(const QString& targetDirectory, const QString& t
     }
     else
     {
-        cleanedTitle = preferences.filenamePattern();
+        cleanedTitle = Preferences::getInstance()->filenamePattern();
         cleanedTitle.replace("%title", title)
                 .replace("%language", language)
                 .replace("%quality", getStreamType().qualityCode.toUpper());
@@ -610,7 +610,7 @@ QString MainWindow::getFileName(const QString& targetDirectory, const QString& t
 }
 
 void MainWindow::downloadFilm(int currentLine, FilmDetails* film){
-    QString workingPath(preferences.destinationDir());
+    QString workingPath(Preferences::getInstance()->destinationDir());
 
     if (isReadyForDownload(film))
     {
@@ -790,7 +790,7 @@ void MainWindow::filmDownloaded(QString filmUrl)
         QFileInfo filmFile(film->m_targetFileName);
 
         // Save metadata
-        if (preferences.saveMetaInInfoFile()) {
+        if (Preferences::getInstance()->saveMetaInInfoFile()) {
             QFile metadataFile(filmFile.absolutePath() + QDir::separator() + filmFile.completeBaseName() + ".info");
             metadataFile.open(QFile::WriteOnly|QFile::Text);
             QTextStream stream (&metadataFile);
@@ -808,7 +808,7 @@ void MainWindow::filmDownloaded(QString filmUrl)
         }
 
         // Save preview picture
-        if (preferences.saveImagePreview()) {
+        if (Preferences::getInstance()->saveImagePreview()) {
             QFile picture(filmFile.absolutePath() + QDir::separator() + filmFile.completeBaseName() + ".png");
             picture.open(QFile::WriteOnly);
             QImageWriter writer(&picture, "PNG");
