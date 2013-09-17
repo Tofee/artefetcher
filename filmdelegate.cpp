@@ -103,7 +103,7 @@ QList<StreamType>& FilmDelegate::listStreamTypes()
 }
 
 FilmDelegate::FilmDelegate(QNetworkAccessManager * in_manager)
-    :m_manager(in_manager), m_signalMapper(new QSignalMapper(this)), m_lastRequestPageId(0)
+    :m_manager(in_manager), m_signalMapper(new QSignalMapper(this)), m_lastRequestPageId(0), m_currentPageCount(0)
 {
     connect(m_signalMapper, SIGNAL(mapped(QObject*)),
             this, SLOT(requestReadyToRead(QObject*)));
@@ -147,7 +147,8 @@ void FilmDelegate::loadPlayList(QString url)
                 m_visibleFilms << filmUrl;
             }
         }
-        emit(streamIndexLoaded(m_visibleFilms.size(), 1, 1));
+        m_currentPageCount = 1;
+        emit(streamIndexLoaded(m_visibleFilms.size(), 1, m_currentPageCount));
         emit(playListHasBeenUpdated());
         return;
     }
@@ -169,7 +170,8 @@ void FilmDelegate::loadPlayList(QString url)
         if (search.isEmpty())
         {
             m_visibleFilms.clear();
-            emit(streamIndexLoaded(m_visibleFilms.size(), 1, 1));
+            m_currentPageCount = 1;
+            emit(streamIndexLoaded(m_visibleFilms.size(), 1, m_currentPageCount));
             emit(playListHasBeenUpdated());
             return;
         }
@@ -190,10 +192,15 @@ void FilmDelegate::loadPlayList(QString url)
 
 
 void FilmDelegate::loadNextPage(){
+    if (m_currentPage >= m_currentPageCount)
+        return;
     ++m_currentPage;
     commonLoadPlaylist(m_initialyCatalog ? MAPPER_STEP_CATALOG : MAPPER_STEP_DATE);
 }
+
 void FilmDelegate::loadPreviousPage(){
+    if (m_currentPage <= 1)
+        return;
     --m_currentPage;
     commonLoadPlaylist(m_initialyCatalog ? MAPPER_STEP_CATALOG : MAPPER_STEP_DATE);
 }
@@ -360,10 +367,15 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                 }
             }
 
-            if (i % RESULT_PER_PAGE == 0)
-                emit(streamIndexLoaded(i, m_currentPage, i/ RESULT_PER_PAGE));
+            if (i % RESULT_PER_PAGE == 0) {
+                m_currentPageCount = i/ RESULT_PER_PAGE;
+                emit(streamIndexLoaded(i, m_currentPage, m_currentPageCount));
+            }
             else
-                emit(streamIndexLoaded(i, m_currentPage, (i / RESULT_PER_PAGE) + 1));
+            {
+                m_currentPageCount = (i / RESULT_PER_PAGE) + 1;
+                emit(streamIndexLoaded(i, m_currentPage, m_currentPageCount));
+            }
             emit (playListHasBeenUpdated());
 
         }

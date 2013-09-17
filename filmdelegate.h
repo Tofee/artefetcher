@@ -155,7 +155,10 @@ private:
     QMap<QString, FilmDetails*> m_films;
     QNetworkAccessManager* m_manager;
     QSignalMapper* m_signalMapper;
+
     int m_currentPage;
+    int m_currentPageCount;
+
     QString m_lastPlaylistUrl;
     /**
      * @brief m_initialyCatalog is true if the initial request is a catalog fetch,
@@ -164,6 +167,8 @@ private:
     bool m_initialyCatalog;
 
     int m_lastRequestPageId;
+
+
 
 
 };
