@@ -65,7 +65,7 @@ protected:
      */
     QString getFileName(const QString &title, const QString &remoteFilename, int fileSuffixNumber = 0, QString episodeName = QString()) const;
 
-    void downloadFilm(int currentLine, FilmDetails* film);
+    void downloadFilm(FilmDetails* film);
 
 
 private slots:
@@ -108,22 +108,19 @@ private slots:
 
 private:
 
-    const QList<MetaType> &listInterestingDetails();
+    static const QList<MetaType> &listInterestingDetails();
 
+    bool isReadyForDownload(const FilmDetails * const film) const;
+    FilmDetails* getCurrentFilm() const;
+    bool fileExistForTheFilm(const FilmDetails * const) const;
+
+    void resizeEvent(QResizeEvent * event);
     void closeEvent(QCloseEvent* event);
 
     QTableWidgetItem *createOrUpdateTitleColumn(int rowNumber);
-    bool isReadyForDownload(const FilmDetails * const film);
     void loadStreamComboBox();
-    void resizeEvent( QResizeEvent * event );
-
     void changeDownloadPartVisibility(bool isVisible);
-
-    FilmDetails* getCurrentFilm() const;
-
     void applyProxySettings();
-
-    bool fileExistForTheFilm(const FilmDetails * const) const;
     
 private:
     Ui::MainWindow *ui;

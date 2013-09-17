@@ -246,7 +246,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-bool MainWindow::isReadyForDownload(const FilmDetails * const film)
+bool MainWindow::isReadyForDownload(const FilmDetails * const film) const
 {
     return film && !film->m_title.isEmpty()
             && !film->m_streamUrl.isEmpty() &&
@@ -915,7 +915,7 @@ void MainWindow::downloadButtonClicked()
         return;
 
     FilmDetails *details = delegate->visibleFilms()[row];
-    downloadFilm(row, details);
+    downloadFilm(details);
 }
 
 void MainWindow::webPageButtonClicked()
