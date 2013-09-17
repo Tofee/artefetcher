@@ -57,13 +57,13 @@ protected:
 
     /**
      * @brief getFileName
-     * @param targetDirectory
      * @param title the title of the film
-     * @param streamTypeId
-     * @param episodeName the name of the episode if the film belongs to series
+     * @param remoteFilename the file name in the remote server (will be used to check the extension)
+     * @param fileSuffixNumber provide an optional file suffix (_<fileSuffixNumber> will be appened between the name and the extension of the file
+     * @param episodeName the name of the episode if the film belongs to a video serie
      * @return the filename
      */
-    QString getFileName(const QString& targetDirectory, const QString &title, const QString &remoteFilename, int fileSuffixNumber = 0, QString episodeName = QString());
+    QString getFileName(const QString &title, const QString &remoteFilename, int fileSuffixNumber = 0, QString episodeName = QString()) const;
 
     void downloadFilm(int currentLine, FilmDetails* film);
 
@@ -122,6 +122,8 @@ private:
     FilmDetails* getCurrentFilm() const;
 
     void applyProxySettings();
+
+    bool fileExistForTheFilm(const FilmDetails * const) const;
     
 private:
     Ui::MainWindow *ui;

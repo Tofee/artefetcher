@@ -188,8 +188,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->pauseButton, SIGNAL(clicked()), thread, SLOT(pause()));
 
-
-
     clearAndLoadTable();
 
 }
@@ -369,6 +367,7 @@ QTableWidgetItem* MainWindow::createOrUpdateTitleColumn(int rowNumber)
     }
 
     titleTableItem->setText(film->m_title);
+    titleTableItem->setFlags(titleTableItem->flags()^Qt::ItemIsEditable);
 
     return titleTableItem;
 
@@ -458,10 +457,17 @@ FilmDetails* MainWindow::getCurrentFilm() const {
     return details.at(rowBegin);
 }
 
+bool MainWindow::fileExistForTheFilm(const FilmDetails * const film) const {
+    if (film == NULL)
+        return false;
+    QString filename = film->m_targetFileName.isEmpty() ? getFileName(film->title(), film->m_streamUrl, 0, film->m_metadata.value(Episode_name))
+                                                        : film->m_targetFileName;
+    return QFile(filename).exists() || QFile(filename.append(".part")).exists();
+}
 
 void MainWindow::updateCurrentDetails(){
      FilmDetails* film = getCurrentFilm();
-     bool hasDownloadStarted = film && (film->m_downloadStatus == DOWNLOADING || film->m_downloadStatus == DOWNLOADED || film->m_downloadStatus == ERROR);
+     bool hasDownloadStarted = film && (film->m_downloadStatus == DOWNLOADING || film->m_downloadStatus == DOWNLOADED || film->m_downloadStatus == ERROR || fileExistForTheFilm(film));
 
      ui->openDirectoryButton->setVisible(hasDownloadStarted);
      ui->playButton->setVisible(hasDownloadStarted);
@@ -555,8 +561,9 @@ QString cleanFilenameForFileSystem(const QString filename) {
     return cleanedFilename.simplified();
 }
 
-QString MainWindow::getFileName(const QString& targetDirectory, const QString& title, const QString& remoteFilename, int fileSuffixNumber, QString episodeName)
+QString MainWindow::getFileName(const QString& title, const QString& remoteFilename, int fileSuffixNumber, QString episodeName) const
 {
+    const QString& targetDirectory = Preferences::getInstance()->destinationDir();
     QString extension = "flv";
     if (remoteFilename != "")
     {
@@ -610,19 +617,18 @@ QString MainWindow::getFileName(const QString& targetDirectory, const QString& t
     return filename;
 }
 
-void MainWindow::downloadFilm(int currentLine, FilmDetails* film){
-    QString workingPath(Preferences::getInstance()->destinationDir());
-
+void MainWindow::downloadFilm(FilmDetails* film){
     if (isReadyForDownload(film))
     {
-        if (ui->tableWidget->item(currentLine, COLUMN_FOR_TITLE) == NULL)
+        // keep existing file name, in case the download has been requested in a previous execution
+        // if this name is empty, build a filename.
+        QString futureFileName = film->m_targetFileName;
+        if (futureFileName.isEmpty())
         {
-            qDebug() << "No title for the current row";
-            return;
+            futureFileName = getFileName(film->m_title, film->m_streamUrl, 0, film->m_metadata.value(Episode_name));
         }
-        QString titleCellText = ui->tableWidget->item(currentLine, COLUMN_FOR_TITLE)->text();
-        QString futureFileName = getFileName(workingPath, titleCellText, film->m_streamUrl, 0, film->m_metadata.value(Episode_name));
 
+        // If a pending download has the same name, append a file suffix number
         int fileSuffixNumber = 1;
         foreach(QString otherFilmUrl, delegate->downloadList())
         {
@@ -631,12 +637,14 @@ void MainWindow::downloadFilm(int currentLine, FilmDetails* film){
             {
                 if (otherFilm->m_targetFileName == futureFileName)
                 {
-                    // TODO faut aussi stocker ce futureFileName dans le fichier de conf de l'appli, sinon au redémarrage, si on reprend le téléchargement dans un ordre différent, les vidéos seront mélangées.
-                    futureFileName = getFileName(workingPath, titleCellText, film->m_streamUrl, fileSuffixNumber, film->m_metadata.value(Episode_name));
+                    // TODO faut aussi stocker ce futureFileName dans le fichier de conf de l'appli,
+                    //      sinon au redémarrage, si on reprend le téléchargement dans un ordre différent, les vidéos seront mélangées.
+                    futureFileName = getFileName(film->m_title, film->m_streamUrl, fileSuffixNumber, film->m_metadata.value(Episode_name));
                 }
             }
         }
 
+        // Check the file (not .part) does not exist.
         if (QFile(futureFileName).exists()
                 && QMessageBox::question(this, tr("File already exists"),
                                   tr("A file with the same name already exists:\n%1\nDo you want to continue and replace it?")
@@ -644,15 +652,6 @@ void MainWindow::downloadFilm(int currentLine, FilmDetails* film){
                                   QMessageBox::Yes,
                                   QMessageBox::No)
                     == QMessageBox::No)
-        {
-            film->m_downloadStatus = CANCELLED;
-        }
-        else if (QFile(QString(futureFileName).append(TEMP_FILE_PREFIX)).exists()
-                 && QMessageBox::question(this, tr("Incomplete download found"),
-                                          tr("The download of the movie <%1> has already been started. Do you want to continue the download?")
-                                            .arg(titleCellText),
-                                          QMessageBox::Yes,
-                                          QMessageBox::No) == QMessageBox::No)
         {
             film->m_downloadStatus = CANCELLED;
         }
@@ -695,9 +694,11 @@ void MainWindow::playFilm() {
         return;
 
     QString filePath = film->m_targetFileName;
-    if (film->m_downloadStatus != DOWNLOADED)
+    if (filePath.isEmpty())
+        filePath = getFileName(film->m_title, film->m_streamUrl, 0, film->m_metadata.value(Episode_name));
+    if (! QFile(filePath).exists())
     {
-        filePath.append(".part");
+        filePath = filePath.append(".part");
     }
     QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
 }
@@ -781,7 +782,6 @@ void MainWindow::hasBeenPaused() {
 
 void MainWindow::filmDownloaded(QString filmUrl)
 {
-
     FilmDetails * film = delegate->findFilmByUrl(filmUrl);
     if (film)
     {
