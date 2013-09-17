@@ -226,16 +226,13 @@
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="openDirectoryButton">
+            <widget class="QPushButton" name="downloadButton">
              <property name="toolTip">
-              <string>Open the directory containing the video</string>
-             </property>
-             <property name="text">
-              <string/>
+              <string>Download this video</string>
              </property>
              <property name="icon">
               <iconset resource="resources.qrc">
-               <normaloff>:/img/directory</normaloff>:/img/directory</iconset>
+               <normaloff>:/img/download</normaloff>:/img/download</iconset>
              </property>
             </widget>
            </item>
@@ -254,13 +251,16 @@
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="downloadButton">
+            <widget class="QPushButton" name="openDirectoryButton">
              <property name="toolTip">
-              <string>Download this video</string>
+              <string>Open the directory containing the video</string>
+             </property>
+             <property name="text">
+              <string/>
              </property>
              <property name="icon">
               <iconset resource="resources.qrc">
-               <normaloff>:/img/download</normaloff>:/img/download</iconset>
+               <normaloff>:/img/directory</normaloff>:/img/directory</iconset>
              </property>
             </widget>
            </item>
