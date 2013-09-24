@@ -20,7 +20,6 @@
 #include <QApplication>
 #include "mainwindow.h"
 #include <FilmDetails.h>
-#include <QTextCodec>
 #include <QTranslator>
 
 int main(int argc, char *argv[])
@@ -28,16 +27,20 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     a.setApplicationVersion(APP_VERSION);
-    QTranslator translator;
-    translator.load(":/translation/arteFetcher_de.qm");
-    translator.load(":/translation/arteFetcher_fr.qm");
-    a.installTranslator(&translator);
+
 
     QCoreApplication::setOrganizationName("ArteFetcher");
     QCoreApplication::setOrganizationDomain("ArteFetcher");
     QCoreApplication::setApplicationName("ArteFetcher");
 
     qRegisterMetaType<StreamType>("StreamType");
+
+    // TODO give the language choice in the settings
+    // (for now "export LANG=de_DE.utf8" works fine)
+    QTranslator translator;
+    translator.load(QLocale::system(), ":/translation/arteFetcher", "_");
+    a.installTranslator(&translator);
+
     MainWindow w;
     w.show();
     

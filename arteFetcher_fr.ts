@@ -562,7 +562,7 @@ Voulez-vous quand même le télécharger ?</translation>
         <source>Downloading %1
 Speed %2 kB/s  -  Remaining: %3</source>
         <translation>Téléchargement: %1
-Débit : %2  -  Temps restant : %3</translation>
+Débit : %2 ko/s -  Temps restant : %3</translation>
     </message>
     <message>
         <location filename="mainwindow.cpp" line="748"/>
