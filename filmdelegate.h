@@ -158,6 +158,7 @@ private:
 
     int m_currentPage;
     int m_currentPageCount;
+	int m_lastRequestPageId;
 
     QString m_lastPlaylistUrl;
     /**
@@ -166,7 +167,6 @@ private:
      */
     bool m_initialyCatalog;
 
-    int m_lastRequestPageId;
 };
 
 class MyPair : public QObject{

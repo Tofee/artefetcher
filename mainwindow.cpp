@@ -250,7 +250,7 @@ bool MainWindow::isReadyForDownload(const FilmDetails * const film) const
 {
     return film && !film->m_title.isEmpty()
             && !film->m_streamUrl.isEmpty() &&
-            (film->m_downloadStatus == NONE || film->m_downloadStatus == CANCELLED || film->m_downloadStatus == ERROR);
+            (film->m_downloadStatus == DL_NONE || film->m_downloadStatus == DL_CANCELLED || film->m_downloadStatus == DL_ERROR);
 }
 
 void MainWindow::languageChanged(){
@@ -326,7 +326,7 @@ QTableWidgetItem* MainWindow::createOrUpdateTitleColumn(int rowNumber)
     {
         titleTableItem->setIcon(QIcon(":/img/warning"));
         titleTableItem->setToolTip(film->m_errors.join("\n"));
-    } else if (film->m_downloadStatus == ERROR)
+    } else if (film->m_downloadStatus == DL_ERROR)
     {
         titleTableItem->setToolTip(tr("Previous download failed."));
     }
@@ -346,22 +346,22 @@ QTableWidgetItem* MainWindow::createOrUpdateTitleColumn(int rowNumber)
         titleTableItem->setIcon(QIcon(":/img/locked"));
     }
     switch (film->m_downloadStatus){
-    case ERROR:
+    case DL_ERROR:
         titleTableItem->setIcon(QIcon(":/img/error"));
         break;
-    case CANCELLED:
+    case DL_CANCELLED:
         titleTableItem->setIcon(QIcon(":/img/cancelled"));
         break;
-    case DOWNLOADING:
+    case DL_DOWNLOADING:
         titleTableItem->setIcon(QIcon(":/img/progress"));
         break;
-    case REQUESTED:
+    case DL_REQUESTED:
         titleTableItem->setIcon(QIcon(":/img/waiting"));
         break;
-    case DOWNLOADED:
+    case DL_DOWNLOADED:
         titleTableItem->setIcon(QIcon(":/img/finished"));
         break;
-    case NONE:
+    case DL_NONE:
     default:
         break;
     }
@@ -467,13 +467,13 @@ bool MainWindow::fileExistForTheFilm(const FilmDetails * const film) const {
 
 void MainWindow::updateCurrentDetails(){
      FilmDetails* film = getCurrentFilm();
-     bool hasDownloadStarted = film && (film->m_downloadStatus == DOWNLOADING || film->m_downloadStatus == DOWNLOADED || film->m_downloadStatus == ERROR || fileExistForTheFilm(film));
+     bool hasDownloadStarted = film && (film->m_downloadStatus == DL_DOWNLOADING || film->m_downloadStatus == DL_DOWNLOADED || film->m_downloadStatus == DL_ERROR || fileExistForTheFilm(film));
 
      ui->openDirectoryButton->setVisible(hasDownloadStarted);
      ui->playButton->setVisible(hasDownloadStarted);
      ui->downloadButton->setVisible(isReadyForDownload(film));
      ui->cancelSelectedFilmButton->setVisible(film != NULL &&
-             (film->m_downloadStatus == DOWNLOADING || film->m_downloadStatus == REQUESTED));
+             (film->m_downloadStatus == DL_DOWNLOADING || film->m_downloadStatus == DL_REQUESTED));
      if (film == NULL)
      {
          ui->summaryLabel->setText(tr("No film in the playlist"));
@@ -653,11 +653,11 @@ void MainWindow::downloadFilm(FilmDetails* film){
                                   QMessageBox::No)
                     == QMessageBox::No)
         {
-            film->m_downloadStatus = CANCELLED;
+            film->m_downloadStatus = DL_CANCELLED;
         }
         else
         {
-            film->m_downloadStatus = REQUESTED;
+            film->m_downloadStatus = DL_REQUESTED;
             film->m_targetFileName = futureFileName;
 
             delegate->addUrlToDownloadList(film->m_infoUrl); // TODO c'est trop trop moche de faire ça. Design à revoir
@@ -680,10 +680,10 @@ void MainWindow::changeDownloadPartVisibility(bool isVisible)
 void MainWindow::cancelSelectedFilmDownload()
 {
     FilmDetails* film = getCurrentFilm();
-    if (film == NULL || film->m_downloadStatus == CANCELLED
-            || film->m_downloadStatus == DOWNLOADED
-            || film->m_downloadStatus == NONE
-            || film->m_downloadStatus == ERROR)
+    if (film == NULL || film->m_downloadStatus == DL_CANCELLED
+            || film->m_downloadStatus == DL_DOWNLOADED
+            || film->m_downloadStatus == DL_NONE
+            || film->m_downloadStatus == DL_ERROR)
         return;
     thread->cancelDownload(film->m_infoUrl);
 }
@@ -705,7 +705,7 @@ void MainWindow::playFilm() {
 
 void MainWindow::openFilmDirectory() {
     FilmDetails* film = getCurrentFilm();
-    if (film == NULL || film->m_downloadStatus == ERROR)
+    if (film == NULL || film->m_downloadStatus == DL_ERROR)
         return;
 
     QFileInfo filmFile(film->m_targetFileName);
@@ -734,7 +734,7 @@ void MainWindow::downloadProgressed(QString filmUrl, double progression, double 
     if (film)
     {
         filmFileName = film->m_targetFileName;
-        film->m_downloadStatus = DOWNLOADING;
+        film->m_downloadStatus = DL_DOWNLOADING;
     }
 
     QString remainingTimeString;
@@ -761,7 +761,7 @@ void MainWindow::downloadCancelled(QString filmUrl)
     FilmDetails* film = delegate->findFilmByUrl(filmUrl);
     if (film)
     {
-        film->m_downloadStatus = CANCELLED;
+        film->m_downloadStatus = DL_CANCELLED;
         refreshTable();
     }
 }
@@ -771,7 +771,7 @@ void MainWindow::downloadError(QString filmUrl, QString errorMsg){
     if (film)
     {
         film->m_errors.append(tr("Download error: %1").arg(errorMsg));
-        film->m_downloadStatus = ERROR;
+        film->m_downloadStatus = DL_ERROR;
         refreshTable();
     }
 }
@@ -786,7 +786,7 @@ void MainWindow::filmDownloaded(QString filmUrl)
     if (film)
     {
         // All of that should be done in the delegate!!
-        film->m_downloadStatus = DOWNLOADED;
+        film->m_downloadStatus = DL_DOWNLOADED;
 
         QFileInfo filmFile(film->m_targetFileName);
 
