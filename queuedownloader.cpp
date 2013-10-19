@@ -28,6 +28,7 @@
 QueueDownloader::QueueDownloader(QObject *parent)
     :m_currentDownload(NULL),m_manager(new QNetworkAccessManager(parent)), m_lastNotifTime(0,0), m_isWorking(false), m_isPaused(false)
 {
+    m_lastNotifTime.start();
 }
 
 void QueueDownloader::addDownload(QUrl url, QString filename) {
@@ -147,6 +148,18 @@ void QueueDownloader::pause() {
 }
 
 void QueueDownloader::cancelDownloadInProgress() {
+    if (m_isPaused){
+        QPair<QUrl, QString> firstItem = m_pendingDownloads.dequeue();
+        emit downloadCancelled(firstItem.first.toString());
+
+        if (m_pendingDownloads.size() ==0)
+        {
+            m_isWorking = false;
+            m_isPaused = false;
+            emit allDownloadsFinished();
+        }
+        return;
+    }
     if (m_currentDownload)
     {
         QUrl url = m_currentDownload->url();
