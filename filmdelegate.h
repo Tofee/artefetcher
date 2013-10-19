@@ -156,6 +156,8 @@ private:
     QNetworkAccessManager* m_manager;
     QSignalMapper* m_signalMapper;
 
+    int m_lastRequestPageId;    // MODIF FreddyP 18/10/2013 : Déplacement de m_lastRequestPageId avant m_currentPageCount pour éviter le warning -Wreorder
+
     int m_currentPage;
     int m_currentPageCount;
 
@@ -165,10 +167,6 @@ private:
      * i.e. is not a date fetch
      */
     bool m_initialyCatalog;
-
-    int m_lastRequestPageId;
-
-
 
 
 };

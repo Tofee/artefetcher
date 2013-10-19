@@ -35,7 +35,7 @@ DownloadManager::DownloadManager(QObject *parent)
 
 void DownloadManager::addFilmToDownloadQueue(QString key, const FilmDetails& details){
 
-    if (details.m_downloadStatus == REQUESTED)
+    if (details.m_downloadStatus == DL_REQUESTED)
     {
         m_downloader.addDownload(details.m_streamUrl, details.m_targetFileName);
         m_keysForSignalByUrl.insert(details.m_streamUrl, key);

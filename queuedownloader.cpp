@@ -88,13 +88,18 @@ void QueueDownloader::startNextDownload(){
     }
     m_currentDownload = m_manager->get(request);
 
+
+// AJOUT FreddyP 14/10/2013 :  m_lastNotifTime.elapsed() est toujours égal à zéro au démarrage du téléchargement
+//                             Il faut faire un restart dans ce cas pour l'initialiser correctement.
+    m_lastNotifTime.restart();
+
     connect(m_currentDownload, SIGNAL(readyRead()),                      SLOT(downloadReadyRead()));
     connect(m_currentDownload, SIGNAL(downloadProgress(qint64,qint64)),  SLOT(downloadProgressed(qint64,qint64)));
     connect(m_currentDownload, SIGNAL(finished()),                       SLOT(downloadFinished()));
 }
 
 void QueueDownloader::downloadProgressed(qint64 bytesReceived, qint64 totalSize){
-    if (m_lastNotifTime.elapsed() < 800 /* ms */)
+    if (m_lastNotifTime.elapsed() < 100 /* ms */)       // Modif FreddyP 14/10/2013 : Tempo à 100 MS au lieu de 800 MS sinon pas de jauge sous windows
         return;
     m_lastNotifTime.restart();
     m_isWorking = true;

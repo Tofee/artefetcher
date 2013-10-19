@@ -52,3 +52,5 @@ DEPENDPATH += /usr/lib64
 
 RESOURCES += \
     resources.qrc
+
+RC_FILE += arteFetcher.rc
