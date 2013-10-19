@@ -167,10 +167,6 @@ private:
     bool m_initialyCatalog;
 
     int m_lastRequestPageId;
-
-
-
-
 };
 
 class MyPair : public QObject{

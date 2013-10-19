@@ -19,7 +19,6 @@
 
 #include <QApplication>
 #include "mainwindow.h"
-#include <FilmDetails.h>
 #include <QTranslator>
 
 int main(int argc, char *argv[])

@@ -29,6 +29,7 @@
 #include <QDebug>
 #include <QScriptEngine>
 #include <QScriptValue>
+
 #define ARTE_PLAYLIST_URL "http://videos.arte.tv/fr/videos/playlistplaylist/index--3259492.html"
 #define VIDEO_LINE_HTML_BEGIN "<div id=\"myPlaylistCont\">" //aaa<h2><a href=\"/fr/videos/"
 
@@ -103,7 +104,7 @@ QList<StreamType>& FilmDelegate::listStreamTypes()
 }
 
 FilmDelegate::FilmDelegate(QNetworkAccessManager * in_manager)
-    :m_manager(in_manager), m_signalMapper(new QSignalMapper(this)), m_lastRequestPageId(0), m_currentPageCount(0)
+    :m_manager(in_manager), m_signalMapper(new QSignalMapper(this)), m_currentPageCount(0), m_lastRequestPageId(0)
 {
     connect(m_signalMapper, SIGNAL(mapped(QObject*)),
             this, SLOT(requestReadyToRead(QObject*)));
@@ -205,7 +206,7 @@ void FilmDelegate::loadPreviousPage(){
     commonLoadPlaylist(m_initialyCatalog ? MAPPER_STEP_CATALOG : MAPPER_STEP_DATE);
 }
 
-void FilmDelegate::commonLoadPlaylist(QString type){
+void FilmDelegate::commonLoadPlaylist(QString type) {
     ++m_lastRequestPageId;
     m_visibleFilms.clear();
     m_initialyCatalog = (type == MAPPER_STEP_CATALOG);
