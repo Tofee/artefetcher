@@ -16,7 +16,6 @@
     along with ArteFetcher.  If not, see <http://www.gnu.org/licenses/>.
     
 ****************************************************************************/
-
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -537,6 +536,30 @@ void MainWindow::updateCurrentDetails(){
 
 QString cleanFilenameForFileSystem(const QString filename) {
     QString cleanedFilename(filename);
+
+// AJOUT FreddyP 26/10/2013 : Jeu de caractère latin1 pour windows, c'est la valeur QString par défaut pour les caractères > 127
+//                            Donc, pas de transformation, conversion directe des caractères accentués sans fromLocal8Bit
+    cleanedFilename.replace(QRegExp("[éèëê]"), "e");
+    cleanedFilename.replace(QRegExp("[ÉÈËÊ]"), "E");
+    cleanedFilename.replace(QRegExp("[ô]"), "o");
+    cleanedFilename.replace(QRegExp("[Ô]"), "O");
+    cleanedFilename.replace(QRegExp("[âáà]"), "a");
+    cleanedFilename.replace(QRegExp("[ÂÁÀ]"), "A");
+    cleanedFilename.replace(QRegExp("[îï]"), "i");
+    cleanedFilename.replace(QRegExp("[ÎÏ]"), "I");
+    cleanedFilename.replace(QRegExp("[û]"), "u");
+    cleanedFilename.replace(QRegExp("[Û]"), "U");
+    cleanedFilename.replace(QRegExp("[ç]"), "c");
+    cleanedFilename.replace(QRegExp("[Ç]"), "C");
+    cleanedFilename.replace(QRegExp("[ß]"), "ss");
+    cleanedFilename.replace(QRegExp("[ä]"), "ae");
+    cleanedFilename.replace(QRegExp("[Ä]"), "AE");
+    cleanedFilename.replace(QRegExp("[ö]"), "oe");
+    cleanedFilename.replace(QRegExp("[Ö]"), "OE");
+    cleanedFilename.replace(QRegExp("[ü]"), "ue");
+    cleanedFilename.replace(QRegExp("[Ü]"), "UE");
+
+// On conserve le fromLocal8Bit (obligatoirement APRES la conversion normale) pour environnement Linux
     cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[éèëê]")), "e");
     cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[ÉÈËÊ]")), "E");
     cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[ô]")), "o");
@@ -556,8 +579,21 @@ QString cleanFilenameForFileSystem(const QString filename) {
     cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[Ö]")), "OE");
     cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[ü]")), "ue");
     cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[Ü]")), "UE");
+
+// Gestion des caractères interdits dans un nom de fichier
     cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[/]")), "-");
+    cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[*]")), "-");       // AJOUT FreddyP 26/10/2013 : Windows n'aime pas "*" dans un filename
+    cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[|]")), "-");       // AJOUT FreddyP 26/10/2013 : Windows n'aime pas "|" dans un filename
+    cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[\\]")), "-");      // AJOUT FreddyP 26/10/2013 : Windows n'aime pas "\" dans un filename
+    cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[:]")), "-");       // AJOUT FreddyP 26/10/2013 : Windows n'aime pas ":" dans un filename
+    cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[""]")), "-");      // AJOUT FreddyP 26/10/2013 : Windows n'aime pas """" dans un filename
+    cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[<]")), "-");       // AJOUT FreddyP 26/10/2013 : Windows n'aime pas "<" dans un filename
+    cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[>]")), "-");       // AJOUT FreddyP 26/10/2013 : Windows n'aime pas ">" dans un filename
+    cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[?]")), "-");       // AJOUT FreddyP 26/10/2013 : Windows n'aime pas ":" dans un filename
+
+// Remplacement par espace de tous les autres caractères spéciaux
     cleanedFilename.replace(QRegExp(QString::fromLocal8Bit("[^a-zA-Z0-9 _-()]")), " ");
+
     return cleanedFilename.simplified();
 }
 
