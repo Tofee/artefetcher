@@ -743,7 +743,7 @@ void MainWindow::downloadProgressed(QString filmUrl, double progression, double 
     remainingTimeString = remainingTimeTime.addSecs(remainingTime).toString();
     ui->downloadLabel->setText(tr("Downloading %1\nSpeed %2 kB/s  -  Remaining: %3")
                                .arg(filmFileName)
-                               .arg(speed)
+                               .arg(QString::number(speed,'f', 1))
                                .arg(remainingTimeString));
 
     statusBar()->showMessage((tr("%1 item(s) in queue").arg(thread->queueSize())));
