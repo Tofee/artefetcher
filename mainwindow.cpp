@@ -441,7 +441,7 @@ const QList<MetaType>& MainWindow::listInterestingDetails() {
     if (shownMetadata.isEmpty())
     {
         shownMetadata // << Available_until
-                << Description //<< First_broadcast_long
+                << Description // << RAW_First_Broadcast
                 << Type << Views << Rank << Episode_name;
     }
     return shownMetadata;
@@ -516,16 +516,16 @@ void MainWindow::updateCurrentDetails(){
 
         if (!film->m_metadata.value(RAW_First_Broadcast).isEmpty())
         {
-            QDateTime firstBroadcast = QDateTime::fromString(film->m_metadata.value(RAW_First_Broadcast), "dd/MM/yyyy HH:mm:ss +0200");
+            QString firstBroadcastString =  film->m_metadata.value(RAW_First_Broadcast);
             coutryYearDurationText.append(tr("%1 %2 ")
                                           .arg(FilmDetails::enum2Str(RAW_First_Broadcast))
-                                          .arg(firstBroadcast.toString(Qt::DefaultLocaleShortDate)));
+                                          .arg(firstBroadcastString));
         }
 
         if (! film->m_metadata.value(RAW_Available_until).isEmpty())
         {
-            QDateTime availableUntil = QDateTime::fromString(film->m_metadata.value(RAW_Available_until), "dd/MM/yyyy HH:mm:ss +0200");
-            coutryYearDurationText.append(tr("\nAvailable until %1").arg(availableUntil.toString(Qt::DefaultLocaleShortDate)));
+            QString availableUntil =film->m_metadata.value(RAW_Available_until);
+            coutryYearDurationText.append(tr("\nAvailable until %1").arg(availableUntil));
         }
 
         ui->countryYearDurationlabel->setText(coutryYearDurationText);

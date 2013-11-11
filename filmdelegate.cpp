@@ -254,12 +254,18 @@ int FilmDelegate::getFilmId(FilmDetails * film) const
     return m_films.values().indexOf(film);
 }
 
-void addMetadataIfNotEmpty(FilmDetails* film, QVariantMap inputMap, QString fieldName, MetaType internalFieldName)
+void addMetadataIfNotEmpty(FilmDetails* film, QVariantMap inputMap, QString fieldName, MetaType internalFieldName, bool isDate = false)
 {
     if (!inputMap.value(fieldName).isValid())
         return;
     QString value = inputMap.value(fieldName).toString();
-    film->m_metadata.insert(internalFieldName, value);
+    if (!isDate) {
+        film->m_metadata.insert(internalFieldName, value);
+    }
+    else {
+        // convert "25/10/2013 08:30:09 +0200" into "25/10/2013 08:30:09"
+        film->m_metadata.insert(internalFieldName, value.left(19));
+    }
 }
 
 void FilmDelegate::requestReadyToRead(QObject* object)
@@ -455,8 +461,8 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                 film->m_summary = mymap.value(JSON_FILMPAGE_SUMMARY).toString();
 
                 addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_TYPE,              Type);
-                addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_FIRST_BROADCAST,   RAW_First_Broadcast); // 25/04/2013 20:50:30 +0200
-                addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_AVAILABILITY,      RAW_Available_until); // 02/05/2013 20:20:30 +0200
+                addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_FIRST_BROADCAST,   RAW_First_Broadcast, true); // 25/04/2013 20:50:30 +0200
+                addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_AVAILABILITY,      RAW_Available_until, true); // 02/05/2013 20:20:30 +0200
                 addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_VIDEO_TYPE,        Preview_Or_ArteP7); // EXTRAIT (AUSSCHNITT in german) or ARTE+7
                 addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_VSU,               Episode_name); // if not null, it belongs to a serie
                 addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_VIEWS,             Views); // different from the one in the catalog: this is just a number
