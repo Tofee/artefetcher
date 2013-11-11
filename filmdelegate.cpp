@@ -332,8 +332,7 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                 if (i > RESULT_PER_PAGE * (m_currentPage - 1) && i <= RESULT_PER_PAGE * m_currentPage) {
 
                     QString url = catalogItem.toMap().value(itemStep == MAPPER_STEP_CATALOG ? "url" : "details_url").toString();
-                    if (itemStep == MAPPER_STEP_CATALOG)
-                        url.prepend("http://www.arte.tv");
+                    url.prepend("http://www.arte.tv");
                     QString title = catalogItem.toMap().value("title").toString();
 
                     if (m_films.contains(url))
