@@ -97,6 +97,16 @@ public:
         m_saveMetaInInfoFile = newValue;
     }
 
+    void setResultCountPerPage(int resultCountPerPage)
+    {
+        m_resultCountPerPage = resultCountPerPage;
+    }
+
+    int resultCountPerPage()
+    {
+        return m_resultCountPerPage;
+    }
+
     virtual void load() = 0;
     virtual void save() = 0;
 
@@ -110,6 +120,7 @@ protected:
     bool    m_dedicatedDirectoryForSeries;
     bool    m_saveImagePreview;
     bool    m_saveMetaInInfoFile;
+    int     m_resultCountPerPage;
 
     /* Proxy : */
     bool    m_proxyEnabled;

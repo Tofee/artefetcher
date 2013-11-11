@@ -30,9 +30,12 @@
 #define DEF_OPT_DEDICATED_DIR_SERIES  "dedicated_dir_series"
 #define DEF_OPT_SAVE_IMAGE_PREVIEW    "save_image_preview"
 #define DEF_OPT_SAVE_META_INFO        "save_meta_info"
+#define DEF_OPT_RESULT_COUNT_P_PAGE   "result_count_per_page"
 #define DEF_OPT_PROXY_HTTP_ENABLED    "proxy_http_enabled"
 #define DEF_OPT_PROXY_HTTP_URL        "proxy_http_url"
 #define DEF_OPT_PROXY_HTTP_PORT       "proxy_http_port"
+
+#define RESULT_PER_PAGE 10
 
 Preferences *Preferences::_singleton = NULL;
 
@@ -54,6 +57,7 @@ void Preferences::load()
     m_dedicatedDirectoryForSeries = settings.value(DEF_OPT_DEDICATED_DIR_SERIES, true).toBool();
     m_saveImagePreview = settings.value(DEF_OPT_SAVE_IMAGE_PREVIEW, true).toBool();
     m_saveMetaInInfoFile = settings.value(DEF_OPT_SAVE_META_INFO, true).toBool();
+    m_resultCountPerPage = settings.value(DEF_OPT_RESULT_COUNT_P_PAGE, RESULT_PER_PAGE).toInt();
 
     m_proxyEnabled = settings.value(DEF_OPT_PROXY_HTTP_ENABLED, false).toBool();
     m_proxyHttpUrl = settings.value(DEF_OPT_PROXY_HTTP_URL).toString();
@@ -71,6 +75,7 @@ void Preferences::save()
     settings.setValue(DEF_OPT_DEDICATED_DIR_SERIES, m_dedicatedDirectoryForSeries);
     settings.setValue(DEF_OPT_SAVE_IMAGE_PREVIEW, m_saveImagePreview);
     settings.setValue(DEF_OPT_SAVE_META_INFO, m_saveMetaInInfoFile);
+    settings.setValue(DEF_OPT_RESULT_COUNT_P_PAGE, m_resultCountPerPage);
 
     settings.setValue(DEF_OPT_PROXY_HTTP_ENABLED, m_proxyEnabled);
     settings.setValue(DEF_OPT_PROXY_HTTP_URL, m_proxyHttpUrl);

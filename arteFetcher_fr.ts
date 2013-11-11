@@ -29,24 +29,24 @@
         <translation type="obsolete">Impossible de trouver les vidéos pour les langues : %1</translation>
     </message>
     <message>
-        <location filename="filmdelegate.cpp" line="388"/>
+        <location filename="filmdelegate.cpp" line="408"/>
         <source>Cannot find the main information for the movie</source>
         <translation>Impossible d&apos;obtenir les principales informations sur la vidéo</translation>
     </message>
     <message>
-        <location filename="filmdelegate.cpp" line="434"/>
+        <location filename="filmdelegate.cpp" line="454"/>
         <source>Cannot load stream details</source>
         <translation>Flux vidéo non disponible</translation>
     </message>
     <message>
-        <location filename="filmdelegate.cpp" line="480"/>
-        <location filename="filmdelegate.cpp" line="518"/>
+        <location filename="filmdelegate.cpp" line="500"/>
+        <location filename="filmdelegate.cpp" line="538"/>
         <source>Cannot find the preview image</source>
         <oldsource>Cannot find the video stream in %1 %2</oldsource>
         <translation>Impossible de trouver l&apos;aperçu de la vidéo</translation>
     </message>
     <message>
-        <location filename="filmdelegate.cpp" line="509"/>
+        <location filename="filmdelegate.cpp" line="529"/>
         <source>Cannot find the video stream</source>
         <translation>Impossible de trouver le flux vidéo</translation>
     </message>
@@ -99,7 +99,7 @@
         <translation type="obsolete">Disponible jusqu&apos;à (RAW)</translation>
     </message>
     <message>
-        <location filename="filmdelegate.cpp" line="533"/>
+        <location filename="filmdelegate.cpp" line="553"/>
         <source>Cannot load the preview image</source>
         <translation>Aperçu indisponible (2)</translation>
     </message>
@@ -224,12 +224,12 @@
         <translation>Annuler le téléchargement du film sélectionné</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="231"/>
+        <location filename="mainwindow.ui" line="256"/>
         <source>Open the directory containing the video</source>
         <translation>Ouvrir le dossier parent de la vidéo</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="245"/>
+        <location filename="mainwindow.ui" line="242"/>
         <source>Play the video</source>
         <translation>Lire la vidéo</translation>
     </message>
@@ -238,7 +238,7 @@
         <translation type="obsolete">Annuler le téléchargement</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="259"/>
+        <location filename="mainwindow.ui" line="231"/>
         <source>Download this video</source>
         <translation>Télécharger la vidéo</translation>
     </message>
@@ -325,7 +325,7 @@
         <translation type="obsolete">Télécharger les vidéos</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="67"/>
+        <location filename="mainwindow.cpp" line="66"/>
         <source>Title</source>
         <translation>Titre</translation>
     </message>
@@ -338,7 +338,7 @@
         <translation type="obsolete">Vues</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="68"/>
+        <location filename="mainwindow.cpp" line="67"/>
         <source>Duration</source>
         <translation>Durée</translation>
     </message>
@@ -347,7 +347,7 @@
         <translation type="obsolete">%1, %2, %3min</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="473"/>
+        <location filename="mainwindow.cpp" line="478"/>
         <source>No film in the playlist</source>
         <translation>Aucun film dans la playlist</translation>
     </message>
@@ -372,7 +372,7 @@ Check: &lt;%1&gt;</source>
         <translation type="obsolete">Impossible de créer le dossier %1</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="722"/>
+        <location filename="mainwindow.cpp" line="767"/>
         <source>Download finished.</source>
         <translation>Téléchargement terminé.</translation>
     </message>
@@ -405,7 +405,7 @@ Check: &lt;%1&gt;</source>
         <translation type="obsolete">Note</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="488"/>
+        <location filename="mainwindow.cpp" line="493"/>
         <source>&lt;b&gt; %0 : &lt;/b&gt;%1&lt;br/&gt;</source>
         <translation>&lt;b&gt; %0 : &lt;/b&gt;%1&lt;br/&gt;</translation>
     </message>
@@ -415,43 +415,43 @@ Check: &lt;%1&gt;</source>
     </message>
     <message>
         <location filename="mainwindow.ui" line="383"/>
-        <location filename="mainwindow.cpp" line="118"/>
-        <location filename="mainwindow.cpp" line="222"/>
+        <location filename="mainwindow.cpp" line="117"/>
+        <location filename="mainwindow.cpp" line="219"/>
         <source>Downloads</source>
         <translation>Téléchargements</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="215"/>
+        <location filename="mainwindow.cpp" line="212"/>
         <source>Arte selection</source>
         <translation>Sélection Arte</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="216"/>
+        <location filename="mainwindow.cpp" line="213"/>
         <source>Most recent</source>
         <translation>Les plus récentes</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="217"/>
+        <location filename="mainwindow.cpp" line="214"/>
         <source>Most seen</source>
         <translation>Les plus vues</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="218"/>
+        <location filename="mainwindow.cpp" line="215"/>
         <source>Last chance</source>
         <translation>Dernière chance</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="219"/>
+        <location filename="mainwindow.cpp" line="216"/>
         <source>All</source>
         <translation>Tout</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="221"/>
+        <location filename="mainwindow.cpp" line="218"/>
         <source>By date</source>
         <translation>Par date</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="229"/>
+        <location filename="mainwindow.cpp" line="226"/>
         <source>Page %1/%2
 Total results: %3</source>
         <translation>Page %1/%2
@@ -464,21 +464,21 @@ Total: %3 résultats</translation>
 %4</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="338"/>
-        <location filename="mainwindow.cpp" line="416"/>
-        <location filename="mainwindow.cpp" line="425"/>
+        <location filename="mainwindow.cpp" line="335"/>
+        <location filename="mainwindow.cpp" line="414"/>
+        <location filename="mainwindow.cpp" line="423"/>
         <source>Episode: %1</source>
         <translation>Épisode : %1</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="505"/>
+        <location filename="mainwindow.cpp" line="510"/>
         <source>The related video is a teaser of the original movie.
 </source>
         <translation>La vidéo associée est un extrait de l&apos;émission originale.
 </translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="514"/>
+        <location filename="mainwindow.cpp" line="519"/>
         <source>%1 %2 </source>
         <translation>%1 %2 </translation>
     </message>
@@ -501,7 +501,7 @@ Total: %3 résultats</translation>
         <translation type="obsolete">Téléchargé</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="641"/>
+        <location filename="mainwindow.cpp" line="693"/>
         <source>File already exists</source>
         <translation>Le fichier existe déjà</translation>
     </message>
@@ -512,19 +512,19 @@ Do you want to continue and replace it?</source>
 Voulez-vous continuer et le remplacer ?</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="333"/>
+        <location filename="mainwindow.cpp" line="330"/>
         <source>Previous download failed.</source>
         <translation>Le dernier téléchargement a échoué.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="508"/>
+        <location filename="mainwindow.cpp" line="513"/>
         <source>(%1 min)
 </source>
         <translation>(%1 min.)
 </translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="522"/>
+        <location filename="mainwindow.cpp" line="527"/>
         <source>
 Available until %1</source>
         <translation>
@@ -539,7 +539,7 @@ Disponible jusqu&apos;au %1</translation>
         <translation type="obsolete">Erreur de téléchargement</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="642"/>
+        <location filename="mainwindow.cpp" line="694"/>
         <source>A file with the same name already exists:
 %1
 Do you want to continue and replace it?</source>
@@ -548,64 +548,62 @@ Do you want to continue and replace it?</source>
 Voulez-vous quand même le télécharger ?</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="651"/>
         <source>Incomplete download found</source>
-        <translation>Un téléchargement incomplet a été trouvé</translation>
+        <translation type="obsolete">Un téléchargement incomplet a été trouvé</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="652"/>
         <source>The download of the movie &lt;%1&gt; has already been started. Do you want to continue the download?</source>
-        <translation>Une partie du film &lt;%1&gt; a déjà été téléchargée. Voulez vous continuer le téléchargement ?</translation>
+        <translation type="obsolete">Une partie du film &lt;%1&gt; a déjà été téléchargée. Voulez vous continuer le téléchargement ?</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="743"/>
+        <location filename="mainwindow.cpp" line="788"/>
         <source>Downloading %1
 Speed %2 kB/s  -  Remaining: %3</source>
         <translation>Téléchargement: %1
 Débit : %2 ko/s -  Temps restant : %3</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="748"/>
+        <location filename="mainwindow.cpp" line="793"/>
         <source>%1 item(s) in queue</source>
         <translation>%1 film(s) en attente</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="772"/>
+        <location filename="mainwindow.cpp" line="817"/>
         <source>Download error: %1</source>
         <translation>Erreur de téléchargement : %1</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="779"/>
+        <location filename="mainwindow.cpp" line="824"/>
         <source>Paused</source>
         <translation>En pause</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="853"/>
+        <location filename="mainwindow.cpp" line="897"/>
         <source>Add a new Film from URL</source>
         <translation>Ajouter un nouveau film à partir d&apos;une URL</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="853"/>
+        <location filename="mainwindow.cpp" line="897"/>
         <source>Enter the URL of your arte film page</source>
         <translation>Entrez l&apos;URL de la page de votre film Arte</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="898"/>
+        <location filename="mainwindow.cpp" line="942"/>
         <source>Close the application?</source>
         <translation>Fermer l&apos;application ?</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="899"/>
+        <location filename="mainwindow.cpp" line="943"/>
         <source>Download is still in progress. Closing the application will stop them immediately and your films file may be incomplete, corrupted or not event downloaded.</source>
         <translation>Téléchargement en cours. Fermer l&apos;application arrêtera les téléchargements immédiatement et le film en cours pourrait être incomplet voire corrompu.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="900"/>
+        <location filename="mainwindow.cpp" line="944"/>
         <source>Quit anyway</source>
         <translation>Quitter quand même</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="901"/>
+        <location filename="mainwindow.cpp" line="945"/>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
@@ -618,71 +616,81 @@ Débit : %2 ko/s -  Temps restant : %3</translation>
         <translation>Préférences</translation>
     </message>
     <message>
-        <location filename="preferencedialog.ui" line="30"/>
+        <location filename="preferencedialog.ui" line="133"/>
         <source>Connection settings</source>
-        <translation type="unfinished">Paramètres de Connexion</translation>
+        <translation>Paramètres de connexion</translation>
     </message>
     <message>
-        <location filename="preferencedialog.ui" line="36"/>
+        <location filename="preferencedialog.ui" line="139"/>
         <source>Use a proxy</source>
-        <translation type="unfinished">Utiliser un proxy</translation>
+        <translation>Utiliser un proxy</translation>
     </message>
     <message>
-        <location filename="preferencedialog.ui" line="43"/>
+        <location filename="preferencedialog.ui" line="146"/>
         <source>HTTP:</source>
-        <translation type="unfinished">HTTP :</translation>
+        <translation>HTTP :</translation>
     </message>
     <message>
-        <location filename="preferencedialog.ui" line="63"/>
+        <location filename="preferencedialog.ui" line="166"/>
         <source>Port:</source>
-        <translation type="unfinished">Port :</translation>
+        <translation>Port :</translation>
     </message>
     <message>
-        <location filename="preferencedialog.ui" line="76"/>
+        <location filename="preferencedialog.ui" line="179"/>
         <source>After a successful video download</source>
         <translation>Après un téléchargement réussi</translation>
     </message>
     <message>
-        <location filename="preferencedialog.ui" line="82"/>
+        <location filename="preferencedialog.ui" line="185"/>
         <source>Save an image preview
 (filename.png)</source>
         <translation>Enregistrer une image d&apos;aperçu
 (nom_du_fichier.png)</translation>
     </message>
     <message>
-        <location filename="preferencedialog.ui" line="90"/>
+        <location filename="preferencedialog.ui" line="193"/>
         <source>Save the video information (title, type, summary...)
 (filename.info)</source>
         <translation>Enregistrer les informations de la vidéo (titre, type, résumé...)
 (nom_du_fichier.info)</translation>
     </message>
     <message>
-        <location filename="preferencedialog.ui" line="101"/>
-        <source>Generated files</source>
-        <translation type="unfinished">Fichiers générés</translation>
+        <location filename="preferencedialog.ui" line="204"/>
+        <source>General</source>
+        <translation>Général</translation>
     </message>
     <message>
-        <location filename="preferencedialog.ui" line="120"/>
+        <location filename="preferencedialog.ui" line="242"/>
+        <source>Result count per page:</source>
+        <translation>Résultats par page :</translation>
+    </message>
+    <message>
+        <location filename="preferencedialog.ui" line="20"/>
+        <source>Generated files</source>
+        <translation>Fichiers générés</translation>
+    </message>
+    <message>
+        <location filename="preferencedialog.ui" line="39"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pattern to generate the film filenames:&lt;br/&gt;%title: video title&lt;br/&gt;%language: language code&lt;br/&gt;%quality: stream type code (hd/sd...)&lt;/p&gt;&lt;p&gt;Example: &apos;[%quality %language] %title&apos; will create&lt;br/&gt;[HQ DE] Movie title.mp4&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Patron pour générer les noms de fichier de film :&lt;br/&gt;%title : titre de la vidéo&lt;br/&gt;%quality : code de la langue&lt;br/&gt;%language : qualité (HD/ED/SD...)&lt;/p&gt;&lt;p&gt;Exemple: &apos;[%quality %language] %title&apos; créera&lt;br/&gt;[HQ DE] Titre de film.mp4&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="preferencedialog.ui" line="107"/>
+        <location filename="preferencedialog.ui" line="26"/>
         <source>Destination:</source>
         <translation>Destination :</translation>
     </message>
     <message>
-        <location filename="preferencedialog.ui" line="134"/>
+        <location filename="preferencedialog.ui" line="53"/>
         <source>Browse...</source>
         <translation>Parcourir...</translation>
     </message>
     <message>
-        <location filename="preferencedialog.ui" line="141"/>
+        <location filename="preferencedialog.ui" line="60"/>
         <source>When a movie belongs to series, a folder will be created for the serie and all episodes will be gathered in this directory.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="preferencedialog.ui" line="144"/>
+        <location filename="preferencedialog.ui" line="63"/>
         <source>Place films belonging to series into a dedicated directory</source>
         <translation>Rassembler tous les épisodes d&apos;une série dans un même dossier</translation>
     </message>
@@ -691,7 +699,7 @@ Débit : %2 ko/s -  Temps restant : %3</translation>
         <translation type="obsolete">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Patron pour générer les noms de fichier de film :&lt;br/&gt;%1 : titre de la vidéo&lt;br/&gt;%2 : code de la langue&lt;br/&gt;%3 : type de flux (HD/SD...)&lt;/p&gt;&lt;p&gt;Exemple: [%2 %3]%1.flv&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="preferencedialog.ui" line="127"/>
+        <location filename="preferencedialog.ui" line="46"/>
         <source>Filename pattern:</source>
         <translation>Patron de nom de fichiers :</translation>
     </message>
@@ -704,17 +712,17 @@ Débit : %2 ko/s -  Temps restant : %3</translation>
         <translation type="obsolete">Flux souhaités :</translation>
     </message>
     <message>
-        <location filename="preferencedialog.cpp" line="82"/>
+        <location filename="preferencedialog.cpp" line="85"/>
         <source>Target directory</source>
         <translation>Répertoire de destination</translation>
     </message>
     <message>
-        <location filename="preferencedialog.cpp" line="92"/>
+        <location filename="preferencedialog.cpp" line="95"/>
         <source>Target directory does not exist</source>
         <translation>Le répertoire de destination n&apos;existe pas</translation>
     </message>
     <message>
-        <location filename="preferencedialog.cpp" line="97"/>
+        <location filename="preferencedialog.cpp" line="100"/>
         <source>Filename pattern is not correct</source>
         <translation>Patron de nom de fichiers incorrect</translation>
     </message>
@@ -761,7 +769,7 @@ Débit : %2 ko/s -  Temps restant : %3</translation>
 <context>
     <name>QueueDownloader</name>
     <message>
-        <location filename="queuedownloader.cpp" line="65"/>
+        <location filename="queuedownloader.cpp" line="66"/>
         <source>Cannot create the working directory %1</source>
         <translation>Impossible de créer le dossier %1</translation>
     </message>

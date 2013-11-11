@@ -42,7 +42,6 @@
 #define MAPPER_STEP_CODE_2_XML "XML"
 #define MAPPER_STEP_CODE_3_RTMP "RTMP_XML"
 #define MAPPER_STEP_CODE_4_PREVIEW "PREVIEW"
-#define RESULT_PER_PAGE 10
 
 #define JSON_AIRDATE        "airdate"
 #define JSON_AIRDATE_LONG   "airdate_long"
@@ -332,10 +331,13 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                 list = json.toVariant().toMap().value("videos").toList();
             else // MAPPER_STEP_DATE
                 list = json.toVariant().toList();
+
+            const int resultCountPerPage(Preferences::getInstance()->resultCountPerPage());
             foreach(QVariant catalogItem, list)
             {
                 ++i;
-                if (i > RESULT_PER_PAGE * (m_currentPage - 1) && i <= RESULT_PER_PAGE * m_currentPage) {
+
+                if (i > resultCountPerPage * (m_currentPage - 1) && i <= resultCountPerPage * m_currentPage) {
 
                     QString url = catalogItem.toMap().value(itemStep == MAPPER_STEP_CATALOG ? "url" : "details_url").toString();
                     url.prepend("http://www.arte.tv");
@@ -373,13 +375,13 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                 }
             }
 
-            if (i % RESULT_PER_PAGE == 0) {
-                m_currentPageCount = i/ RESULT_PER_PAGE;
+            if (i % resultCountPerPage == 0) {
+                m_currentPageCount = i/ resultCountPerPage;
                 emit(streamIndexLoaded(i, m_currentPage, m_currentPageCount));
             }
             else
             {
-                m_currentPageCount = (i / RESULT_PER_PAGE) + 1;
+                m_currentPageCount = (i / resultCountPerPage) + 1;
                 emit(streamIndexLoaded(i, m_currentPage, m_currentPageCount));
             }
             emit (playListHasBeenUpdated());

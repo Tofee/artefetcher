@@ -39,6 +39,8 @@ PreferenceDialog::PreferenceDialog(QWidget *parent) :
     ui->proxyCheckBox->setChecked(Preferences::getInstance()->m_proxyEnabled);
     ui->proxyHttpUrlLineEdit->setText(Preferences::getInstance()->m_proxyHttpUrl);
     ui->proxyHttpPortSpinBox->setValue(Preferences::getInstance()->m_proxyHttpPort);
+    QString countPerPageString = QString::number(Preferences::getInstance()->m_resultCountPerPage);
+    ui->resultCountComboBox->setCurrentIndex(ui->resultCountComboBox->findText(countPerPageString));
 
     updateProxyConfigVisibility();
 
@@ -69,6 +71,7 @@ void PreferenceDialog::accept()
 
     Preferences::getInstance()->m_saveMetaInInfoFile = ui->metaInfoCheckBox->isChecked();
     Preferences::getInstance()->m_saveImagePreview = ui->imagePreviewCheckBox->isChecked();
+    Preferences::getInstance()->m_resultCountPerPage = ui->resultCountComboBox->currentText().toInt();
 
     Preferences::getInstance()->m_proxyEnabled = ui->proxyCheckBox->isChecked();
     Preferences::getInstance()->m_proxyHttpUrl = ui->proxyHttpUrlLineEdit->text();
