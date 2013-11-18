@@ -212,6 +212,8 @@ void FilmDelegate::commonLoadPlaylist(QString type) {
     downloadUrl(m_lastPlaylistUrl, m_lastRequestPageId, QString(), type);
 }
 
+
+
 QString extractUniqueResult(const QString& document, const QString& xpath)
 {
     QXmlQuery query;
@@ -589,6 +591,55 @@ int FilmDelegate::getLineForUrl(QString filmUrl)
 FilmDetails* FilmDelegate::findFilmByUrl(QString filmUrl)
 {
     return m_films.contains(filmUrl) ? m_films[filmUrl] : NULL;
+}
+
+double FilmDelegate::computeTotalDownloadProgress() const {
+    double totalDurationInMinute(0);
+    double completedDurationInMinute(0);
+    foreach (QString url, m_currentDownloads){
+        FilmDetails* film = m_films.value(url);
+        switch (film->m_downloadStatus)
+        {
+        case DL_DOWNLOADING:
+            totalDurationInMinute += (double) film->m_durationInMinutes;
+            completedDurationInMinute += ((double)film->m_durationInMinutes * ((double) film->m_downloadProgress / 100.));
+            break;
+        case DL_DOWNLOADED:
+            totalDurationInMinute += (double) film->m_durationInMinutes;
+            completedDurationInMinute += (double) film->m_durationInMinutes;
+            break;
+        case DL_REQUESTED:
+            totalDurationInMinute += (double) film->m_durationInMinutes;
+            break;
+        case DL_CANCELLED:
+        case DL_ERROR:
+        case DL_NONE:
+        default:
+            break;
+        }
+    }
+    return totalDurationInMinute > 0 ? 100.*completedDurationInMinute/totalDurationInMinute : 0;
+}
+
+double FilmDelegate::computeTotalDownloadRequestedDuration() const {
+    int totalDurationInMinute(0);
+    foreach (QString url, m_currentDownloads){
+        FilmDetails* film = m_films.value(url);
+        switch (film->m_downloadStatus)
+        {
+        case DL_DOWNLOADING:
+        case DL_DOWNLOADED:
+        case DL_REQUESTED:
+            totalDurationInMinute += film->m_durationInMinutes;
+            break;
+        case DL_CANCELLED:
+        case DL_ERROR:
+        case DL_NONE:
+        default:
+            break;
+        }
+    }
+    return totalDurationInMinute;
 }
 
 StreamType FilmDelegate::getStreamTypeByLanguageAndQuality(QString languageCode, QString qualityCode) throw (NotFoundException)

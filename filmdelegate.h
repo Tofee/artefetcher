@@ -101,6 +101,9 @@ public:
         return m_currentDownloads.toList();
     }
 
+    double computeTotalDownloadProgress() const;
+    double computeTotalDownloadRequestedDuration() const;
+
     static QString getStreamHumanName(int i);
     static QString getStreamLanguageCode(int i);
     static QString getStreamQualityCode(int i);

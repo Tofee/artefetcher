@@ -98,6 +98,7 @@ public:
     QMap<MetaType, QString> m_metadata;
 
     EDownloadStatus m_downloadStatus;
+    int m_downloadProgress;
 
     QString m_streamUrl;
     // Full path of the future downloaded film.

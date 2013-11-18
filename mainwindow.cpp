@@ -40,6 +40,10 @@
 #define TABLE_PREVIEW_MAX_HEIGHT 100
 #define TABLE_COLUMN_MARGIN 10
 
+#define PROGRESS_PEN_WIDTH 16
+#define PROGRESS_Y_POS_ON_IMAGE MAX_IMAGE_HEIGHT - PROGRESS_PEN_WIDTH / 2
+
+
 #define DEFAULT_FILM_ICON ":/img/unknown"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -403,8 +407,17 @@ void MainWindow::refreshTable()
         }
         if (film->m_preview.isNull())
             previewItem->setIcon(QIcon(QPixmap(DEFAULT_FILM_ICON).scaled(TABLE_PREVIEW_MAX_WIDTH, TABLE_PREVIEW_MAX_HEIGHT, Qt::KeepAspectRatio)));
-        else
-            previewItem->setIcon(QIcon(QPixmap::fromImage(film->m_preview)));
+        else {
+            QImage image = film->m_preview;
+            if (film->m_downloadProgress > 0) {
+                QPainter painter(&image);
+
+                painter.setPen(QPen(Qt::green, PROGRESS_PEN_WIDTH));
+                painter.drawLine(0,PROGRESS_Y_POS_ON_IMAGE,film->m_downloadProgress*MAX_IMAGE_WIDTH/100,PROGRESS_Y_POS_ON_IMAGE);
+            }
+            previewItem->setIcon(QIcon(QPixmap::fromImage(image)));
+
+        }
 
 
         bool isEpisode=film->m_metadata.contains(Episode_name);
@@ -767,11 +780,9 @@ void MainWindow::allFilmDownloadFinished()
     statusBar()->showMessage(tr("Download finished."));
 }
 
-void MainWindow::downloadProgressed(QString filmUrl, double progression, double speed, double remainingTime)
+void MainWindow::downloadProgressed(QString filmUrl, double progression, double kBytesPersecond, double remainingTimeForCurrentFilm)
 {
     changeDownloadPartVisibility(true);
-    ui->progressBar->setValue(progression);
-
 
     FilmDetails* film = delegate->findFilmByUrl(filmUrl);
     QString filmFileName("...");
@@ -779,16 +790,29 @@ void MainWindow::downloadProgressed(QString filmUrl, double progression, double 
     {
         filmFileName = film->m_targetFileName;
         film->m_downloadStatus = DL_DOWNLOADING;
+        film->m_downloadProgress = progression;
+        refreshTable();
     }
 
-    QString remainingTimeString;
-    QTime remainingTimeTime(0,0,0);
+    double totalProgress = delegate->computeTotalDownloadProgress();
+    double totalFilmsDuration = delegate->computeTotalDownloadRequestedDuration();
+    ui->progressBar->setValue(totalProgress);
 
-    remainingTimeString = remainingTimeTime.addSecs(remainingTime).toString();
-    ui->downloadLabel->setText(tr("Downloading %1\nSpeed %2 kB/s  -  Remaining: %3")
-                               .arg(filmFileName)
-                               .arg(QString::number(speed,'f', 1))
-                               .arg(remainingTimeString));
+    double filmLeftSize = (100. - progression) * film->m_durationInMinutes;
+    if (remainingTimeForCurrentFilm != 0 && filmLeftSize != 0)
+    {
+        double speed = filmLeftSize  / remainingTimeForCurrentFilm;
+
+        double tailleRestanteTotale = (100. - totalProgress) * totalFilmsDuration;
+        double tempsTotal = tailleRestanteTotale / speed;
+
+        QTime remainingTimeTime(0,0,0);
+        QString remainingTimeString(remainingTimeTime.addSecs(tempsTotal).toString());
+        ui->downloadLabel->setText(tr("Downloading %1\nSpeed %2 kB/s  -  Remaining: %3")
+                                   .arg(filmFileName)
+                                   .arg(QString::number(kBytesPersecond,'f', 1))
+                                   .arg(remainingTimeString));
+    }
 
     statusBar()->showMessage((tr("%1 item(s) in queue").arg(thread->queueSize())));
     int filmId = delegate->getLineForUrl(filmUrl);
