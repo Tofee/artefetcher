@@ -6,7 +6,7 @@
     <message>
         <location filename="aboutdialog.cpp" line="24"/>
         <source>Release notes are not available</source>
-        <translation>Release notes sind nicht verfügbar</translation>
+        <translation type="unfinished">Release Notes nicht verfügbar</translation>
     </message>
     <message>
         <location filename="aboutdialog.ui" line="14"/>
@@ -186,7 +186,7 @@
     <message>
         <location filename="mainwindow.ui" line="40"/>
         <source>dd/MM/yy</source>
-        <translation>dd/MM/yy</translation>
+        <translation type="unfinished">dd/MM/yy</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="50"/>
@@ -212,7 +212,7 @@
         <location filename="mainwindow.ui" line="107"/>
         <source>&lt;p&gt;HQ: smallest quality - 800 (720 x 406)&lt;/p&gt;&lt;p&gt;EQ: intermediate quality - 1500 (1280 x 720)&lt;/p&gt;&lt;p&gt;SQ: top quality - 2200 (1280 x 720)&lt;/p&gt;</source>
         <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;HQ: smallest quality - 800 (720 x 406)&lt;/p&gt;&lt;p&gt;EQ: intermediate quality - 1500 (1280 x 720&lt;span style=&quot; color:#000000; background-color:#e6e6fa;&quot;&gt;)&lt;/span&gt;&lt;/p&gt;&lt;p&gt;SQ: top quality - 2200 (1280 x 720)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
-        <translation>&lt;p&gt;HQ: kleinste Qualität - 800 (720 x 406)&lt;/p&gt;&lt;p&gt;EQ: normale Qualität - 1500 (1280 x 720)&lt;/p&gt;&lt;p&gt;SQ: höchste Qualität - 2200 (1280 x 720)&lt;/p&gt;</translation>
+        <translation type="unfinished">&lt;p&gt;HQ: geringste Qualität - 800 (720 x 406)&lt;/p&gt;&lt;p&gt;EQ: normale Qualität - 1500 (1280 x 720)&lt;/p&gt;&lt;p&gt;SQ: höchste Qualität - 2200 (1280 x 720)&lt;/p&gt;</translation>
     </message>
     <message>
         <source>Settings...</source>
@@ -221,7 +221,7 @@
     <message>
         <location filename="mainwindow.ui" line="217"/>
         <source>Cancel the download of the selected film</source>
-        <translation>Download des augewählten Films abbrechen</translation>
+        <translation type="unfinished">Download des ausgewählten Films abbrechen</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="256"/>
@@ -231,7 +231,7 @@
     <message>
         <location filename="mainwindow.ui" line="242"/>
         <source>Play the video</source>
-        <translation>Video anschauen</translation>
+        <translation type="unfinished">Video abspielen</translation>
     </message>
     <message>
         <source>Cancel download</source>
@@ -240,7 +240,7 @@
     <message>
         <location filename="mainwindow.ui" line="231"/>
         <source>Download this video</source>
-        <translation>Das Video herunterladen</translation>
+        <translation type="unfinished">Video herunterladen</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="270"/>
@@ -260,7 +260,7 @@
     <message>
         <location filename="mainwindow.ui" line="413"/>
         <source>Cancel the download in progress</source>
-        <translation>Läufenden Download abbrechen</translation>
+        <translation type="unfinished">Laufenden Download abbrechen</translation>
     </message>
     <message>
         <source>Web page</source>
@@ -297,12 +297,12 @@
     <message>
         <location filename="mainwindow.ui" line="141"/>
         <source>About...</source>
-        <translation type="unfinished">About...</translation>
+        <translation type="unfinished">Über...</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="179"/>
         <source>Film details</source>
-        <translation>Filminformationen</translation>
+        <translation type="unfinished">Filmdetails</translation>
     </message>
     <message>
         <source>Download</source>
@@ -370,7 +370,7 @@ Check: &lt;%1&gt;</source>
     <message>
         <location filename="mainwindow.cpp" line="767"/>
         <source>Download finished.</source>
-        <translation>Download fertig.</translation>
+        <translation type="unfinished">Download beendet.</translation>
     </message>
     <message>
         <source>Waiting...</source>
@@ -425,7 +425,7 @@ Check: &lt;%1&gt;</source>
     <message>
         <location filename="mainwindow.cpp" line="214"/>
         <source>Most seen</source>
-        <translation>Meistgesehen</translation>
+        <translation type="unfinished">Meistgesehene</translation>
     </message>
     <message>
         <location filename="mainwindow.cpp" line="215"/>
@@ -452,7 +452,7 @@ Gesamtergebnisse: %3</translation>
     <message>
         <location filename="mainwindow.cpp" line="943"/>
         <source>Download is still in progress. Closing the application will stop them immediately and your films file may be incomplete, corrupted or not event downloaded.</source>
-        <translation type="unfinished">Unfertiger Download. Ein Schließen der Anwendung wird den Download sofort unterbrechen und die Datei könnte unvollständig, kaputt oder nicht einmal heruntergeladen sein.</translation>
+        <translation type="unfinished">Laufender Download. Ein Schließen der Anwendung wird den Download sofort unterbrechen und die Datei könnte unvollständig, kaputt oder garnicht erst heruntergeladen sein.</translation>
     </message>
     <message>
         <source>%1 %2 (%3min)
@@ -511,7 +511,7 @@ Möchten Sie fortfahren und sie ersetzen?</translation>
     <message>
         <location filename="mainwindow.cpp" line="330"/>
         <source>Previous download failed.</source>
-        <translation>Letzter Download ging schief.</translation>
+        <translation type="unfinished">Letzter Download fehlerhaft.</translation>
     </message>
     <message>
         <location filename="mainwindow.cpp" line="513"/>
@@ -556,8 +556,8 @@ Möchten Sie fortfahren und sie ersetzen?</translation>
         <location filename="mainwindow.cpp" line="788"/>
         <source>Downloading %1
 Speed %2 kB/s  -  Remaining: %3</source>
-        <translation>Lade %1 herunter
-%2 kB/s  -  Restzeit: %3</translation>
+        <translation type="unfinished">Lade %1 herunter
+Geschwindigkeit %2 kB/s  -  Restzeit: %3</translation>
     </message>
     <message>
         <location filename="mainwindow.cpp" line="793"/>
@@ -567,7 +567,7 @@ Speed %2 kB/s  -  Remaining: %3</source>
     <message>
         <location filename="mainwindow.cpp" line="817"/>
         <source>Download error: %1</source>
-        <translation>Fehler während des Herunderladens: %1</translation>
+        <translation type="unfinished">Downloadfehler: %1</translation>
     </message>
     <message>
         <location filename="mainwindow.cpp" line="824"/>
@@ -582,7 +582,7 @@ Speed %2 kB/s  -  Remaining: %3</source>
     <message>
         <location filename="mainwindow.cpp" line="897"/>
         <source>Enter the URL of your arte film page</source>
-        <translation>Geben Sie die URL der Arteseite ein</translation>
+        <translation type="unfinished">Geben Sie die URL des Films auf der Arteseite ein</translation>
     </message>
     <message>
         <location filename="mainwindow.cpp" line="942"/>
@@ -653,18 +653,18 @@ Speed %2 kB/s  -  Remaining: %3</source>
     <message>
         <location filename="preferencedialog.ui" line="204"/>
         <source>General</source>
-        <translation type="unfinished">Gemeinsam</translation>
+        <translation type="unfinished">Allgemein</translation>
     </message>
     <message>
         <location filename="preferencedialog.ui" line="242"/>
         <source>Result count per page:</source>
         <translatorcomment>to be validated</translatorcomment>
-        <translation type="unfinished">Ergebnis per Seite:</translation>
+        <translation type="unfinished">Ergebnisse pro Seite:</translation>
     </message>
     <message>
         <location filename="preferencedialog.ui" line="20"/>
         <source>Generated files</source>
-        <translation type="unfinished">Herunterladene Dateien</translation>
+        <translation type="unfinished">Erzeugte Dateien</translation>
     </message>
     <message>
         <location filename="preferencedialog.ui" line="39"/>
@@ -684,17 +684,17 @@ Speed %2 kB/s  -  Remaining: %3</source>
     <message>
         <location filename="preferencedialog.ui" line="60"/>
         <source>When a movie belongs to series, a folder will be created for the serie and all episodes will be gathered in this directory.</source>
-        <translation>Falls ein Film zu einer Serie gehört, wird für sie ein Ordner erzeugt, in dem alle Folgen gesammelt werden.</translation>
+        <translation type="unfinished">Falls ein Film zu einer Serie gehört, wird für sie ein Ordner erstellt, in dem alle Folgen gesammelt werden.</translation>
     </message>
     <message>
         <location filename="preferencedialog.ui" line="63"/>
         <source>Place films belonging to series into a dedicated directory</source>
-        <translation>Sammeln aller Folgen in einem Ordner pro Fernsehserie</translation>
+        <translation type="unfinished">Sammeln aller Folgen einer Serie in einem Ordner</translation>
     </message>
     <message>
         <location filename="preferencedialog.ui" line="46"/>
         <source>Filename pattern:</source>
-        <translation>Muster für den Dateinamen:</translation>
+        <translation type="unfinished">Muster für Dateinamen:</translation>
     </message>
     <message>
         <location filename="preferencedialog.cpp" line="85"/>
@@ -709,7 +709,7 @@ Speed %2 kB/s  -  Remaining: %3</source>
     <message>
         <location filename="preferencedialog.cpp" line="100"/>
         <source>Filename pattern is not correct</source>
-        <translation>Muster für den Dateinamen ist nicht korrekt</translation>
+        <translation type="unfinished">Muster für Dateinamen ist nicht korrekt</translation>
     </message>
 </context>
 <context>
