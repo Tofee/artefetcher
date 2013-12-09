@@ -388,15 +388,17 @@ void MainWindow::refreshTable()
     foreach (film, details)
     {
         createOrUpdateTitleColumn(rowNumber);
+        QString durationString;
         if (film->m_durationInMinutes > 0)
         {
 
             QTime duration(0,0);
             duration = duration.addSecs(film->m_durationInMinutes * 60);
-            QTableWidgetItem* item = new QTableWidgetItem(duration.toString());
-            item->setFlags(item->flags()^Qt::ItemIsEditable);
-            ui->tableWidget->setItem(rowNumber, COLUMN_FOR_DURATION, item);
+            durationString = duration.toString();
         }
+        QTableWidgetItem* durationItem = new QTableWidgetItem(durationString);
+        durationItem->setFlags(durationItem->flags()^Qt::ItemIsEditable);
+        ui->tableWidget->setItem(rowNumber, COLUMN_FOR_DURATION, durationItem);
 
         QTableWidgetItem* previewItem = ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW);
         if (previewItem == NULL)
