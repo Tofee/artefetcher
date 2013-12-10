@@ -79,7 +79,7 @@ private slots:
 
     /* Triggered by the downloader*/
     void allFilmDownloadFinished();
-    void downloadProgressed(QString filmUrl, double progression, double speed, double remainingTime);
+    void downloadProgressed(QString filmUrl, double progression, double kBytesPersecond, double remainingTimeForCurrentFilm);
     void filmDownloaded(QString filmUrl);
     void hasBeenPaused();
     void downloadCancelled(QString filmUrl);

@@ -24,6 +24,20 @@ along with ArteFetcher.  If not, see <http://www.gnu.org/licenses/>.
 
 
 Release notes :
+v0.4.0
+  New features:
+   - Windows build
+   - result count per page can be changed by the user
+  UI:
+    - play/open directory buttons are available if the file exists
+    - prevent user to go on illegal page
+    - minor fixes
+    - better progress management
+  Fix: SEGFAULT when canceling the paused download
+  Fix: new regression on film by date (Arte website just changed)
+  Translation fixes
+  Code clean: useless dependencies
+---------------------------------------------------------------
 v0.3.3
   Add proxy support
 ---------------------------------------------------------------
