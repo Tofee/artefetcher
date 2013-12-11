@@ -34,10 +34,12 @@ int main(int argc, char *argv[])
 
     qRegisterMetaType<StreamType>("StreamType");
 
-    // TODO give the language choice in the settings
-    // (for now "export LANG=de_DE.utf8" works fine)
     QTranslator translator;
+#if QT_VERSION >= 0x040800
     translator.load(QLocale::system(), ":/translation/arteFetcher", "_");
+#else
+    translator.load(QString(":/translation/arteFetcher_").append(QLocale::system().name()));
+#endif
     a.installTranslator(&translator);
 
     MainWindow w;
