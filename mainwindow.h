@@ -76,7 +76,7 @@ private slots:
     void clearAndLoadTable();
     void reloadCurrentRow();
     void updateCurrentDetails();
-    void updateRowInTable(const FilmDetails* const film, int rowNumber);
+    void updateRowInTable(const FilmDetails* const film);
 
     /* Triggered by the downloader*/
     void allFilmDownloadFinished();
@@ -122,6 +122,9 @@ private:
     void loadStreamComboBox();
     void changeDownloadPartVisibility(bool isVisible);
     void applyProxySettings();
+    bool eventFilter(QObject *obj, QEvent *event);
+
+    void clicOnPreview();
     
 private:
     Ui::MainWindow *ui;
@@ -129,6 +132,7 @@ private:
     FilmDelegate* delegate;
     Qt::CheckState m_pressedItemCheckState;
     int m_pressedItemRow;
+    int m_currentPreview;
 
     QNetworkProxy m_userDefinedProxy;
 

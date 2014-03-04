@@ -85,7 +85,7 @@ class FilmDetails {
     //TODO mettre tout en privé sauf les accesseurs
 public:
     QString m_title;
-    QImage m_preview;
+    QMap<QString, QImage> m_preview; // preview indexed by image url
     QString m_summary;
 
     double m_rating;

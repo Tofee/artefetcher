@@ -53,7 +53,6 @@ void Preferences::load()
     m_filenamePattern = settings.value(DEF_OPT_FILENAME_PATTERN, "[%language %quality] %title").toString();
     m_destinationDir = settings.value(DEF_OPT_DST_DIR, defaultWorkingPath).toString();
     m_pendingDownloads = settings.value(DEF_OPT_PENDING_DOWNLADS, QStringList()).toStringList();
-    qDebug() << "loading " << m_pendingDownloads;
     m_preferredWindowSize = settings.value(DEF_OPT_PREF_WINDOW_SIZE, QSize(960,600)).toSize();
     m_dedicatedDirectoryForSeries = settings.value(DEF_OPT_DEDICATED_DIR_SERIES, true).toBool();
     m_saveImagePreview = settings.value(DEF_OPT_SAVE_IMAGE_PREVIEW, true).toBool();

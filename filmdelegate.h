@@ -80,9 +80,9 @@ public:
     /**
      * @brief getLineForUrl for an URL of a film
      * @param filmUrl url of the film description page
-     * @return the line in the view containing this film (or -1 if not found)
+     * @return the lines in the view containing this film (or empty list if not found)
      */
-    int getLineForUrl(QString filmUrl);
+    QList<int> getLineForUrl(QString filmUrl);
 
     /**
      * @brief findFilmByUrl find the film for a given url
@@ -149,6 +149,8 @@ private:
 
     int getFilmId(FilmDetails*film) const;
     void commonLoadPlaylist(QString type);
+
+    void fetchImagesFromUrlsInPage(const QString& htmlPage, const FilmDetails * const film, const int pageRequestId);
 
 
     // List of the film description paged shown in the UI

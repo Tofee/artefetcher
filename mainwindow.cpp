@@ -50,8 +50,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     manager(new QNetworkAccessManager(this)),
-        thread (new DownloadManager(this)),
-        m_trayIcon(new QSystemTrayIcon(QIcon(":/img/icon"), this))
+    m_currentPreview(0),
+    thread (new DownloadManager(this)),
+    m_trayIcon(new QSystemTrayIcon(QIcon(":/img/icon"), this))
 {
     Preferences::getInstance();
     applyProxySettings();
@@ -190,6 +191,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->webPageButton, SIGNAL(clicked()), SLOT(webPageButtonClicked()));
 
     connect(ui->pauseButton, SIGNAL(clicked()), thread, SLOT(pause()));
+
+    ui->previewLabel->installEventFilter(this);
 
     clearAndLoadTable();
 
@@ -419,11 +422,9 @@ void MainWindow::refreshTable()
     ui->tableWidget->setRowCount(details.size());
 
     FilmDetails* film;
-    int rowNumber = 0;
     foreach (film, details)
     {
-        updateRowInTable(film, rowNumber);
-        ++rowNumber;
+        updateRowInTable(film);
     }
 
     if (ui->tableWidget->currentRow() < 0 && details.size() > 0 )
@@ -435,61 +436,69 @@ void MainWindow::refreshTable()
 
 }
 
-void MainWindow::updateRowInTable(const FilmDetails* const film, int rowNumber){
+void MainWindow::updateRowInTable(const FilmDetails* const film){
+    if (!film)
+        return;
 
-    createOrUpdateTitleColumn(rowNumber);
-    QString durationString;
-    if (film->m_durationInMinutes > 0)
+    QList<int> rows = delegate->getLineForUrl(film->m_infoUrl);
+
+    int rowNumber;
+    foreach (rowNumber, rows)
     {
+        createOrUpdateTitleColumn(rowNumber);
+        QString durationString;
+        if (film->m_durationInMinutes > 0)
+        {
 
-        QTime duration(0,0);
-        duration = duration.addSecs(film->m_durationInMinutes * 60);
-        durationString = duration.toString();
-    }
-    QTableWidgetItem* durationItem = new QTableWidgetItem(durationString);
-    durationItem->setFlags(durationItem->flags()^Qt::ItemIsEditable);
-    ui->tableWidget->setItem(rowNumber, COLUMN_FOR_DURATION, durationItem);
-
-    QTableWidgetItem* previewItem = ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW);
-    if (previewItem == NULL)
-    {
-        previewItem = new QTableWidgetItem();
-        previewItem->setFlags(previewItem->flags()^Qt::ItemIsEditable);
-        ui->tableWidget->setItem(rowNumber, COLUMN_FOR_PREVIEW, previewItem);
-    }
-    if (film->m_preview.isNull())
-        previewItem->setIcon(QIcon(QPixmap(DEFAULT_FILM_ICON).scaled(TABLE_PREVIEW_MAX_WIDTH, TABLE_PREVIEW_MAX_HEIGHT, Qt::KeepAspectRatio)));
-    else {
-        QImage image = film->m_preview;
-        if (film->m_downloadProgress > 0) {
-            QPainter painter(&image);
-
-            painter.setPen(QPen(Qt::green, PROGRESS_PEN_WIDTH));
-            painter.drawLine(0,PROGRESS_Y_POS_ON_IMAGE,film->m_downloadProgress*MAX_IMAGE_WIDTH/100,PROGRESS_Y_POS_ON_IMAGE);
+            QTime duration(0,0);
+            duration = duration.addSecs(film->m_durationInMinutes * 60);
+            durationString = duration.toString();
         }
-        previewItem->setIcon(QIcon(QPixmap::fromImage(image)));
+        QTableWidgetItem* durationItem = new QTableWidgetItem(durationString);
+        durationItem->setFlags(durationItem->flags()^Qt::ItemIsEditable);
+        ui->tableWidget->setItem(rowNumber, COLUMN_FOR_DURATION, durationItem);
+
+        QTableWidgetItem* previewItem = ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW);
+        if (previewItem == NULL)
+        {
+            previewItem = new QTableWidgetItem();
+            previewItem->setFlags(previewItem->flags()^Qt::ItemIsEditable);
+            ui->tableWidget->setItem(rowNumber, COLUMN_FOR_PREVIEW, previewItem);
+        }
+        if (film->m_preview.isEmpty())
+            previewItem->setIcon(QIcon(QPixmap(DEFAULT_FILM_ICON).scaled(TABLE_PREVIEW_MAX_WIDTH, TABLE_PREVIEW_MAX_HEIGHT, Qt::KeepAspectRatio)));
+        else {
+            QImage image = film->m_preview.values().first();// TODO
+            if (film->m_downloadProgress > 0) {
+                QPainter painter(&image);
+
+                painter.setPen(QPen(Qt::green, PROGRESS_PEN_WIDTH));
+                painter.drawLine(0,PROGRESS_Y_POS_ON_IMAGE,film->m_downloadProgress*MAX_IMAGE_WIDTH/100,PROGRESS_Y_POS_ON_IMAGE);
+            }
+            previewItem->setIcon(QIcon(QPixmap::fromImage(image)));
+
+        }
+
+        bool isEpisode = isFilmAnEpisode(film);
+
+        QString tooltip(buildTooltip(film));
+
+        if (ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW)) {
+            ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW)->setBackgroundColor(isEpisode ? Qt::lightGray : Qt::white);
+            ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW)->setToolTip(tooltip);
+        }
+
+        if (ui->tableWidget->item(rowNumber, COLUMN_FOR_TITLE)) {
+            ui->tableWidget->item(rowNumber, COLUMN_FOR_TITLE)->setBackgroundColor(isEpisode ? Qt::lightGray : Qt::white);
+            ui->tableWidget->item(rowNumber, COLUMN_FOR_TITLE)->setToolTip(tooltip);
+        }
+
+        if (ui->tableWidget->item(rowNumber, COLUMN_FOR_DURATION)) {
+            ui->tableWidget->item(rowNumber, COLUMN_FOR_DURATION)->setBackgroundColor(isEpisode ? Qt::lightGray : Qt::white);
+            ui->tableWidget->item(rowNumber, COLUMN_FOR_DURATION)->setToolTip(tooltip);
+        }
 
     }
-
-    bool isEpisode = isFilmAnEpisode(film);
-
-    QString tooltip(buildTooltip(film));
-
-    if (ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW)) {
-        ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW)->setBackgroundColor(isEpisode ? Qt::lightGray : Qt::white);
-        ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW)->setToolTip(tooltip);
-    }
-
-    if (ui->tableWidget->item(rowNumber, COLUMN_FOR_TITLE)) {
-        ui->tableWidget->item(rowNumber, COLUMN_FOR_TITLE)->setBackgroundColor(isEpisode ? Qt::lightGray : Qt::white);
-        ui->tableWidget->item(rowNumber, COLUMN_FOR_TITLE)->setToolTip(tooltip);
-    }
-
-    if (ui->tableWidget->item(rowNumber, COLUMN_FOR_DURATION)) {
-        ui->tableWidget->item(rowNumber, COLUMN_FOR_DURATION)->setBackgroundColor(isEpisode ? Qt::lightGray : Qt::white);
-        ui->tableWidget->item(rowNumber, COLUMN_FOR_DURATION)->setToolTip(tooltip);
-    }
-
 }
 
 
@@ -523,8 +532,11 @@ bool MainWindow::fileExistForTheFilm(const FilmDetails * const film) const {
     return QFile(filename).exists() || QFile(filename.append(".part")).exists();
 }
 
-void MainWindow::updateCurrentDetails(){
+void MainWindow::updateCurrentDetails() {
      FilmDetails* film = getCurrentFilm();
+     if (film == NULL)
+         return;
+
      bool hasDownloadStarted = film && (film->m_downloadStatus == DL_DOWNLOADING || film->m_downloadStatus == DL_DOWNLOADED || film->m_downloadStatus == DL_ERROR || fileExistForTheFilm(film));
 
      ui->openDirectoryButton->setVisible(hasDownloadStarted);
@@ -554,9 +566,9 @@ void MainWindow::updateCurrentDetails(){
 
     prefix.append("<br/>");
     ui->summaryLabel->setText(prefix.append(film->m_summary));
-    if (!film->m_preview.isNull())
+    if (!film->m_preview.isEmpty())
     {
-        ui->previewLabel->setPixmap(QPixmap::fromImage(film->m_preview));
+        ui->previewLabel->setPixmap(QPixmap::fromImage(film->m_preview.values().value(m_currentPreview % film->m_preview.size())));
     }
     else
     {
@@ -721,54 +733,55 @@ QString MainWindow::getFileName(const QString& title, const QString& remoteFilen
 }
 
 void MainWindow::downloadFilm(FilmDetails* film){
-    if (isReadyForDownload(film))
+    if (!isReadyForDownload(film))
+        return;
+
+    // keep existing file name, in case the download has been requested in a previous execution
+    // if this name is empty, build a filename.
+    QString futureFileName = film->m_targetFileName;
+    if (futureFileName.isEmpty())
     {
-        // keep existing file name, in case the download has been requested in a previous execution
-        // if this name is empty, build a filename.
-        QString futureFileName = film->m_targetFileName;
-        if (futureFileName.isEmpty())
-        {
-            futureFileName = getFileName(film->m_title, film->m_streamUrl, 0, film->m_metadata.value(Episode_name));
-        }
+        futureFileName = getFileName(film->m_title, film->m_streamUrl, 0, film->m_metadata.value(Episode_name));
+    }
 
-        // If a pending download has the same name, append a file suffix number
-        int fileSuffixNumber = 1;
-        foreach(QString otherFilmUrl, delegate->downloadList())
+    // If a pending download has the same name, append a file suffix number
+    int fileSuffixNumber = 1;
+    foreach(QString otherFilmUrl, delegate->downloadList())
+    {
+        FilmDetails* otherFilm = delegate->findFilmByUrl(otherFilmUrl);
+        if (otherFilm)
         {
-            FilmDetails* otherFilm = delegate->findFilmByUrl(otherFilmUrl);
-            if (otherFilm)
+            if (otherFilm->m_targetFileName == futureFileName)
             {
-                if (otherFilm->m_targetFileName == futureFileName)
-                {
-                    // TODO faut aussi stocker ce futureFileName dans le fichier de conf de l'appli,
-                    //      sinon au redémarrage, si on reprend le téléchargement dans un ordre différent, les vidéos seront mélangées.
-                    futureFileName = getFileName(film->m_title, film->m_streamUrl, fileSuffixNumber, film->m_metadata.value(Episode_name));
-                }
+                // TODO faut aussi stocker ce futureFileName dans le fichier de conf de l'appli,
+                //      sinon au redémarrage, si on reprend le téléchargement dans un ordre différent, les vidéos seront mélangées.
+                futureFileName = getFileName(film->m_title, film->m_streamUrl, fileSuffixNumber, film->m_metadata.value(Episode_name));
             }
-        }
-
-        // Check the file (not .part) does not exist.
-        if (QFile(futureFileName).exists()
-                && QMessageBox::question(this, tr("File already exists"),
-                                  tr("A file with the same name already exists:\n%1\nDo you want to continue and replace it?")
-                                         .arg(futureFileName),
-                                  QMessageBox::Yes,
-                                  QMessageBox::No)
-                    == QMessageBox::No)
-        {
-            film->m_downloadStatus = DL_CANCELLED;
-        }
-        else
-        {
-            film->m_downloadStatus = DL_REQUESTED;
-            film->m_targetFileName = futureFileName;
-
-            delegate->addUrlToDownloadList(film->m_infoUrl); // TODO c'est trop trop moche de faire ça. Design à revoir
-            thread->addFilmToDownloadQueue(film->m_infoUrl, *film);
         }
     }
 
-    refreshTable();
+    // Check the file (not .part) does not exist.
+    if (QFile(futureFileName).exists()
+            && QMessageBox::question(this, tr("File already exists"),
+                              tr("A file with the same name already exists:\n%1\nDo you want to continue and replace it?")
+                                     .arg(futureFileName),
+                              QMessageBox::Yes,
+                              QMessageBox::No)
+                == QMessageBox::No)
+    {
+        film->m_downloadStatus = DL_CANCELLED;
+    }
+    else
+    {
+        film->m_downloadStatus = DL_REQUESTED;
+        film->m_targetFileName = futureFileName;
+
+        delegate->addUrlToDownloadList(film->m_infoUrl); // TODO c'est trop trop moche de faire ça. Design à revoir
+        thread->addFilmToDownloadQueue(film->m_infoUrl, *film);
+    }
+
+    updateRowInTable(film);
+    updateCurrentDetails();
 }
 
 void MainWindow::changeDownloadPartVisibility(bool isVisible)
@@ -819,6 +832,21 @@ void MainWindow::showAboutWindow() {
     popup.exec();
 }
 
+bool MainWindow::eventFilter(QObject *obj, QEvent *event)
+{
+    if (obj == ui->previewLabel && event->type() == QEvent::MouseButtonPress)
+    {
+        clicOnPreview();
+        return true;
+    }
+    return QObject::eventFilter(obj, event);
+}
+
+void MainWindow::clicOnPreview() {
+    m_currentPreview = m_currentPreview + 1;
+    updateCurrentDetails();
+}
+
 void MainWindow::allFilmDownloadFinished()
 {
     changeDownloadPartVisibility(false);
@@ -831,14 +859,14 @@ void MainWindow::downloadProgressed(QString filmUrl, double progression, double 
     changeDownloadPartVisibility(true);
 
     FilmDetails* film = delegate->findFilmByUrl(filmUrl);
+    if (!film)
+        return;
+
     QString filmFileName("...");
-    if (film)
-    {
-        filmFileName = film->m_targetFileName;
-        film->m_downloadStatus = DL_DOWNLOADING;
-        film->m_downloadProgress = progression;
-        refreshTable();
-    }
+
+    filmFileName = film->m_targetFileName;
+    film->m_downloadStatus = DL_DOWNLOADING;
+    film->m_downloadProgress = progression;
 
     double totalProgress = delegate->computeTotalDownloadProgress();
     double totalFilmsDuration = delegate->computeTotalDownloadRequestedDuration();
@@ -862,14 +890,9 @@ void MainWindow::downloadProgressed(QString filmUrl, double progression, double 
     }
 
     statusBar()->showMessage((tr("%1 item(s) in queue").arg(thread->queueSize())));
-    int filmId = delegate->getLineForUrl(filmUrl);
 
-    if (filmId >= 0)
-    {
-        updateRowInTable(film, filmId);
-        if (filmId == ui->tableWidget->currentRow())
-            updateCurrentDetails();
-    }
+    updateRowInTable(film);
+    updateCurrentDetails();
 }
 
 void MainWindow::downloadCancelled(QString filmUrl)
@@ -878,7 +901,8 @@ void MainWindow::downloadCancelled(QString filmUrl)
     if (film)
     {
         film->m_downloadStatus = DL_CANCELLED;
-        refreshTable();
+        updateRowInTable(film);
+        updateCurrentDetails();
     }
 }
 
@@ -888,7 +912,8 @@ void MainWindow::downloadError(QString filmUrl, QString errorMsg){
     {
         film->m_errors.append(tr("Download error: %1").arg(errorMsg));
         film->m_downloadStatus = DL_ERROR;
-        refreshTable();
+        updateRowInTable(film);
+        updateCurrentDetails();
     }
 }
 
@@ -899,52 +924,46 @@ void MainWindow::hasBeenPaused() {
 void MainWindow::filmDownloaded(QString filmUrl)
 {
     FilmDetails * film = delegate->findFilmByUrl(filmUrl);
-    if (film)
-    {
-        // All of that should be done in the delegate!!
-        film->m_downloadStatus = DL_DOWNLOADED;
+    if (film == NULL)
+        return;
+    // All of that should be done in the delegate!!
+    film->m_downloadStatus = DL_DOWNLOADED;
 
-        QFileInfo filmFile(film->m_targetFileName);
+    QFileInfo filmFile(film->m_targetFileName);
 
-        // Save metadata
-        if (Preferences::getInstance()->saveMetaInInfoFile()) {
-            QFile metadataFile(filmFile.absolutePath() + QDir::separator() + filmFile.completeBaseName() + ".info");
-            metadataFile.open(QFile::WriteOnly|QFile::Text);
-            QTextStream stream (&metadataFile);
-            stream<< film->m_title << "\n";
+    // Save metadata
+    if (Preferences::getInstance()->saveMetaInInfoFile()) {
+        QFile metadataFile(filmFile.absolutePath() + QDir::separator() + filmFile.completeBaseName() + ".info");
+        metadataFile.open(QFile::WriteOnly|QFile::Text);
+        QTextStream stream (&metadataFile);
+        stream<< film->m_title << "\n";
 
-            foreach (MetaType key, listInterestingDetails())
-            {
-                QString value = film->m_metadata.value(key);
-                stream << FilmDetails::enum2Str(key) << ": " << value << "\n";
-            }
-            stream<< film->m_summary;
-
-            stream.flush();
-            metadataFile.close();
+        foreach (MetaType key, listInterestingDetails())
+        {
+            QString value = film->m_metadata.value(key);
+            stream << FilmDetails::enum2Str(key) << ": " << value << "\n";
         }
+        stream<< film->m_summary;
 
-        // Save preview picture
-        if (Preferences::getInstance()->saveImagePreview()) {
-            QFile picture(filmFile.absolutePath() + QDir::separator() + filmFile.completeBaseName() + ".png");
+        stream.flush();
+        metadataFile.close();
+    }
+
+    // Save preview picture
+    if (Preferences::getInstance()->saveImagePreview()) {
+        int count(1);
+        foreach(QImage image, film->m_preview.values()) {
+            QFile picture(QString("%1%2%3_%4.png").arg(filmFile.absolutePath(), QDir::separator(), filmFile.completeBaseName(), QString::number(count)));
             picture.open(QFile::WriteOnly);
             QImageWriter writer(&picture, "PNG");
-            writer.write(film->m_preview);
+            writer.write(image);
             picture.close();
+            ++count;
         }
     }
 
-    int filmId = delegate->getLineForUrl(filmUrl);
-
-    if (filmId >= 0)
-    {
-        refreshTable();
-    }
-
-    if (filmId == ui->tableWidget->currentRow())
-    {
-        updateCurrentDetails();
-    }
+    updateRowInTable(film);
+    updateCurrentDetails();
 }
 
 void MainWindow::reloadCurrentRow()
@@ -979,7 +998,8 @@ void MainWindow::errorOccured(QString filmUrl, QString errorMessage)
     film->m_errors.append(errorMessage);
     qDebug() << errorMessage << " for " << filmUrl;
 
-    refreshTable();
+    updateRowInTable(film);
+    updateCurrentDetails();
 }
 
 void MainWindow::showPreferences()
