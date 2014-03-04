@@ -94,11 +94,12 @@ public:
 
     void addUrlToDownloadList(QString url)
     {
-        m_currentDownloads << url;
+        if (!m_currentDownloads.contains(url))
+            m_currentDownloads << url;
     }
 
     QStringList downloadList() const {
-        return m_currentDownloads.toList();
+        return m_currentDownloads;
     }
 
     double computeTotalDownloadProgress() const;
@@ -151,8 +152,8 @@ private:
 
 
     // List of the film description paged shown in the UI
-    QSet<QString> m_visibleFilms;
-    QSet<QString> m_currentDownloads;
+    QList<QString> m_visibleFilms;
+    QList<QString> m_currentDownloads;
 
     // Indexed by the url of the film description page
     QMap<QString, FilmDetails*> m_films;

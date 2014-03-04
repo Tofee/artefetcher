@@ -76,6 +76,7 @@ private slots:
     void clearAndLoadTable();
     void reloadCurrentRow();
     void updateCurrentDetails();
+    void updateRowInTable(const FilmDetails* const film, int rowNumber);
 
     /* Triggered by the downloader*/
     void allFilmDownloadFinished();

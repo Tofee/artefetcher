@@ -115,7 +115,7 @@ FilmDelegate::FilmDelegate(QNetworkAccessManager * in_manager)
 
 FilmDelegate::~FilmDelegate()
 {
-    QSet<QString> pendingDownloads;
+    QList<QString> pendingDownloads;
     foreach (QString dlUrl, m_currentDownloads)
     {
         FilmDetails* film = findFilmByUrl(dlUrl);
@@ -583,7 +583,7 @@ StreamType FilmDelegate::getStreamTypeByHumanName(const QString& humanName) thro
 
 int FilmDelegate::getLineForUrl(QString filmUrl)
 {
-    return m_visibleFilms.toList().indexOf(filmUrl);
+    return m_visibleFilms.indexOf(filmUrl);
 }
 
 /**

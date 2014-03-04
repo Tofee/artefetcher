@@ -305,6 +305,57 @@ bool isTeaserFromOriginalMovie(const FilmDetails& film)
                                      && "ARTE+7" != film.m_metadata.value(Preview_Or_ArteP7);
 }
 
+bool isFilmAnEpisode(const FilmDetails* const film){
+    return !film->m_metadata.value(Episode_name).isEmpty();
+}
+
+void appendWithNewLine(QString& stringToChange, const QString & addition)
+{
+    if (!stringToChange.isEmpty())
+    {
+        stringToChange.append("\n");
+    }
+    stringToChange.append(addition);
+}
+
+QString buildTooltip(const FilmDetails* const film){
+    QString tooltip;
+
+    if (isFilmAnEpisode(film))
+    {
+        tooltip = QObject::tr("Episode: %1").arg(film->m_metadata.value(Episode_name));
+    }
+
+    if (! film->m_errors.empty())
+    {
+        appendWithNewLine(tooltip, film->m_errors.join("\n"));
+    }
+
+    switch (film->m_downloadStatus)
+    {
+    case DL_REQUESTED:
+        appendWithNewLine(tooltip, QObject::tr("Download pending"));
+        break;
+    case DL_DOWNLOADING:
+        appendWithNewLine(tooltip, QObject::tr("Download in progress: %1%2").arg(film->m_downloadProgress).arg("%"));
+        break;
+    case DL_DOWNLOADED:
+        appendWithNewLine(tooltip, QObject::tr("Download finished"));
+        break;
+    case DL_CANCELLED:
+        appendWithNewLine(tooltip, QObject::tr("Download has been cancelled."));
+        break;
+    case DL_ERROR:
+        appendWithNewLine(tooltip, QObject::tr("Previous download failed."));
+        break;
+    default:
+    case DL_NONE:
+        break;
+    }
+
+    return tooltip;
+}
+
 QTableWidgetItem* MainWindow::createOrUpdateTitleColumn(int rowNumber)
 {
     QTableWidgetItem* titleTableItem = ui->tableWidget->item(rowNumber, COLUMN_FOR_TITLE);
@@ -323,26 +374,10 @@ QTableWidgetItem* MainWindow::createOrUpdateTitleColumn(int rowNumber)
         return titleTableItem;
     }
 
-    titleTableItem->setToolTip("");
     titleTableItem->setIcon(QIcon());
     if (! film->m_errors.empty())
     {
         titleTableItem->setIcon(QIcon(":/img/warning"));
-        titleTableItem->setToolTip(film->m_errors.join("\n"));
-    } else if (film->m_downloadStatus == DL_ERROR)
-    {
-        titleTableItem->setToolTip(tr("Previous download failed."));
-    }
-
-    if (film->m_metadata.contains(Episode_name))
-    {
-        QString newTooltip = tr("Episode: %1").arg(film->m_metadata.value(Episode_name));
-        QString previousTooltip = titleTableItem->toolTip();
-        if (!previousTooltip.isEmpty())
-        {
-            newTooltip.append("\n\n").append(previousTooltip);
-        }
-        titleTableItem->setToolTip(newTooltip);
     }
 
     if (isTeaserFromOriginalMovie(*film)) {
@@ -387,57 +422,7 @@ void MainWindow::refreshTable()
     int rowNumber = 0;
     foreach (film, details)
     {
-        createOrUpdateTitleColumn(rowNumber);
-        QString durationString;
-        if (film->m_durationInMinutes > 0)
-        {
-
-            QTime duration(0,0);
-            duration = duration.addSecs(film->m_durationInMinutes * 60);
-            durationString = duration.toString();
-        }
-        QTableWidgetItem* durationItem = new QTableWidgetItem(durationString);
-        durationItem->setFlags(durationItem->flags()^Qt::ItemIsEditable);
-        ui->tableWidget->setItem(rowNumber, COLUMN_FOR_DURATION, durationItem);
-
-        QTableWidgetItem* previewItem = ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW);
-        if (previewItem == NULL)
-        {
-            previewItem = new QTableWidgetItem();
-            previewItem->setFlags(previewItem->flags()^Qt::ItemIsEditable);
-            ui->tableWidget->setItem(rowNumber, COLUMN_FOR_PREVIEW, previewItem);
-        }
-        if (film->m_preview.isNull())
-            previewItem->setIcon(QIcon(QPixmap(DEFAULT_FILM_ICON).scaled(TABLE_PREVIEW_MAX_WIDTH, TABLE_PREVIEW_MAX_HEIGHT, Qt::KeepAspectRatio)));
-        else {
-            QImage image = film->m_preview;
-            if (film->m_downloadProgress > 0) {
-                QPainter painter(&image);
-
-                painter.setPen(QPen(Qt::green, PROGRESS_PEN_WIDTH));
-                painter.drawLine(0,PROGRESS_Y_POS_ON_IMAGE,film->m_downloadProgress*MAX_IMAGE_WIDTH/100,PROGRESS_Y_POS_ON_IMAGE);
-            }
-            previewItem->setIcon(QIcon(QPixmap::fromImage(image)));
-
-        }
-
-
-        bool isEpisode=film->m_metadata.contains(Episode_name);
-
-            if (ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW)) {
-                ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW)->setBackgroundColor(isEpisode ? Qt::lightGray : Qt::white);
-                ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW)->setToolTip(tr("Episode: %1").arg(film->m_metadata.value(Episode_name)));
-            }
-
-            if (ui->tableWidget->item(rowNumber, COLUMN_FOR_TITLE)) {
-                ui->tableWidget->item(rowNumber, COLUMN_FOR_TITLE)->setBackgroundColor(isEpisode ? Qt::lightGray : Qt::white);
-            }
-
-            if (ui->tableWidget->item(rowNumber, COLUMN_FOR_DURATION)) {
-                ui->tableWidget->item(rowNumber, COLUMN_FOR_DURATION)->setBackgroundColor(isEpisode ? Qt::lightGray : Qt::white);
-                ui->tableWidget->item(rowNumber, COLUMN_FOR_DURATION)->setToolTip(tr("Episode: %1").arg(film->m_metadata.value(Episode_name)));
-            }
-
+        updateRowInTable(film, rowNumber);
         ++rowNumber;
     }
 
@@ -449,6 +434,65 @@ void MainWindow::refreshTable()
     updateCurrentDetails();
 
 }
+
+void MainWindow::updateRowInTable(const FilmDetails* const film, int rowNumber){
+
+    createOrUpdateTitleColumn(rowNumber);
+    QString durationString;
+    if (film->m_durationInMinutes > 0)
+    {
+
+        QTime duration(0,0);
+        duration = duration.addSecs(film->m_durationInMinutes * 60);
+        durationString = duration.toString();
+    }
+    QTableWidgetItem* durationItem = new QTableWidgetItem(durationString);
+    durationItem->setFlags(durationItem->flags()^Qt::ItemIsEditable);
+    ui->tableWidget->setItem(rowNumber, COLUMN_FOR_DURATION, durationItem);
+
+    QTableWidgetItem* previewItem = ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW);
+    if (previewItem == NULL)
+    {
+        previewItem = new QTableWidgetItem();
+        previewItem->setFlags(previewItem->flags()^Qt::ItemIsEditable);
+        ui->tableWidget->setItem(rowNumber, COLUMN_FOR_PREVIEW, previewItem);
+    }
+    if (film->m_preview.isNull())
+        previewItem->setIcon(QIcon(QPixmap(DEFAULT_FILM_ICON).scaled(TABLE_PREVIEW_MAX_WIDTH, TABLE_PREVIEW_MAX_HEIGHT, Qt::KeepAspectRatio)));
+    else {
+        QImage image = film->m_preview;
+        if (film->m_downloadProgress > 0) {
+            QPainter painter(&image);
+
+            painter.setPen(QPen(Qt::green, PROGRESS_PEN_WIDTH));
+            painter.drawLine(0,PROGRESS_Y_POS_ON_IMAGE,film->m_downloadProgress*MAX_IMAGE_WIDTH/100,PROGRESS_Y_POS_ON_IMAGE);
+        }
+        previewItem->setIcon(QIcon(QPixmap::fromImage(image)));
+
+    }
+
+    bool isEpisode = isFilmAnEpisode(film);
+
+    QString tooltip(buildTooltip(film));
+
+    if (ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW)) {
+        ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW)->setBackgroundColor(isEpisode ? Qt::lightGray : Qt::white);
+        ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW)->setToolTip(tooltip);
+    }
+
+    if (ui->tableWidget->item(rowNumber, COLUMN_FOR_TITLE)) {
+        ui->tableWidget->item(rowNumber, COLUMN_FOR_TITLE)->setBackgroundColor(isEpisode ? Qt::lightGray : Qt::white);
+        ui->tableWidget->item(rowNumber, COLUMN_FOR_TITLE)->setToolTip(tooltip);
+    }
+
+    if (ui->tableWidget->item(rowNumber, COLUMN_FOR_DURATION)) {
+        ui->tableWidget->item(rowNumber, COLUMN_FOR_DURATION)->setBackgroundColor(isEpisode ? Qt::lightGray : Qt::white);
+        ui->tableWidget->item(rowNumber, COLUMN_FOR_DURATION)->setToolTip(tooltip);
+    }
+
+}
+
+
 
 const QList<MetaType>& MainWindow::listInterestingDetails() {
     static QList<MetaType> shownMetadata;
@@ -801,6 +845,7 @@ void MainWindow::downloadProgressed(QString filmUrl, double progression, double 
     ui->progressBar->setValue(totalProgress);
 
     double filmLeftSize = (100. - progression) * film->m_durationInMinutes;
+
     if (remainingTimeForCurrentFilm != 0 && filmLeftSize != 0)
     {
         double speed = filmLeftSize  / remainingTimeForCurrentFilm;
@@ -821,11 +866,12 @@ void MainWindow::downloadProgressed(QString filmUrl, double progression, double 
 
     if (filmId >= 0)
     {
-        createOrUpdateTitleColumn(filmId);
+        updateRowInTable(film, filmId);
         if (filmId == ui->tableWidget->currentRow())
             updateCurrentDetails();
     }
 }
+
 void MainWindow::downloadCancelled(QString filmUrl)
 {
     FilmDetails* film = delegate->findFilmByUrl(filmUrl);

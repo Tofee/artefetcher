@@ -52,7 +52,8 @@ void Preferences::load()
     m_selectedQuality = settings.value(DEF_OPT_STR_QUALITY, FilmDelegate::listQualities().first()).toString();
     m_filenamePattern = settings.value(DEF_OPT_FILENAME_PATTERN, "[%language %quality] %title").toString();
     m_destinationDir = settings.value(DEF_OPT_DST_DIR, defaultWorkingPath).toString();
-    m_pendingDownloads = QSet<QString>::fromList(settings.value(DEF_OPT_PENDING_DOWNLADS, QStringList()).toStringList());
+    m_pendingDownloads = settings.value(DEF_OPT_PENDING_DOWNLADS, QStringList()).toStringList();
+    qDebug() << "loading " << m_pendingDownloads;
     m_preferredWindowSize = settings.value(DEF_OPT_PREF_WINDOW_SIZE, QSize(960,600)).toSize();
     m_dedicatedDirectoryForSeries = settings.value(DEF_OPT_DEDICATED_DIR_SERIES, true).toBool();
     m_saveImagePreview = settings.value(DEF_OPT_SAVE_IMAGE_PREVIEW, true).toBool();
@@ -70,7 +71,7 @@ void Preferences::save()
     settings.setValue(DEF_OPT_STR_QUALITY, m_selectedQuality);
     settings.setValue(DEF_OPT_FILENAME_PATTERN, m_filenamePattern);
     settings.setValue(DEF_OPT_DST_DIR, m_destinationDir);
-    settings.setValue(DEF_OPT_PENDING_DOWNLADS, QStringList(m_pendingDownloads.toList()));
+    settings.setValue(DEF_OPT_PENDING_DOWNLADS, QStringList(m_pendingDownloads));
     settings.setValue(DEF_OPT_PREF_WINDOW_SIZE, m_preferredWindowSize);
     settings.setValue(DEF_OPT_DEDICATED_DIR_SERIES, m_dedicatedDirectoryForSeries);
     settings.setValue(DEF_OPT_SAVE_IMAGE_PREVIEW, m_saveImagePreview);

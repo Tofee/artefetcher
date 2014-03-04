@@ -55,11 +55,11 @@ public:
     {
         return m_destinationDir;
     }
-    const QSet<QString> &pendingDownloads() const
+    const QList<QString> &pendingDownloads() const
     {
         return m_pendingDownloads;
     }
-    void setPendingDownloads(QSet<QString> downloadUrls){
+    void setPendingDownloads(QList<QString> downloadUrls){
         m_pendingDownloads = downloadUrls;
     }
 
@@ -116,7 +116,7 @@ protected:
     QString m_filenamePattern;
     QString m_destinationDir;
     QSize   m_preferredWindowSize;
-    QSet<QString> m_pendingDownloads;
+    QList<QString> m_pendingDownloads;
     bool    m_dedicatedDirectoryForSeries;
     bool    m_saveImagePreview;
     bool    m_saveMetaInInfoFile;
