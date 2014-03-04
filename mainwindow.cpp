@@ -977,7 +977,7 @@ void MainWindow::errorOccured(QString filmUrl, QString errorMessage)
     if (!film)
         return;
     film->m_errors.append(errorMessage);
-    qError() << errorMessage << " for " << filmUrl;
+    qDebug() << errorMessage << " for " << filmUrl;
 
     refreshTable();
 }
