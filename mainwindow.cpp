@@ -53,7 +53,7 @@ MainWindow::MainWindow(QWidget *parent) :
         thread (new DownloadManager(this)),
         m_trayIcon(new QSystemTrayIcon(QIcon(":/img/icon"), this))
 {
-    Preferences::getInstance()->load();
+    Preferences::getInstance();
     applyProxySettings();
 
     ui->setupUi(this);
@@ -931,7 +931,7 @@ void MainWindow::errorOccured(QString filmUrl, QString errorMessage)
     if (!film)
         return;
     film->m_errors.append(errorMessage);
-    qDebug() << errorMessage;
+    qError() << errorMessage << " for " << filmUrl;
 
     refreshTable();
 }

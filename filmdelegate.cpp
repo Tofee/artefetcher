@@ -31,6 +31,9 @@
 #include <QScriptValue>
 
 #define ARTE_PLAYLIST_URL "http://videos.arte.tv/fr/videos/playlistplaylist/index--3259492.html"
+#define ARTE_SEARCH_URL_FR "http://www.arte.tv/guide/fr/resultats-de-recherche?keyword=%1"
+#define ARTE_SEARCH_URL_DE "http://www.arte.tv/guide/de/suchergebnisse?keyword=%1"
+
 #define VIDEO_LINE_HTML_BEGIN "<div id=\"myPlaylistCont\">" //aaa<h2><a href=\"/fr/videos/"
 
 #define VIDEO_URL_PREFIX "http://videos.arte.tv/fr/videos/"
@@ -176,11 +179,11 @@ void FilmDelegate::loadPlayList(QString url)
             return;
         }
         if (language.toLower() == "fr"){
-            url = QString("http://www.arte.tv/guide/fr/resultats-de-recherche?keyword=%1")
+            url = QString(ARTE_SEARCH_URL_FR)
                 .arg(search);
         }
         else {
-            url = QString("http://www.arte.tv/guide/de/suchergebnisse?keyword=%1")
+            url = QString(ARTE_SEARCH_URL_DE)
                 .arg(search);
         }
         type = MAPPER_STEP_SEARCH;
@@ -666,8 +669,11 @@ void FilmDelegate::reloadFilm(FilmDetails* film)
 
 bool FilmDelegate::addMovieFromUrl(const QString url, QString title)
 {
-    if (!url.startsWith("http://www.arte.tv/guide/fr/"))
+    if (!url.startsWith("http://www.arte.tv/guide/"))
+    {
+        qWarning() << QString("Warning: cannot add %1: %2 is not compatible with ArteFetcher").arg(title, url);
         return false;
+    }
 
     FilmDetails* film;
     if (m_films.contains(url))

@@ -133,8 +133,8 @@ class Preferences: public IPreferences
 {
 private:
     Preferences();
-public:
     void load();
+public:
     void save();
 
     static Preferences* getInstance() {
