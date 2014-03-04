@@ -272,6 +272,26 @@ void addMetadataIfNotEmpty(FilmDetails* film, QVariantMap inputMap, QString fiel
     }
 }
 
+void FilmDelegate::fetchImagesFromUrlsInPage(const QString& htmlPage,
+                                             const FilmDetails * const film,
+                                             const int pageRequestId)
+{
+    QRegExp imageRegExp("(http://www\\.arte\\.tv/papi/tvguide/images[^\"]+.jpg)");
+    imageRegExp.setMinimal(true);
+
+    int pos(0);
+    QSet<QString> fetchedImage;
+    while ((pos = imageRegExp.indexIn(htmlPage, pos)) != -1) {
+         pos += imageRegExp.matchedLength();
+
+        QString imageUrl = imageRegExp.capturedTexts().at(0);
+        if (film->m_preview.contains(imageUrl) || fetchedImage.contains(imageUrl))
+            continue;
+        downloadUrl(imageUrl, pageRequestId, film->m_infoUrl, MAPPER_STEP_CODE_4_PREVIEW);
+        fetchedImage << imageUrl;
+    }
+}
+
 void FilmDelegate::requestReadyToRead(QObject* object)
 {
     QNetworkReply* reply = qobject_cast<QNetworkReply *>(m_signalMapper->mapping(object));
@@ -351,7 +371,7 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                     if (m_films.contains(url))
                     {
                         m_visibleFilms << url;
-                        if (m_films.value(url)->m_preview.isNull() || m_films.value(url)->m_streamUrl.isNull())
+                        if (m_films.value(url)->m_preview.isEmpty() || m_films.value(url)->m_streamUrl.isNull())
                         {
                             // refresh incomplete cache
                             reloadFilm(m_films.value(url));
@@ -417,6 +437,13 @@ void FilmDelegate::requestReadyToRead(QObject* object)
             {
                 downloadUrl(jsonUrl, pageRequestId, film->m_infoUrl, MAPPER_STEP_CODE_2_XML);
             }
+
+
+            // Fetch all images for the page
+            fetchImagesFromUrlsInPage(page, film, pageRequestId);
+
+
+
             // jsonUrl = http://org-www.arte.tv/papi/tvguide/videos/stream/player/F/048473-089_PLUS7-F/ALL/ALL.json
         }
         else if (itemStep == MAPPER_STEP_CODE_2_XML)
@@ -446,6 +473,7 @@ void FilmDelegate::requestReadyToRead(QObject* object)
             videoStreamUrl.append(Preferences::getInstance()->selectedLanguage() == "fr" ? "F/" : "D/");
             videoStreamUrl.append(filmCode);
             videoStreamUrl.append("/ALL/ALL.json");
+            qDebug() << videoStreamUrl;
             downloadUrl(videoStreamUrl, pageRequestId, film->m_infoUrl, QString(MAPPER_STEP_CODE_3_RTMP));
 
             QScriptEngine engine;
@@ -545,12 +573,14 @@ void FilmDelegate::requestReadyToRead(QObject* object)
         }
         else if (itemStep == MAPPER_STEP_CODE_4_PREVIEW)
         {
-            if (film->m_preview.isNull())
+            if (!film->m_preview.contains(reply->url().toString()))
             {
-                film->m_preview.load(reply,"jpg");
-                if (! film->m_preview.isNull())
+                QImage image;
+                image.load(reply, "jpg");
+
+                if (! image.isNull())
                 {
-                    film->m_preview = film->m_preview.scaled(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT, Qt::KeepAspectRatio);
+                    film->m_preview[reply->url().toString()] = image.scaled(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT, Qt::KeepAspectRatio);
                     emit playListHasBeenUpdated();
                 }
                 else
@@ -581,9 +611,16 @@ StreamType FilmDelegate::getStreamTypeByHumanName(const QString& humanName) thro
 }
 
 
-int FilmDelegate::getLineForUrl(QString filmUrl)
+QList<int> FilmDelegate::getLineForUrl(QString filmUrl)
 {
-    return m_visibleFilms.indexOf(filmUrl);
+    QList<int> indexes;
+    int offset(0);
+    while ((offset = m_visibleFilms.indexOf(filmUrl, offset)) >= 0)
+    {
+        indexes << offset;
+        offset++;
+    }
+    return indexes;
 }
 
 /**
