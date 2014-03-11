@@ -116,6 +116,7 @@ public:
 
 signals:
     void playListHasBeenUpdated();
+    void filmHasBeenUpdated(const FilmDetails * const film);
     void errorOccured(QString filmUrl, QString errorMessage);
     void streamIndexLoaded(int resultCount, int currentPage, int pageCount);
 private slots:

@@ -75,6 +75,7 @@ private slots:
     void refreshTable();
     void clearAndLoadTable();
     void reloadCurrentRow();
+    void filmHasBeenUpdated(const FilmDetails * const film);
     void updateCurrentDetails();
     void updateRowInTable(const FilmDetails* const film);
 

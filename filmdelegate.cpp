@@ -157,6 +157,7 @@ void FilmDelegate::loadPlayList(QString url)
     }
     else if (url.startsWith(DATE_STREAM_PREFIX))
     {
+        m_visibleFilms.clear();
         QStringList urlParts = url.split(":");
         QString language = urlParts.at(2);
         QString dateString = urlParts.at(3);
@@ -210,6 +211,13 @@ void FilmDelegate::loadPreviousPage(){
 
 void FilmDelegate::commonLoadPlaylist(QString type) {
     ++m_lastRequestPageId;
+    // Aborting all deprecated download request
+    QList<QNetworkReply*> oldRequests(m_manager->findChildren<QNetworkReply*>());
+    foreach (QNetworkReply* old, oldRequests){
+        old->abort();
+        old->deleteLater();
+    }
+
     m_visibleFilms.clear();
     m_initialyCatalog = (type == MAPPER_STEP_CATALOG);
     downloadUrl(m_lastPlaylistUrl, m_lastRequestPageId, QString(), type);
@@ -340,8 +348,8 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                  else {
                      m_visibleFilms << newUrl;
                  }
-                 emit(playListHasBeenUpdated());
              }
+             emit(playListHasBeenUpdated());
 
         }
         else if (itemStep == MAPPER_STEP_CATALOG || itemStep == MAPPER_STEP_DATE) {
@@ -473,7 +481,7 @@ void FilmDelegate::requestReadyToRead(QObject* object)
             videoStreamUrl.append(Preferences::getInstance()->selectedLanguage() == "fr" ? "F/" : "D/");
             videoStreamUrl.append(filmCode);
             videoStreamUrl.append("/ALL/ALL.json");
-            qDebug() << videoStreamUrl;
+            //qDebug() << videoStreamUrl;
             downloadUrl(videoStreamUrl, pageRequestId, film->m_infoUrl, QString(MAPPER_STEP_CODE_3_RTMP));
 
             QScriptEngine engine;
@@ -520,7 +528,7 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                 {
                     qDebug () << "[Warning] more than german and french available";
                 }
-                emit(playListHasBeenUpdated());
+                emit filmHasBeenUpdated(film);
 
                 QString thumbnail = mymap.value(JSON_FILMPAGE_PREVIEW).toMap()
                         .value(JSON_FILMPAGE_PREVIEW_URL).toString();
@@ -552,7 +560,7 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                     if (quality == Preferences::getInstance()->selectedQuality())
                     {
                         film->m_streamUrl = stream.toMap().value("VUR").toString();
-                        emit playListHasBeenUpdated();
+                        emit filmHasBeenUpdated(film);
                         break;
                     }
                 }
@@ -580,8 +588,10 @@ void FilmDelegate::requestReadyToRead(QObject* object)
 
                 if (! image.isNull())
                 {
-                    film->m_preview[reply->url().toString()] = image.scaled(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT, Qt::KeepAspectRatio);
-                    emit playListHasBeenUpdated();
+                    film->m_preview[reply->url().toString()] = image.scaled(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+                    // No need to update current image if an image has already been loaded
+                    if (film->m_preview.size() == 1)
+                        emit filmHasBeenUpdated(film);
                 }
                 else
                 {

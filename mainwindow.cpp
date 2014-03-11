@@ -127,6 +127,12 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(delegate, SIGNAL(errorOccured(QString,QString)),
             SLOT(errorOccured(QString,QString)));
 
+    connect(delegate, SIGNAL(streamIndexLoaded(int,int,int)),
+            SLOT(streamIndexLoaded(int,int,int)));
+
+    connect(delegate, SIGNAL(filmHasBeenUpdated(FilmDetails*const)),
+            SLOT(filmHasBeenUpdated(FilmDetails*const)));
+
     connect(ui->tableWidget, SIGNAL(currentCellChanged(int,int,int,int)),
             SLOT(updateCurrentDetails()));
 
@@ -176,9 +182,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->downloadButton, SIGNAL(clicked()), SLOT(downloadButtonClicked()));
     connect(ui->cancelSelectedFilmButton, SIGNAL(clicked()),
             SLOT(cancelSelectedFilmDownload()));
-
-    connect(delegate, SIGNAL(streamIndexLoaded(int,int,int)),
-            SLOT(streamIndexLoaded(int,int,int)));
 
     connect(ui->rightPageButton, SIGNAL(clicked()),
             SLOT(nextPage()));
@@ -288,6 +291,10 @@ void MainWindow::clearAndLoadTable()
     ui->searchEdit->setVisible(searchEditShown);
     ui->searchButton->setVisible(searchEditShown);
     ui->dateEdit->setVisible(dateCurrentlyShown);
+
+    ui->tableWidget->clearContents();
+    ui->pageLabel->setText(tr("Loading..."));
+
     delegate->loadPlayList(url);
 }
 
@@ -416,7 +423,6 @@ QTableWidgetItem* MainWindow::createOrUpdateTitleColumn(int rowNumber)
 
 void MainWindow::refreshTable()
 {
-
     QList<FilmDetails*> details = delegate->visibleFilms();
 
     ui->tableWidget->setRowCount(details.size());
@@ -1072,3 +1078,11 @@ void MainWindow::resizeEvent(QResizeEvent *event) {
     event->accept();
 }
 
+void MainWindow::filmHasBeenUpdated(const FilmDetails * const film){
+    if (film == NULL)
+        return;
+    if (film == getCurrentFilm()){
+        updateCurrentDetails();
+    }
+    updateRowInTable(film);
+}
