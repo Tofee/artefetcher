@@ -119,6 +119,7 @@ signals:
     void filmHasBeenUpdated(const FilmDetails * const film);
     void errorOccured(QString filmUrl, QString errorMessage);
     void streamIndexLoaded(int resultCount, int currentPage, int pageCount);
+
 private slots:
     void requestReadyToRead(QObject*);
 
@@ -153,6 +154,7 @@ private:
 
     void fetchImagesFromUrlsInPage(const QString& htmlPage, const FilmDetails * const film, const int pageRequestId);
 
+    void abortDownloadItemsInProgress();
 
     // List of the film description paged shown in the UI
     QList<QString> m_visibleFilms;

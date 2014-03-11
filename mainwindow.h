@@ -28,13 +28,13 @@
 #include <preferences.h>
 #include <filmdelegate.h>
 
-class QNetworkReply;
-class QNetworkAccessManager;
-class FilmDelegate;
-class QTableWidgetItem;
 class DownloadManager;
+class FilmDelegate;
 class FilmDetails;
+class QNetworkAccessManager;
+class QNetworkReply;
 class QSystemTrayIcon;
+class QTableWidgetItem;
 
 namespace Ui {
 class MainWindow;
@@ -79,6 +79,8 @@ private slots:
     void updateCurrentDetails();
     void updateRowInTable(const FilmDetails* const film);
 
+    void updateItemProgressBar();
+
     /* Triggered by the downloader*/
     void allFilmDownloadFinished();
     void downloadProgressed(QString filmUrl, double progression, double kBytesPersecond, double remainingTimeForCurrentFilm);
@@ -108,6 +110,9 @@ private slots:
     void errorOccured(QString filmUrl, QString errorMessage);
     void streamIndexLoaded(int resultCount, int currentPage, int pageCount);
 
+    /* note : this slot is not triggered as a slot by the user click but a timer needs it as a slot */
+    void clicOnPreview();
+
 private:
 
     static const QList<MetaType> &listInterestingDetails();
@@ -125,7 +130,7 @@ private:
     void applyProxySettings();
     bool eventFilter(QObject *obj, QEvent *event);
 
-    void clicOnPreview();
+
     
 private:
     Ui::MainWindow *ui;

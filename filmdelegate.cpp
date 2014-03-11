@@ -136,10 +136,12 @@ FilmDelegate::~FilmDelegate()
 
 void FilmDelegate::loadPlayList(QString url)
 {
+    abortDownloadItemsInProgress();
     QString type  = MAPPER_STEP_CATALOG;
     if (url == DOWNLOAD_STREAM)
     {
         m_visibleFilms.clear();
+
         foreach(QString filmUrl, m_currentDownloads)
         {
             if (!m_films.contains(filmUrl))
@@ -171,6 +173,7 @@ void FilmDelegate::loadPlayList(QString url)
         QStringList urlParts = url.split(":");
         QString language = urlParts.at(2);
         QString search = urlParts.at(3);
+        type = MAPPER_STEP_SEARCH;
         if (search.isEmpty())
         {
             m_visibleFilms.clear();
@@ -179,7 +182,7 @@ void FilmDelegate::loadPlayList(QString url)
             emit(playListHasBeenUpdated());
             return;
         }
-        if (language.toLower() == "fr"){
+        else if (language.toLower() == "fr"){
             url = QString(ARTE_SEARCH_URL_FR)
                 .arg(search);
         }
@@ -187,7 +190,6 @@ void FilmDelegate::loadPlayList(QString url)
             url = QString(ARTE_SEARCH_URL_DE)
                 .arg(search);
         }
-        type = MAPPER_STEP_SEARCH;
     }
     m_currentPage = 1;
     m_lastPlaylistUrl = url;
@@ -199,6 +201,7 @@ void FilmDelegate::loadNextPage(){
     if (m_currentPage >= m_currentPageCount)
         return;
     ++m_currentPage;
+    abortDownloadItemsInProgress();
     commonLoadPlaylist(m_initialyCatalog ? MAPPER_STEP_CATALOG : MAPPER_STEP_DATE);
 }
 
@@ -206,17 +209,21 @@ void FilmDelegate::loadPreviousPage(){
     if (m_currentPage <= 1)
         return;
     --m_currentPage;
+    abortDownloadItemsInProgress();
     commonLoadPlaylist(m_initialyCatalog ? MAPPER_STEP_CATALOG : MAPPER_STEP_DATE);
 }
 
-void FilmDelegate::commonLoadPlaylist(QString type) {
-    ++m_lastRequestPageId;
+void FilmDelegate::abortDownloadItemsInProgress() {
     // Aborting all deprecated download request
     QList<QNetworkReply*> oldRequests(m_manager->findChildren<QNetworkReply*>());
     foreach (QNetworkReply* old, oldRequests){
         old->abort();
         old->deleteLater();
     }
+}
+
+void FilmDelegate::commonLoadPlaylist(QString type) {
+    ++m_lastRequestPageId;
 
     m_visibleFilms.clear();
     m_initialyCatalog = (type == MAPPER_STEP_CATALOG);

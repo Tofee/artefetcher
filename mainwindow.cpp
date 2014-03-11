@@ -98,8 +98,6 @@ MainWindow::MainWindow(QWidget *parent) :
         ui->tableWidget->setMinimumSize(totalColumnWidths, 0);
     }
 
-    ui->progressBar->setMaximum(100);
-
     ui->languageComboBox->addItems(FilmDelegate::listLanguages());
     ui->languageComboBox->setCurrentIndex(ui->languageComboBox->findText(Preferences::getInstance()->selectedLanguage()));
     ui->qualityComboBox->addItems(FilmDelegate::listQualities());
@@ -115,6 +113,16 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->dateEdit->setVisible(false);
     ui->dateEdit->setDate(QDate::currentDate());
+
+    QTimer* timer = new QTimer(this);
+    timer->setSingleShot(false);
+    timer->start(100 /*ms*/);
+    connect(timer, SIGNAL(timeout()), SLOT(updateItemProgressBar()));
+
+    QTimer* imageTimer = new QTimer(this);
+    imageTimer->setSingleShot(false);
+    imageTimer->start(3000 /*ms*/);
+    connect(imageTimer, SIGNAL(timeout()), SLOT(clicOnPreview()));
 
     loadStreamComboBox();
     if (!Preferences::getInstance()->pendingDownloads().isEmpty())
@@ -271,6 +279,19 @@ void MainWindow::qualityChanged()
 {
     Preferences::getInstance()->m_selectedQuality = ui->qualityComboBox->currentText();
     clearAndLoadTable();
+}
+
+void MainWindow::updateItemProgressBar(){
+    if (!ui->playlistProgressBar->isVisible()){
+        ui->playlistProgressBar->setMaximum(0);
+    }
+    const int currentMax = ui->playlistProgressBar->maximum();
+    const int newCount(manager->findChildren<QNetworkReply*>().size());
+    const int newMax(newCount > currentMax ? newCount : currentMax);
+
+    ui->playlistProgressBar->setMaximum(newMax);
+    ui->playlistProgressBar->setValue(newMax-newCount);
+    ui->playlistProgressBar->setVisible(newCount > 0);
 }
 
 void MainWindow::clearAndLoadTable()
