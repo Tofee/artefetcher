@@ -142,13 +142,10 @@ void FilmDelegate::loadPlayList(QString url)
     {
         m_visibleFilms.clear();
 
-        foreach(QString filmUrl, m_currentDownloads)
-        {
-            if (!m_films.contains(filmUrl))
-            {
+        foreach(QString filmUrl, m_currentDownloads) {
+            if (!m_films.contains(filmUrl)) {
                 addMovieFromUrl(filmUrl);
-            }
-            else {
+            } else {
                 m_visibleFilms << filmUrl;
             }
         }
@@ -156,8 +153,7 @@ void FilmDelegate::loadPlayList(QString url)
         emit(streamIndexLoaded(m_visibleFilms.size(), 1, m_currentPageCount));
         emit(playListHasBeenUpdated());
         return;
-    }
-    else if (url.startsWith(DATE_STREAM_PREFIX))
+    } else if (url.startsWith(DATE_STREAM_PREFIX))
     {
         m_visibleFilms.clear();
         QStringList urlParts = url.split(":");
@@ -291,10 +287,14 @@ void FilmDelegate::fetchImagesFromUrlsInPage(const QString& htmlPage,
                                              const FilmDetails * const film,
                                              const int pageRequestId)
 {
+    // Search for the "Photo" section in the page to skip images of related videos
+    QRegExp photoSectionRegExp("#content-photo");
+    int pos = photoSectionRegExp.indexIn(htmlPage, 0);
+
+    // Search for any image file matching this URL:
     QRegExp imageRegExp("(http://www\\.arte\\.tv/papi/tvguide/images[^\"]+.jpg)");
     imageRegExp.setMinimal(true);
 
-    int pos(0);
     QSet<QString> fetchedImage;
     while ((pos = imageRegExp.indexIn(htmlPage, pos)) != -1) {
          pos += imageRegExp.matchedLength();
@@ -539,13 +539,9 @@ void FilmDelegate::requestReadyToRead(QObject* object)
 
                 QString thumbnail = mymap.value(JSON_FILMPAGE_PREVIEW).toMap()
                         .value(JSON_FILMPAGE_PREVIEW_URL).toString();
-                if (!thumbnail.isEmpty())
+                if (!thumbnail.isEmpty() && !film->m_preview.contains(thumbnail))
                 {
                     downloadUrl(thumbnail, pageRequestId, film->m_infoUrl, MAPPER_STEP_CODE_4_PREVIEW);
-                }
-                else
-                {
-                    emit(errorOccured(film->m_infoUrl,tr("Cannot find the preview image")));
                 }
             }
         }
