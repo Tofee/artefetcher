@@ -12,7 +12,7 @@ isEmpty(PREFIX) {
  PREFIX = /usr/bin
 }
 
-VERSION = 0.4.1
+VERSION = 0.4.2
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
 TARGET = arteFetcher

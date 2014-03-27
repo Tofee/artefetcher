@@ -24,6 +24,18 @@ along with ArteFetcher.  If not, see <http://www.gnu.org/licenses/>.
 
 
 Release notes :
+v0.4.2
+  Optimizations (download film details abortion when no longer necessary)
+  Improvement on playlist update
+  Better refresh management for table and current details
+  Fetch all the images for each film (clic on image to see the next one)
+  Fix build issue because of qError
+  List of downloads are now correctly ordered
+  List of videos in a day or any other category are now correctly ordered
+  Refactor to improve tooltips in the video table
+  Update german translations
+  Code clean
+---------------------------------------------------------------
 v0.4.1
   Fix compilation issue for Qt older than 4.8
 ---------------------------------------------------------------
