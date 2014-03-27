@@ -119,10 +119,10 @@ MainWindow::MainWindow(QWidget *parent) :
     timer->start(100 /*ms*/);
     connect(timer, SIGNAL(timeout()), SLOT(updateItemProgressBar()));
 
-    QTimer* imageTimer = new QTimer(this);
-    imageTimer->setSingleShot(false);
-    imageTimer->start(3000 /*ms*/);
-    connect(imageTimer, SIGNAL(timeout()), SLOT(clicOnPreview()));
+    m_imageTimer = new QTimer(this);
+    m_imageTimer->setSingleShot(true);
+    m_imageTimer->start(3000 /*ms*/);
+    connect(m_imageTimer, SIGNAL(timeout()), SLOT(clicOnPreview()));
 
     loadStreamComboBox();
     if (!Preferences::getInstance()->pendingDownloads().isEmpty())
@@ -872,6 +872,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 void MainWindow::clicOnPreview() {
     m_currentPreview = m_currentPreview + 1;
     updateCurrentDetails();
+    m_imageTimer->start();
 }
 
 void MainWindow::allFilmDownloadFinished()

@@ -144,6 +144,7 @@ private:
 
     DownloadManager* thread;
     QSystemTrayIcon *m_trayIcon;
+    QTimer* m_imageTimer;
 };
 
 #endif // MAINWINDOW_H

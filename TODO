@@ -18,12 +18,15 @@
 ****************************************************************************/
 
 IMPORTANCE     TEMPS       DESCRIPTION
-Standard       Moyen       Recherche par champ texte
-Standard       Long        voir s'il est possible de récupérer d'autres infos
-
 Mineur         Moyen       Notifications systeme quand un film est téléchargé.
 Standard       Rapide      ne pas coder de chiffres ou de string en dur, utiliser des macros ou mieux
 Standard       Moyen       refactor pour avoir le thread dans le delegate
+			   ajouter une option pour télécharger en premier les films qui seront expirés les premiers
+20%			   permettre de faire passer un film avant un autre.
 
-Mineur         Moyen       se débarrasser des MyPair ou au moins s'assurer que le nombre de new/delete coïncide
-Mineur         Moyen       avoir un changement de page plus simple 
+bug restant avec la nouvelle gestion des progression : quand on relance l'appli avec des téléchargements qui étaient en attente,
+la progression tient compte des vieux téléchargements même s'ils n'ont pas été encore demandés
+Add a wishlist to remember the film we want to download but that are not accessible
+Let possible to disable the pagination
+Add a cache size limitation
+
