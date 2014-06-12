@@ -321,7 +321,7 @@ void FilmDelegate::requestReadyToRead(QObject* object)
     QString itemStep = pair->second;
     int pageRequestId = pair->pageRequestId;
 
-    delete pair;
+    pair->deleteLater();
     if (pageRequestId < m_lastRequestPageId)
     {
         // This download request is out dated. No need to continue
