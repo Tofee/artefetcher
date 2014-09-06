@@ -536,7 +536,7 @@ const QList<MetaType>& MainWindow::listInterestingDetails() {
     {
         shownMetadata // << Available_until
                 << Description // << RAW_First_Broadcast
-                << Type << Views << Rank << Episode_name;
+                << Type << Views << Episode_name;
     }
     return shownMetadata;
 }

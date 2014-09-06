@@ -68,7 +68,6 @@ enum MetaType {
 //    Available_until, // useless, see RAW_Available_until
     Views,
     Channels,
-    Rank,
     Type,
     RAW_First_Broadcast,
     RAW_Available_until,
@@ -116,7 +115,7 @@ public:
 //             QT_TRANSLATE_NOOP("FilmDetails","Available until"),
              QT_TRANSLATE_NOOP("FilmDetails","Views"),
              QT_TRANSLATE_NOOP("FilmDetails","Channels"),
-             QT_TRANSLATE_NOOP("FilmDetails","Rank"),
+//             QT_TRANSLATE_NOOP("FilmDetails","Rank"),
              QT_TRANSLATE_NOOP("FilmDetails","Type"),
              QT_TRANSLATE_NOOP("FilmDetails","First Broadcast"),
              QT_TRANSLATE_NOOP("FilmDetails","Available until"),

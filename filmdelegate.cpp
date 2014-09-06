@@ -61,7 +61,7 @@
 #define JSON_FILMPAGE_VIDEO_TYPE        "VTX"
 #define JSON_FILMPAGE_VSU               "VSU"
 #define JSON_FILMPAGE_VIEWS             "VVI"
-#define JSON_FILMPAGE_RANK              "videoRank"
+// #define JSON_FILMPAGE_RANK              "videoRank"// useless, it just gives the position in the carousel...
 #define JSON_FILMPAGE_DESCRIPTION       "V7T"
 #define JSON_FILMPAGE_DURATION_SECONDS  "VTI"
 #define JSON_FILMPAGE_SUMMARY           "VDE"
@@ -407,7 +407,6 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                     addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_DESC, Description);
                     addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_VIEWS, Views);
                     addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_VIDEO_CHANNEL, Channels);
-                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_RANK, Rank);
 
                     m_films.insert(newFilm->m_infoUrl, newFilm);
                     m_visibleFilms << newFilm->m_infoUrl;
@@ -522,7 +521,7 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                 addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_VIDEO_TYPE,        Preview_Or_ArteP7); // EXTRAIT (AUSSCHNITT in german) or ARTE+7
                 addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_VSU,               Episode_name); // if not null, it belongs to a serie
                 addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_VIEWS,             Views); // different from the one in the catalog: this is just a number
-                addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_RANK,              Rank);
+//                addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_RANK,              Rank);
                 addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_DESCRIPTION,       Description);
 
                 QStringList labels;
