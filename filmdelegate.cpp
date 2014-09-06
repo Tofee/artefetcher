@@ -518,7 +518,6 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                 addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_VIDEO_TYPE,        Preview_Or_ArteP7); // EXTRAIT (AUSSCHNITT in german) or ARTE+7
                 addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_VSU,               Episode_name); // if not null, it belongs to a serie
                 addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_VIEWS,             Views); // different from the one in the catalog: this is just a number
-//                addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_RANK,              Rank);
                 addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_DESCRIPTION,       Description);
 
                 QStringList labels;
@@ -551,7 +550,6 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                     if (map.value("videoFormat").toString() == "HBBTV" && map.value("VQU").toString().toLower() == Preferences::getInstance()->selectedQuality())
                     {
                         film->m_allStreams[map.value("versionLibelle").toString()] = map.value("url").toString();
-                        qDebug() << film->title() << map.value("versionLibelle").toString();
                     }
                 }
             }

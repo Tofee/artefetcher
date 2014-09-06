@@ -19,14 +19,23 @@
 
 #include "preferencedialog.h"
 #include "ui_preferencedialog.h"
+
 #include <QtGui>
 #include <QFileDialog>
+
+#include <filmdelegate.h>
 
 PreferenceDialog::PreferenceDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::PreferenceDialog)
 {
     ui->setupUi(this);
+
+    ui->languageComboBox->addItems(FilmDelegate::listLanguages());
+    ui->languageComboBox->setCurrentIndex(ui->languageComboBox->findText(Preferences::getInstance()->applicationLanguage()));
+
+    ui->qualityComboBox->addItems(FilmDelegate::listQualities());
+    ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findText(Preferences::getInstance()->selectedQuality()));
 
     ui->destinationDirectoryLineEdit->setText(Preferences::getInstance()->m_destinationDir);
     ui->filenamePatternLineEdit->setText(Preferences::getInstance()->m_filenamePattern);
@@ -76,6 +85,10 @@ void PreferenceDialog::accept()
     Preferences::getInstance()->m_proxyEnabled = ui->proxyCheckBox->isChecked();
     Preferences::getInstance()->m_proxyHttpUrl = ui->proxyHttpUrlLineEdit->text();
     Preferences::getInstance()->m_proxyHttpPort = ui->proxyHttpPortSpinBox->value();
+
+    Preferences::getInstance()->m_selectedQuality = ui->qualityComboBox->currentText();
+
+    Preferences::getInstance()->m_applicationLanguage = ui->languageComboBox->currentText();
 
     QDialog::accept();
 }

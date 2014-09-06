@@ -72,8 +72,6 @@ MainWindow::MainWindow(QWidget *parent) :
            << tr("Duration")
     ;
 
-    ui->qualityLabel->setToolTip(ui->qualityComboBox->toolTip());
-
     ui->tableWidget->setColumnCount(header.size());
     ui->tableWidget->setHorizontalHeaderLabels(header);
     ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -98,16 +96,13 @@ MainWindow::MainWindow(QWidget *parent) :
         ui->tableWidget->setMinimumSize(totalColumnWidths, 0);
     }
 
-    ui->languageComboBox->addItems(FilmDelegate::listLanguages());
-    ui->languageComboBox->setCurrentIndex(ui->languageComboBox->findText(Preferences::getInstance()->applicationLanguage()));
-    ui->qualityComboBox->addItems(FilmDelegate::listQualities());
-    ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findText(Preferences::getInstance()->selectedQuality()));
-
     ui->previewLabel->setMaximumSize(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT);
     ui->previewLabel->setMinimumSize(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT);
     ui->previewLabel->setPixmap(QPixmap(DEFAULT_FILM_ICON).scaled(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT, Qt::KeepAspectRatio));
 
     ui->detailsGroupBox->setStyleSheet("QGroupBox { font-size: 16px; font-weight: bold; }");
+
+    ui->filmStreamComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 
     changeDownloadPartVisibility(false);
 
@@ -167,11 +162,6 @@ MainWindow::MainWindow(QWidget *parent) :
             SLOT(clearAndLoadTable()));
     connect(ui->searchButton, SIGNAL(clicked()),
             SLOT(clearAndLoadTable()));
-
-    connect(ui->languageComboBox, SIGNAL(currentIndexChanged(int)),
-            SLOT(languageChanged()));
-    connect(ui->qualityComboBox, SIGNAL(currentIndexChanged(int)),
-            SLOT(qualityChanged()));
 
     connect(thread, SIGNAL(signalAllFilmDownloadFinished()),
             SLOT(allFilmDownloadFinished()));
@@ -268,17 +258,6 @@ bool MainWindow::isReadyForDownload(const FilmDetails * const film) const
     return film && !film->m_title.isEmpty()
             && !film->m_allStreams.isEmpty() &&
             (film->m_downloadStatus == DL_NONE || film->m_downloadStatus == DL_CANCELLED || film->m_downloadStatus == DL_ERROR);
-}
-
-void MainWindow::languageChanged(){
-    Preferences::getInstance()->m_applicationLanguage = ui->languageComboBox->currentText();
-    loadStreamComboBox();
-}
-
-void MainWindow::qualityChanged()
-{
-    Preferences::getInstance()->m_selectedQuality = ui->qualityComboBox->currentText();
-    clearAndLoadTable();
 }
 
 void MainWindow::updateItemProgressBar(){
@@ -1049,6 +1028,7 @@ void MainWindow::showPreferences()
     {
         applyProxySettings();
         clearAndLoadTable();
+        loadStreamComboBox();
     }
 }
 

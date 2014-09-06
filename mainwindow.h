@@ -101,8 +101,6 @@ private slots:
     void addFilmManuallyFromUrl();
 
     void showPreferences();
-    void languageChanged();
-    void qualityChanged();
 
     /* Film delegate */
     void errorOccured(QString filmUrl, QString errorMessage);
