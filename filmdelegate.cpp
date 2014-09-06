@@ -490,7 +490,7 @@ void FilmDelegate::requestReadyToRead(QObject* object)
             QString filmCode = reply->url().toString().split("/").at(9);
 
             QString videoStreamUrl = "http://www.arte.tv/papi/tvguide/videos/stream/";
-            videoStreamUrl.append(Preferences::getInstance()->selectedLanguage() == "fr" ? "F/" : "D/");
+            videoStreamUrl.append(Preferences::getInstance()->applicationLanguage() == "fr" ? "F/" : "D/");
             videoStreamUrl.append(filmCode);
             videoStreamUrl.append("/ALL/ALL.json");
             //qDebug() << videoStreamUrl;

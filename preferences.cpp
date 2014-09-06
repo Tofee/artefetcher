@@ -48,7 +48,7 @@ void Preferences::load()
 {
     QString defaultWorkingPath(QDir::homePath().append(QDir::separator()).append("arteFetcher"));
 
-    m_selectedLanguage = settings.value(DEF_OPT_STR_LANGUAGE, FilmDelegate::listLanguages().first()).toString();
+    m_applicationLanguage = settings.value(DEF_OPT_STR_LANGUAGE, FilmDelegate::listLanguages().first()).toString();
     m_selectedQuality = settings.value(DEF_OPT_STR_QUALITY, FilmDelegate::listQualities().first()).toString();
     m_filenamePattern = settings.value(DEF_OPT_FILENAME_PATTERN, "[%language %quality] %title").toString();
     m_destinationDir = settings.value(DEF_OPT_DST_DIR, defaultWorkingPath).toString();
@@ -66,7 +66,7 @@ void Preferences::load()
 
 void Preferences::save()
 {
-    settings.setValue(DEF_OPT_STR_LANGUAGE, m_selectedLanguage);
+    settings.setValue(DEF_OPT_STR_LANGUAGE, m_applicationLanguage);
     settings.setValue(DEF_OPT_STR_QUALITY, m_selectedQuality);
     settings.setValue(DEF_OPT_FILENAME_PATTERN, m_filenamePattern);
     settings.setValue(DEF_OPT_DST_DIR, m_destinationDir);

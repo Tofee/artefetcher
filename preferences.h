@@ -38,9 +38,9 @@ public:
      * @brief selectedStreams
      * @return if empty, it means all
      */
-    const QString &selectedLanguage() const
+    const QString &applicationLanguage() const
     {
-        return m_selectedLanguage;
+        return m_applicationLanguage;
     }
     const QString &selectedQuality() const
     {
@@ -111,7 +111,7 @@ public:
     virtual void save() = 0;
 
 protected:
-    QString m_selectedLanguage;
+    QString m_applicationLanguage;
     QString m_selectedQuality;
     QString m_filenamePattern;
     QString m_destinationDir;

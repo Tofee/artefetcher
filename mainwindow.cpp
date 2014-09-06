@@ -99,7 +99,7 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
     ui->languageComboBox->addItems(FilmDelegate::listLanguages());
-    ui->languageComboBox->setCurrentIndex(ui->languageComboBox->findText(Preferences::getInstance()->selectedLanguage()));
+    ui->languageComboBox->setCurrentIndex(ui->languageComboBox->findText(Preferences::getInstance()->applicationLanguage()));
     ui->qualityComboBox->addItems(FilmDelegate::listQualities());
     ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findText(Preferences::getInstance()->selectedQuality()));
 
@@ -250,7 +250,7 @@ void MainWindow::streamIndexLoaded(int resultCount, int currentPage, int pageCou
 
 StreamType MainWindow::getStreamType() const
 {
-    return FilmDelegate::getStreamTypeByLanguageAndQuality(Preferences::getInstance()->m_selectedLanguage, Preferences::getInstance()->m_selectedQuality);
+    return FilmDelegate::getStreamTypeByLanguageAndQuality(Preferences::getInstance()->m_applicationLanguage, Preferences::getInstance()->m_selectedQuality);
 }
 
 
@@ -271,7 +271,7 @@ bool MainWindow::isReadyForDownload(const FilmDetails * const film) const
 }
 
 void MainWindow::languageChanged(){
-    Preferences::getInstance()->m_selectedLanguage = ui->languageComboBox->currentText();
+    Preferences::getInstance()->m_applicationLanguage = ui->languageComboBox->currentText();
     loadStreamComboBox();
 }
 
@@ -302,11 +302,11 @@ void MainWindow::clearAndLoadTable()
     if (url == DATE_STREAM_PREFIX)
     {
         dateCurrentlyShown = true;
-        url.append(Preferences::getInstance()->selectedLanguage()).append(":");
+        url.append(Preferences::getInstance()->applicationLanguage()).append(":");
         url.append(ui->dateEdit->date().toString("yyyyMMdd"));
     } else if (url == SEARCH_PREFIX) {
         searchEditShown = true;
-        url.append(Preferences::getInstance()->selectedLanguage()).append(":");
+        url.append(Preferences::getInstance()->applicationLanguage()).append(":");
         url.append(ui->searchEdit->text());
     }
     ui->searchEdit->setVisible(searchEditShown);
