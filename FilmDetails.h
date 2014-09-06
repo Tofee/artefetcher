@@ -99,7 +99,7 @@ public:
     EDownloadStatus m_downloadStatus;
     int m_downloadProgress;
 
-    QString m_streamUrl;
+    QMap<QString, QString> m_allStreams;
     // Full path of the future downloaded film.
     QString m_targetFileName;
 

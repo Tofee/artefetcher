@@ -57,13 +57,11 @@ protected:
 
     /**
      * @brief getFileName
-     * @param title the title of the film
-     * @param remoteFilename the file name in the remote server (will be used to check the extension)
-     * @param fileSuffixNumber provide an optional file suffix (_<fileSuffixNumber> will be appened between the name and the extension of the file
-     * @param episodeName the name of the episode if the film belongs to a video serie
+     * @param film to get the filename
+     * @param provide an optional file suffix (_<fileSuffixNumber> will be appened between the name and the extension of the file
      * @return the filename
      */
-    QString getFileName(const QString &title, const QString &remoteFilename, int fileSuffixNumber = 0, QString episodeName = QString()) const;
+    QString getFileName(const FilmDetails * const film, int fileSuffix = 0) const;
 
     void downloadFilm(FilmDetails* film);
 

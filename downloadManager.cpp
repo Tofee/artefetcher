@@ -33,13 +33,9 @@ DownloadManager::DownloadManager(QObject *parent)
         connect(&m_downloader, SIGNAL(downloadCancelled(QString)), SLOT(downloadCancelled(QString)));
     }
 
-void DownloadManager::addFilmToDownloadQueue(QString key, const FilmDetails& details){
-
-    if (details.m_downloadStatus == DL_REQUESTED)
-    {
-        m_downloader.addDownload(details.m_streamUrl, details.m_targetFileName);
-        m_keysForSignalByUrl.insert(details.m_streamUrl, key);
-    }
+void DownloadManager::addFilmToDownloadQueue(const QString &key, const QString &remoteUrl, const QString &targetFileName){
+    m_downloader.addDownload(remoteUrl, targetFileName);
+    m_keysForSignalByUrl.insert(remoteUrl, key);
 }
 
 void DownloadManager::cancelDownloadInProgress() {

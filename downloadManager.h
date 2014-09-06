@@ -29,7 +29,7 @@ class DownloadManager : public QObject{
 public:
     DownloadManager(QObject *parent);
 
-    void addFilmToDownloadQueue(QString key, const FilmDetails& details);
+    void addFilmToDownloadQueue(const QString& key, const QString& remoteUrl, const QString& targetFileName);
     int queueSize() const;
 
     void cancelDownload(QString key);

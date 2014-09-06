@@ -266,7 +266,7 @@ MainWindow::~MainWindow()
 bool MainWindow::isReadyForDownload(const FilmDetails * const film) const
 {
     return film && !film->m_title.isEmpty()
-            && !film->m_streamUrl.isEmpty() &&
+            && !film->m_allStreams.isEmpty() &&
             (film->m_downloadStatus == DL_NONE || film->m_downloadStatus == DL_CANCELLED || film->m_downloadStatus == DL_ERROR);
 }
 
@@ -554,7 +554,7 @@ FilmDetails* MainWindow::getCurrentFilm() const {
 bool MainWindow::fileExistForTheFilm(const FilmDetails * const film) const {
     if (film == NULL)
         return false;
-    QString filename = film->m_targetFileName.isEmpty() ? getFileName(film->title(), film->m_streamUrl, 0, film->m_metadata.value(Episode_name))
+    QString filename = film->m_targetFileName.isEmpty() ? getFileName(film)
                                                         : film->m_targetFileName;
     return QFile(filename).exists() || QFile(filename.append(".part")).exists();
 }
@@ -629,6 +629,10 @@ void MainWindow::updateCurrentDetails() {
     }
     ui->extractIconLabel->setVisible(isTeaserFromOriginalMovie(*film));
 
+    QString currentFilmStream = ui->filmStreamComboBox->currentText();
+    ui->filmStreamComboBox->clear();
+    ui->filmStreamComboBox->addItems(film->m_allStreams.keys());
+    ui->filmStreamComboBox->setCurrentIndex(ui->filmStreamComboBox->findText(currentFilmStream) >= 0 ? ui->filmStreamComboBox->findText(currentFilmStream) : 0);
 }
 
 
@@ -703,16 +707,23 @@ QString cleanFilenameForFileSystem(const QString filename) {
     return cleanedFilename.simplified();
 }
 
-QString MainWindow::getFileName(const QString& title, const QString& remoteFilename, int fileSuffixNumber, QString episodeName) const
+QString MainWindow::getFileName(const FilmDetails * const film, int fileSuffixNumber) const
 {
+    //title the title of the film
+    const QString& title = film->title();
+    //the file name in the remote server (will be used to check the extension)
+    const QString extension = "mp4";
+    //the name of the episode if the film belongs to a video serie
+    const QString& episodeName = film->m_metadata.value(Episode_name);
+
     const QString& targetDirectory = Preferences::getInstance()->destinationDir();
-    QString extension = "flv";
-    if (remoteFilename != "")
-    {
-        QFileInfo remoteFile(remoteFilename);
-        if (remoteFile.suffix().size() == 3 || remoteFile.suffix().size() == 4)
-            extension = remoteFile.suffix();
-    }
+//    QString extension = "flv";
+//    if (remoteFilename != "")
+//    {
+//        QFileInfo remoteFile(remoteFilename);
+//        if (remoteFile.suffix().size() == 3 || remoteFile.suffix().size() == 4)
+//            extension = remoteFile.suffix();
+//    }
 
     QString cleanedTitle;
 
@@ -763,12 +774,13 @@ void MainWindow::downloadFilm(FilmDetails* film){
     if (!isReadyForDownload(film))
         return;
 
+    QString remoteUrl = film->m_allStreams[ui->filmStreamComboBox->currentText()];
     // keep existing file name, in case the download has been requested in a previous execution
     // if this name is empty, build a filename.
     QString futureFileName = film->m_targetFileName;
     if (futureFileName.isEmpty())
     {
-        futureFileName = getFileName(film->m_title, film->m_streamUrl, 0, film->m_metadata.value(Episode_name));
+        futureFileName = getFileName(film);
     }
 
     // If a pending download has the same name, append a file suffix number
@@ -782,7 +794,7 @@ void MainWindow::downloadFilm(FilmDetails* film){
             {
                 // TODO faut aussi stocker ce futureFileName dans le fichier de conf de l'appli,
                 //      sinon au redémarrage, si on reprend le téléchargement dans un ordre différent, les vidéos seront mélangées.
-                futureFileName = getFileName(film->m_title, film->m_streamUrl, fileSuffixNumber, film->m_metadata.value(Episode_name));
+                futureFileName = getFileName(film, fileSuffixNumber);
             }
         }
     }
@@ -804,7 +816,7 @@ void MainWindow::downloadFilm(FilmDetails* film){
         film->m_targetFileName = futureFileName;
 
         delegate->addUrlToDownloadList(film->m_infoUrl); // TODO c'est trop trop moche de faire ça. Design à revoir
-        thread->addFilmToDownloadQueue(film->m_infoUrl, *film);
+        thread->addFilmToDownloadQueue(film->m_infoUrl, remoteUrl, futureFileName);
     }
 
     updateRowInTable(film);
@@ -838,7 +850,7 @@ void MainWindow::playFilm() {
 
     QString filePath = film->m_targetFileName;
     if (filePath.isEmpty())
-        filePath = getFileName(film->m_title, film->m_streamUrl, 0, film->m_metadata.value(Episode_name));
+        filePath = getFileName(film);
     if (! QFile(filePath).exists())
     {
         filePath = filePath.append(".part");

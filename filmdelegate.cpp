@@ -43,7 +43,6 @@
 #define MAPPER_STEP_CATALOG "CATALOG"
 #define MAPPER_STEP_CODE_1_HTML "HTML"
 #define MAPPER_STEP_CODE_2_XML "XML"
-#define MAPPER_STEP_CODE_3_RTMP "RTMP_XML"
 #define MAPPER_STEP_CODE_4_PREVIEW "PREVIEW"
 
 #define JSON_AIRDATE        "airdate"
@@ -386,7 +385,7 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                     if (m_films.contains(url))
                     {
                         m_visibleFilms << url;
-                        if (m_films.value(url)->m_preview.isEmpty() || m_films.value(url)->m_streamUrl.isNull())
+                        if (m_films.value(url)->m_preview.isEmpty() || m_films.value(url)->m_allStreams.isEmpty())
                         {
                             // refresh incomplete cache
                             reloadFilm(m_films.value(url));
@@ -493,8 +492,6 @@ void FilmDelegate::requestReadyToRead(QObject* object)
             videoStreamUrl.append(Preferences::getInstance()->applicationLanguage() == "fr" ? "F/" : "D/");
             videoStreamUrl.append(filmCode);
             videoStreamUrl.append("/ALL/ALL.json");
-            //qDebug() << videoStreamUrl;
-            downloadUrl(videoStreamUrl, pageRequestId, film->m_infoUrl, QString(MAPPER_STEP_CODE_3_RTMP));
 
             QScriptEngine engine;
             QScriptValue json = engine.evaluate("JSON.parse").call(QScriptValue(),
@@ -548,43 +545,15 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                 {
                     downloadUrl(thumbnail, pageRequestId, film->m_infoUrl, MAPPER_STEP_CODE_4_PREVIEW);
                 }
-            }
-        }
-        else if (itemStep == MAPPER_STEP_CODE_3_RTMP)
-        {
-            // ce json indique cette URL http://artestras.vo.llnwxd.net/o35/nogeo/HBBTV/048373-005-A_SQ_2_VF_00122046_MP4-2200_AMM-HBBTV.mp4
-            const QString page(QString::fromUtf8(reply->readAll()));
 
-            QScriptEngine engine;
-            QScriptValue json = engine.evaluate("JSON.parse").call(QScriptValue(),
-                                                                   QScriptValueList() << QString(page));
-            QMap<QString, QVariant> mymap = json.toVariant().toMap().value("video").toMap();
-            foreach(QVariant stream, mymap.value("VSR").toList())
-            {
-                QString type = stream.toMap().value("VFO").toString();
-                if (type == "HBBTV")
-                {
-                    QString quality = stream.toMap().value("VQU").toString().toLower();
-                    if (quality == Preferences::getInstance()->selectedQuality())
+                foreach (QVariant streamJson, mymap.value("VSR").toMap().values()){
+                    QMap<QString, QVariant> map = streamJson.toMap();
+                    if (map.value("videoFormat").toString() == "HBBTV" && map.value("VQU").toString().toLower() == Preferences::getInstance()->selectedQuality())
                     {
-                        film->m_streamUrl = stream.toMap().value("VUR").toString();
-                        emit filmHasBeenUpdated(film);
-                        break;
+                        film->m_allStreams[map.value("versionLibelle").toString()] = map.value("url").toString();
+                        qDebug() << film->title() << map.value("versionLibelle").toString();
                     }
                 }
-            }
-
-            if (film->m_streamUrl.isEmpty())
-                emit(errorOccured(film->m_infoUrl,tr("Cannot find the video stream")));
-
-            QString thumbnail = mymap.value("programImage").toString();
-            if (!thumbnail.isEmpty())
-            {
-                downloadUrl(thumbnail, pageRequestId, film->m_infoUrl, MAPPER_STEP_CODE_4_PREVIEW);
-            }
-            else
-            {
-                emit(errorOccured(film->m_infoUrl,tr("Cannot find the preview image")));
             }
         }
         else if (itemStep == MAPPER_STEP_CODE_4_PREVIEW)
