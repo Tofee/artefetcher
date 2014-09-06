@@ -34,6 +34,7 @@
 #define DEF_OPT_PROXY_HTTP_ENABLED    "proxy_http_enabled"
 #define DEF_OPT_PROXY_HTTP_URL        "proxy_http_url"
 #define DEF_OPT_PROXY_HTTP_PORT       "proxy_http_port"
+#define DEF_LAST_VERSION_USED         "last_version_used"
 
 #define RESULT_PER_PAGE 10
 
@@ -62,6 +63,9 @@ void Preferences::load()
     m_proxyEnabled = settings.value(DEF_OPT_PROXY_HTTP_ENABLED, false).toBool();
     m_proxyHttpUrl = settings.value(DEF_OPT_PROXY_HTTP_URL).toString();
     m_proxyHttpPort = settings.value(DEF_OPT_PROXY_HTTP_PORT, 3128).toInt();
+
+    if (settings.value(DEF_LAST_VERSION_USED, "0.5.1").toString() == "0.5.1"){
+    }
 }
 
 void Preferences::save()
@@ -80,5 +84,6 @@ void Preferences::save()
     settings.setValue(DEF_OPT_PROXY_HTTP_ENABLED, m_proxyEnabled);
     settings.setValue(DEF_OPT_PROXY_HTTP_URL, m_proxyHttpUrl);
     settings.setValue(DEF_OPT_PROXY_HTTP_PORT, m_proxyHttpPort);
+    settings.setValue(DEF_LAST_VERSION_USED, QApplication::applicationVersion());
     settings.sync();
 }
