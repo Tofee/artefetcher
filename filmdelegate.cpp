@@ -448,6 +448,9 @@ void FilmDelegate::requestReadyToRead(QObject* object)
             regexp1.setMinimal(true);
             regexp1.indexIn(page);*/
             QString filmId = splittenUrl.size() > 5 ? splittenUrl.at(5) : "";
+            film->arteId = filmId;
+            QStringList splittenCode = filmId.split("-");
+            film->episodeNumber = splittenCode.value(1).toInt();
 
             QString languageCharacter = Preferences::getInstance()->applicationLanguage().left(1).toUpper();
 

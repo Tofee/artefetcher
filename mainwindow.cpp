@@ -151,6 +151,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->streamComboBox, SIGNAL(currentIndexChanged(int)),
             SLOT(clearAndLoadTable()));
 
+    connect(ui->filmStreamComboBox, SIGNAL(currentTextChanged(QString)),
+            SLOT(streamTypeChanged()));
+
     connect(ui->playButton, SIGNAL(clicked()),
             SLOT(playFilm()));
     connect(ui->openDirectoryButton, SIGNAL(clicked()),
@@ -260,6 +263,11 @@ bool MainWindow::isReadyForDownload(const FilmDetails * const film) const
             (film->m_downloadStatus == DL_NONE || film->m_downloadStatus == DL_CANCELLED || film->m_downloadStatus == DL_ERROR);
 }
 
+bool filmWillBeDownloaded(const FilmDetails* const film)
+{
+    return !(film->m_downloadStatus == DL_NONE || film->m_downloadStatus == DL_CANCELLED || film->m_downloadStatus == DL_ERROR);
+}
+
 void MainWindow::updateItemProgressBar(){
     if (!ui->playlistProgressBar->isVisible()){
         ui->playlistProgressBar->setMaximum(0);
@@ -315,8 +323,12 @@ bool isTeaserFromOriginalMovie(const FilmDetails& film)
                                      && "ARTE+7" != film.m_metadata.value(Preview_Or_ArteP7);
 }
 
-bool isFilmAnEpisode(const FilmDetails* const film){
+bool hasFilmAnEpisodeName(const FilmDetails* const film){
     return !film->m_metadata.value(Episode_name).isEmpty();
+}
+
+bool isFilmAnEpisode(const FilmDetails* const film){
+    return (film->episodeNumber > 0) || hasFilmAnEpisodeName(film);
 }
 
 void appendWithNewLine(QString& stringToChange, const QString & addition)
@@ -331,7 +343,7 @@ void appendWithNewLine(QString& stringToChange, const QString & addition)
 QString buildTooltip(const FilmDetails* const film){
     QString tooltip;
 
-    if (isFilmAnEpisode(film))
+    if (hasFilmAnEpisodeName(film))
     {
         tooltip = QObject::tr("Episode: %1").arg(film->m_metadata.value(Episode_name));
     }
@@ -550,17 +562,7 @@ void MainWindow::updateCurrentDetails() {
      ui->downloadButton->setVisible(isReadyForDownload(film));
      ui->cancelSelectedFilmButton->setVisible(film != NULL &&
              (film->m_downloadStatus == DL_DOWNLOADING || film->m_downloadStatus == DL_REQUESTED));
-     if (film == NULL)
-     {
-         ui->summaryLabel->setText(tr("No film in the playlist"));
-         ui->previewLabel->setPixmap(QPixmap());
-         ui->previewLabel->setVisible(false);
-         ui->detailsGroupBox->setTitle("");
-         ui->countryYearDurationlabel->setText("");
-         return;
-     }
 
-    ui->previewLabel->setVisible(true);
     ui->detailsGroupBox->setTitle(film->m_title);
 
     QString prefix;
@@ -572,14 +574,6 @@ void MainWindow::updateCurrentDetails() {
 
     prefix.append("<br/>");
     ui->summaryLabel->setText(prefix.append(film->m_summary));
-    if (!film->m_preview.isEmpty())
-    {
-        ui->previewLabel->setPixmap(QPixmap::fromImage(film->m_preview.values().value(m_currentPreview % film->m_preview.size())));
-    }
-    else
-    {
-        ui->previewLabel->setPixmap(QPixmap(DEFAULT_FILM_ICON).scaled(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT, Qt::KeepAspectRatio));
-    }
 
     {
         QString coutryYearDurationText;
@@ -608,21 +602,27 @@ void MainWindow::updateCurrentDetails() {
     }
     ui->extractIconLabel->setVisible(isTeaserFromOriginalMovie(*film));
 
+    clicOnPreview(false);
+
     ui->filmStreamComboBox->clear();
     ui->filmStreamComboBox->addItems(film->m_allStreams.keys());
+
     ui->filmStreamComboBox->setVisible(ui->filmStreamComboBox->count());
     int streamTypeIndexToSelect = -1;
-    if (! film->m_choosenStreamType.isEmpty()){
-        streamTypeIndexToSelect = ui->filmStreamComboBox->findText(film->m_choosenStreamType);
-    }
-    int indexInFavorites = 0;
-    while (streamTypeIndexToSelect < 0 && indexInFavorites < Preferences::getInstance()->favoriteStreamTypes().size()) {
-        streamTypeIndexToSelect = ui->filmStreamComboBox->findText(Preferences::getInstance()->favoriteStreamTypes().at(indexInFavorites++));
-    }
-    if (streamTypeIndexToSelect >= 0){
-        ui->filmStreamComboBox->setCurrentIndex(streamTypeIndexToSelect);
-    }
+    ui->filmStreamComboBox->setVisible(ui->filmStreamComboBox->count() && !filmWillBeDownloaded(film));
 
+    if (streamTypeIndexToSelect < 0){
+        if (! film->m_choosenStreamType.isEmpty()){
+            streamTypeIndexToSelect = ui->filmStreamComboBox->findText(film->m_choosenStreamType);
+        }
+        int indexInFavorites = 0;
+        while (streamTypeIndexToSelect < 0 && indexInFavorites < Preferences::getInstance()->favoriteStreamTypes().size()) {
+            streamTypeIndexToSelect = ui->filmStreamComboBox->findText(Preferences::getInstance()->favoriteStreamTypes().at(indexInFavorites++));
+        }
+        if (streamTypeIndexToSelect >= 0){
+            ui->filmStreamComboBox->setCurrentIndex(streamTypeIndexToSelect);
+        }
+    }
 }
 
 
@@ -697,7 +697,7 @@ QString cleanFilenameForFileSystem(const QString filename) {
     return cleanedFilename.simplified();
 }
 
-QString MainWindow::getFileName(const FilmDetails * const film, int fileSuffixNumber) const
+QString MainWindow::getFileName(const FilmDetails * const film) const
 {
     //title the title of the film
     const QString& title = film->title();
@@ -736,6 +736,13 @@ QString MainWindow::getFileName(const FilmDetails * const film, int fileSuffixNu
                 .replace("%quality", getStreamType().qualityCode.toUpper());
 
         cleanedTitle = cleanFilenameForFileSystem(serieName).append(QDir::separator()).append(cleanFilenameForFileSystem(filename));
+    } else if (film->episodeNumber){
+        QString filename = Preferences::getInstance()->filenamePattern();;
+        filename.replace("%title", QString("%0 (%1)").arg(title).arg(film->episodeNumber))
+                .replace("%language", film->m_choosenStreamType)
+                .replace("%quality", getStreamType().qualityCode.toUpper());
+
+        cleanedTitle = cleanFilenameForFileSystem(filename);
     }
     else
     {
@@ -746,13 +753,10 @@ QString MainWindow::getFileName(const FilmDetails * const film, int fileSuffixNu
         cleanedTitle = cleanFilenameForFileSystem(cleanedTitle);
     }
 
-    QString countSuffix(fileSuffixNumber > 0 ? "_" + fileSuffixNumber : "");
-
-    QString filename("%1%2%3%4.%5");
+    QString filename("%1%2%3.%5");
     filename = filename.arg(targetDirectory,
                             QDir::separator(),
                             cleanedTitle,
-                            countSuffix,
                             extension);
     return filename;
 }
@@ -771,20 +775,21 @@ void MainWindow::downloadFilm(FilmDetails* film){
     }
 
     // If a pending download has the same name, append a file suffix number
-    int fileSuffixNumber = 1;
-    foreach(QString otherFilmUrl, delegate->downloadList())
-    {
-        FilmDetails* otherFilm = delegate->findFilmByUrl(otherFilmUrl);
-        if (otherFilm)
-        {
-            if (otherFilm->m_targetFileName == futureFileName)
-            {
-                // TODO faut aussi stocker ce futureFileName dans le fichier de conf de l'appli,
-                //      sinon au redémarrage, si on reprend le téléchargement dans un ordre différent, les vidéos seront mélangées.
-                futureFileName = getFileName(film, fileSuffixNumber);
-            }
-        }
-    }
+    //int fileSuffixNumber = 1;
+//    foreach(QString otherFilmUrl, delegate->downloadList())
+//    {
+//        // TODO ça ne marche pas ça...
+//        FilmDetails* otherFilm = delegate->findFilmByUrl(otherFilmUrl);
+//        if (otherFilm)
+//        {
+//            if (otherFilm->m_targetFileName == futureFileName)
+//            {
+//                // TODO faut aussi stocker ce futureFileName dans le fichier de conf de l'appli,
+//                //      sinon au redémarrage, si on reprend le téléchargement dans un ordre différent, les vidéos seront mélangées.
+//                futureFileName = getFileName(film, fileSuffixNumber);
+//            }
+//        }
+//    }
 
     // Check the file (not .part) does not exist.
     if (QFile(futureFileName).exists()
@@ -856,10 +861,10 @@ void MainWindow::openFilmDirectory() {
 
 void MainWindow::streamTypeChanged() {
     FilmDetails* film = getCurrentFilm();
-    if (film == NULL || ui->streamComboBox->currentText().isEmpty()){
+    if (film == NULL || ui->filmStreamComboBox->currentText().isEmpty()){
         return;
     }
-    film->m_choosenStreamType = ui->streamComboBox->currentText();
+    film->m_choosenStreamType = ui->filmStreamComboBox->currentText();
 }
 
 void MainWindow::showAboutWindow() {
@@ -877,10 +882,30 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
     return QObject::eventFilter(obj, event);
 }
 
-void MainWindow::clicOnPreview() {
-    m_currentPreview = m_currentPreview + 1;
-    updateCurrentDetails();
-    m_imageTimer->start();
+void MainWindow::clicOnPreview(bool fromTimer) {
+    if (fromTimer)
+    {
+        m_currentPreview = m_currentPreview + 1;
+    }
+
+    FilmDetails* film = getCurrentFilm();
+    if (film == NULL)
+        return;
+
+    ui->previewLabel->setVisible(true);
+    if (!film->m_preview.isEmpty())
+    {
+        ui->previewLabel->setPixmap(QPixmap::fromImage(film->m_preview.values().value(m_currentPreview % film->m_preview.size())));
+    }
+    else
+    {
+        ui->previewLabel->setPixmap(QPixmap(DEFAULT_FILM_ICON).scaled(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT, Qt::KeepAspectRatio));
+    }
+
+    if (fromTimer)
+    {
+        m_imageTimer->start();
+    }
 }
 
 void MainWindow::allFilmDownloadFinished()

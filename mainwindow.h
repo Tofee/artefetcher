@@ -61,7 +61,7 @@ protected:
      * @param provide an optional file suffix (_<fileSuffixNumber> will be appened between the name and the extension of the file
      * @return the filename
      */
-    QString getFileName(const FilmDetails * const film, int fileSuffix = 0) const;
+    QString getFileName(const FilmDetails * const film) const;
 
     void downloadFilm(FilmDetails* film);
 
@@ -108,7 +108,7 @@ private slots:
     void streamIndexLoaded(int resultCount, int currentPage, int pageCount);
 
     /* note : this slot is not triggered as a slot by the user click but a timer needs it as a slot */
-    void clicOnPreview();
+    void clicOnPreview(bool fromTimer = true);
 
 private:
 
