@@ -437,13 +437,17 @@ void FilmDelegate::requestReadyToRead(QObject* object)
             const QString page(QString::fromUtf8(reply->readAll()));
             // this page is further information for the film
 
-            // <input name='id' type='hidden' value=****ici se trouve l'identifiant du film***
-            // Et on reconstruit l'URL ainsi :  http://org-www.arte.tv/papi/tvguide/videos/stream/player/F/{identifiant du film}_PLUS7-F/ALL/ALL.json
 
-            QRegExp regexp1("<input name='id' type='hidden' value='([0-9-]+)'");
+            // reply.url est égal à http://www.arte.tv/guide/fr/051912-001/28-minutes
+            // on en extrait le code ou en faisant
+            //       <input name='id' type='hidden' value=****ici se trouve l'identifiant du film***
+            //    ou en le prenant de l'URL
+            // Et on reconstruit l'URL ainsi :  http://org-www.arte.tv/papi/tvguide/videos/stream/player/F/{identifiant du film}_PLUS7-F/ALL/ALL.json
+            QStringList splittenUrl = reply->url().toString().split('/');
+            /*QRegExp regexp1("<input name='id' type='hidden' value='([0-9-]+)'");
             regexp1.setMinimal(true);
-            regexp1.indexIn(page);
-            QString filmId = regexp1.cap(1);
+            regexp1.indexIn(page);*/
+            QString filmId = splittenUrl.size() > 5 ? splittenUrl.at(5) : "";
 
             QString jsonUrl = filmId.isEmpty() ? "" : QString("http://org-www.arte.tv/papi/tvguide/videos/stream/player/F/%0_PLUS7-F/ALL/ALL.json").arg(filmId);
 
