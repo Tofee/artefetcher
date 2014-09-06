@@ -227,11 +227,11 @@ void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
 void MainWindow::loadStreamComboBox() {
     int previousIndex = ui->streamComboBox->currentIndex();
     ui->streamComboBox->clear();
-    ui->streamComboBox->addItem(tr("Arte selection"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->selectedLanguage() + "/plus7/selection.json");
-    ui->streamComboBox->addItem(tr("Most recent"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->selectedLanguage() + "/plus7/plus_recentes.json");
-    ui->streamComboBox->addItem(tr("Most seen"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->selectedLanguage() + "/plus7/plus_vues.json");
-    ui->streamComboBox->addItem(tr("Last chance"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->selectedLanguage() + "/plus7/derniere_chance.json");
-    ui->streamComboBox->addItem(tr("All"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->selectedLanguage() + "/plus7.json");
+    ui->streamComboBox->addItem(tr("Arte selection"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7/selection.json");
+    ui->streamComboBox->addItem(tr("Most recent"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7/plus_recentes.json");
+    ui->streamComboBox->addItem(tr("Most seen"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7/plus_vues.json");
+    ui->streamComboBox->addItem(tr("Last chance"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7/derniere_chance.json");
+    ui->streamComboBox->addItem(tr("All"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7.json");
     //ui->streamComboBox->addItem(tr("Test"), "http://www.arte.tv/papi/tvguide/epg/live/F/L3/1.json");
     ui->streamComboBox->addItem(tr("By date"), DATE_STREAM_PREFIX);
     ui->streamComboBox->addItem(tr("Downloads"), DOWNLOAD_STREAM);
