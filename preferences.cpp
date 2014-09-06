@@ -24,6 +24,7 @@
 #define DEF_OPT_STR_LANGUAGE          "stream_language"
 #define DEF_OPT_STR_QUALITY           "stream_quality"
 #define DEF_OPT_FILENAME_PATTERN      "filename_pattern"
+#define DEF_OPT_FAVORITE_STREAM_TYPE  "favorite_stream_type"
 #define DEF_OPT_DST_DIR               "destination_directory"
 #define DEF_OPT_PENDING_DOWNLADS      "pending_downloads"
 #define DEF_OPT_PREF_WINDOW_SIZE      "preferred_window_size"
@@ -45,6 +46,23 @@ Preferences::Preferences()
     load();
 }
 
+QStringList listVideoStreamTypes() {
+    // TODO that could be better
+    QStringList list;
+    list.append("VOSTF");
+    list.append("VF");
+    list.append("Version allemande");
+    list.append("ST sourds/mal");
+    list.append("VOF");
+
+    list.append("Dt. Version");
+    list.append("Frz. Version");
+    list.append("Hörfilm");
+    list.append("OmU");
+    list.append("UT Hörgeschädigte");
+    return list;
+}
+
 void Preferences::load()
 {
     QString defaultWorkingPath(QDir::homePath().append(QDir::separator()).append("arteFetcher"));
@@ -52,6 +70,13 @@ void Preferences::load()
     m_applicationLanguage = settings.value(DEF_OPT_STR_LANGUAGE, FilmDelegate::listLanguages().first()).toString();
     m_selectedQuality = settings.value(DEF_OPT_STR_QUALITY, FilmDelegate::listQualities().first()).toString();
     m_filenamePattern = settings.value(DEF_OPT_FILENAME_PATTERN, "[%language %quality] %title").toString();
+    m_favoriteStreamTypes = settings.value(DEF_OPT_FAVORITE_STREAM_TYPE, listVideoStreamTypes()).toStringList();
+    // If a favorite is missing, we have to add it at the end of the list
+    foreach (QString favorite, listVideoStreamTypes()) {
+        if (!m_favoriteStreamTypes.contains(favorite)) {
+            m_favoriteStreamTypes << favorite;
+        }
+    }
     m_destinationDir = settings.value(DEF_OPT_DST_DIR, defaultWorkingPath).toString();
     m_pendingDownloads = settings.value(DEF_OPT_PENDING_DOWNLADS, QStringList()).toStringList();
     m_preferredWindowSize = settings.value(DEF_OPT_PREF_WINDOW_SIZE, QSize(960,600)).toSize();
@@ -80,7 +105,7 @@ void Preferences::save()
     settings.setValue(DEF_OPT_SAVE_IMAGE_PREVIEW, m_saveImagePreview);
     settings.setValue(DEF_OPT_SAVE_META_INFO, m_saveMetaInInfoFile);
     settings.setValue(DEF_OPT_RESULT_COUNT_P_PAGE, m_resultCountPerPage);
-
+    settings.setValue(DEF_OPT_FAVORITE_STREAM_TYPE, m_favoriteStreamTypes);
     settings.setValue(DEF_OPT_PROXY_HTTP_ENABLED, m_proxyEnabled);
     settings.setValue(DEF_OPT_PROXY_HTTP_URL, m_proxyHttpUrl);
     settings.setValue(DEF_OPT_PROXY_HTTP_PORT, m_proxyHttpPort);

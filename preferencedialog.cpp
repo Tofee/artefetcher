@@ -25,6 +25,7 @@
 
 #include <filmdelegate.h>
 
+
 PreferenceDialog::PreferenceDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::PreferenceDialog)
@@ -51,6 +52,8 @@ PreferenceDialog::PreferenceDialog(QWidget *parent) :
     QString countPerPageString = QString::number(Preferences::getInstance()->m_resultCountPerPage);
     ui->resultCountComboBox->setCurrentIndex(ui->resultCountComboBox->findText(countPerPageString));
 
+    ui->favoriteStreamListWidget->addItems(Preferences::getInstance()->favoriteStreamTypes());
+
     updateProxyConfigVisibility();
 
     connect(ui->browsePushButton, SIGNAL(clicked()),
@@ -63,6 +66,11 @@ PreferenceDialog::PreferenceDialog(QWidget *parent) :
 
     connect(ui->proxyCheckBox, SIGNAL(clicked()),
             SLOT(updateProxyConfigVisibility()));
+
+    connect(ui->upPushButton, SIGNAL(clicked()),
+            SLOT(upStreamType()));
+    connect(ui->downPushButton, SIGNAL(clicked()),
+            SLOT(downStreamType()));
 }
 
 PreferenceDialog::~PreferenceDialog()
@@ -70,13 +78,17 @@ PreferenceDialog::~PreferenceDialog()
     delete ui;
 }
 
-
 void PreferenceDialog::accept()
 {
     Preferences::getInstance()->m_destinationDir = ui->destinationDirectoryLineEdit->text();
     Preferences::getInstance()->m_filenamePattern = ui->filenamePatternLineEdit->text();
 
     Preferences::getInstance()->m_dedicatedDirectoryForSeries = ui->seriesDirectoryCheckBox->isChecked();
+
+    Preferences::getInstance()->m_favoriteStreamTypes.clear();
+    for (int i = 0; i < ui->favoriteStreamListWidget->count(); i++){
+        Preferences::getInstance()->m_favoriteStreamTypes << ui->favoriteStreamListWidget->item(i)->text();
+    }
 
     Preferences::getInstance()->m_saveMetaInInfoFile = ui->metaInfoCheckBox->isChecked();
     Preferences::getInstance()->m_saveImagePreview = ui->imagePreviewCheckBox->isChecked();
@@ -123,4 +135,23 @@ void PreferenceDialog::updateProxyConfigVisibility() {
     ui->proxyHttpUrlLineEdit->setVisible(toBeVisible);
     ui->proxyHttpPortLabel->setVisible(toBeVisible);
     ui->proxyHttpPortSpinBox->setVisible(toBeVisible);
+}
+
+
+void PreferenceDialog::upStreamType(){
+    int currentIndex = ui->favoriteStreamListWidget->currentRow();
+    if (currentIndex > 0){
+        QListWidgetItem* item = ui->favoriteStreamListWidget->takeItem(currentIndex);
+        ui->favoriteStreamListWidget->insertItem(currentIndex - 1, item);
+        ui->favoriteStreamListWidget->setCurrentRow(currentIndex - 1);
+    }
+}
+
+void PreferenceDialog::downStreamType(){
+    int currentIndex = ui->favoriteStreamListWidget->currentRow();
+    if (currentIndex < ui->favoriteStreamListWidget->count() - 1){
+        QListWidgetItem* item = ui->favoriteStreamListWidget->takeItem(currentIndex);
+        ui->favoriteStreamListWidget->insertItem(currentIndex + 1, item);
+        ui->favoriteStreamListWidget->setCurrentRow(currentIndex + 1);
+    }
 }

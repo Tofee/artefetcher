@@ -99,9 +99,11 @@ public:
     EDownloadStatus m_downloadStatus;
     int m_downloadProgress;
 
+    // Map of stream urls indexed by stream type name
     QMap<QString, QString> m_allStreams;
     // Full path of the future downloaded film.
     QString m_targetFileName;
+    QString m_choosenStreamType;
 
     QStringList m_errors;
 

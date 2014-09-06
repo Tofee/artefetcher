@@ -608,10 +608,21 @@ void MainWindow::updateCurrentDetails() {
     }
     ui->extractIconLabel->setVisible(isTeaserFromOriginalMovie(*film));
 
-    QString currentFilmStream = ui->filmStreamComboBox->currentText();
     ui->filmStreamComboBox->clear();
     ui->filmStreamComboBox->addItems(film->m_allStreams.keys());
-    ui->filmStreamComboBox->setCurrentIndex(ui->filmStreamComboBox->findText(currentFilmStream) >= 0 ? ui->filmStreamComboBox->findText(currentFilmStream) : 0);
+    ui->filmStreamComboBox->setVisible(ui->filmStreamComboBox->count());
+    int streamTypeIndexToSelect = -1;
+    if (! film->m_choosenStreamType.isEmpty()){
+        streamTypeIndexToSelect = ui->filmStreamComboBox->findText(film->m_choosenStreamType);
+    }
+    int indexInFavorites = 0;
+    while (streamTypeIndexToSelect < 0 && indexInFavorites < Preferences::getInstance()->favoriteStreamTypes().size()) {
+        streamTypeIndexToSelect = ui->filmStreamComboBox->findText(Preferences::getInstance()->favoriteStreamTypes().at(indexInFavorites++));
+    }
+    if (streamTypeIndexToSelect >= 0){
+        ui->filmStreamComboBox->setCurrentIndex(streamTypeIndexToSelect);
+    }
+
 }
 
 
@@ -706,9 +717,6 @@ QString MainWindow::getFileName(const FilmDetails * const film, int fileSuffixNu
 
     QString cleanedTitle;
 
-    QString language(getStreamType().languageCode);
-    language = language.replace(0, 1, language.left(1).toUpper());
-
     if (Preferences::getInstance()->useDedicatedDirectoryForSeries() && !episodeName.isEmpty())
     {
         QRegExp episodeNumberRegExp("\\([0-9 \\-/]+\\)");
@@ -724,7 +732,7 @@ QString MainWindow::getFileName(const FilmDetails * const film, int fileSuffixNu
 
         QString filename = Preferences::getInstance()->filenamePattern();;
         filename.replace("%title", episodeNumberText.append(episodeName))
-                .replace("%language", language)
+                .replace("%language", film->m_choosenStreamType)
                 .replace("%quality", getStreamType().qualityCode.toUpper());
 
         cleanedTitle = cleanFilenameForFileSystem(serieName).append(QDir::separator()).append(cleanFilenameForFileSystem(filename));
@@ -733,7 +741,7 @@ QString MainWindow::getFileName(const FilmDetails * const film, int fileSuffixNu
     {
         cleanedTitle = Preferences::getInstance()->filenamePattern();
         cleanedTitle.replace("%title", title)
-                .replace("%language", language)
+                .replace("%language",  film->m_choosenStreamType)
                 .replace("%quality", getStreamType().qualityCode.toUpper());
         cleanedTitle = cleanFilenameForFileSystem(cleanedTitle);
     }
@@ -845,6 +853,15 @@ void MainWindow::openFilmDirectory() {
     QFileInfo filmFile(film->m_targetFileName);
     QDesktopServices::openUrl(QUrl::fromLocalFile(filmFile.absolutePath()));
 }
+
+void MainWindow::streamTypeChanged() {
+    FilmDetails* film = getCurrentFilm();
+    if (film == NULL || ui->streamComboBox->currentText().isEmpty()){
+        return;
+    }
+    film->m_choosenStreamType = ui->streamComboBox->currentText();
+}
+
 void MainWindow::showAboutWindow() {
     AboutDialog popup(this);
     popup.exec();

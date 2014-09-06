@@ -93,7 +93,7 @@ private slots:
     void cancelSelectedFilmDownload();
     void playFilm();
     void openFilmDirectory();
-    void showAboutWindow();
+    void streamTypeChanged();
 
     void nextPage();
     void previousPage();
@@ -101,6 +101,7 @@ private slots:
     void addFilmManuallyFromUrl();
 
     void showPreferences();
+    void showAboutWindow();
 
     /* Film delegate */
     void errorOccured(QString filmUrl, QString errorMessage);

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>531</width>
-    <height>569</height>
+    <height>695</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -204,7 +204,60 @@
       <string>General</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_4">
-      <item row="3" column="1">
+      <item row="3" column="1" rowspan="2">
+       <widget class="QListWidget" name="favoriteStreamListWidget"/>
+      </item>
+      <item row="1" column="1">
+       <widget class="QComboBox" name="qualityComboBox"/>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_8">
+        <property name="text">
+         <string>Favorite streams:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Language:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="2">
+       <widget class="QPushButton" name="downPushButton">
+        <property name="text">
+         <string>Down</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Result count per page:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="languageComboBox"/>
+      </item>
+      <item row="3" column="2">
+       <widget class="QPushButton" name="upPushButton">
+        <property name="text">
+         <string>Up</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>HQ: smallest quality - 800 (720 x 406)
+EQ: intermediate quality - 1500 (1280 x 720)
+SQ: top quality - 2200 (1280 x 720)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
        <widget class="QComboBox" name="resultCountComboBox">
         <property name="currentIndex">
          <number>0</number>
@@ -236,39 +289,10 @@
         </item>
        </widget>
       </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Result count per page:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_5">
-        <property name="text">
-         <string>Language:</string>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="0">
        <widget class="QLabel" name="label_6">
         <property name="text">
          <string>Quality:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QComboBox" name="languageComboBox"/>
-      </item>
-      <item row="1" column="1">
-       <widget class="QComboBox" name="qualityComboBox"/>
-      </item>
-      <item row="2" column="1">
-       <widget class="QLabel" name="label_7">
-        <property name="text">
-         <string>HQ: smallest quality - 800 (720 x 406)
-EQ: intermediate quality - 1500 (1280 x 720)
-SQ: top quality - 2200 (1280 x 720)</string>
         </property>
        </widget>
       </item>

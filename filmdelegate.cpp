@@ -449,7 +449,12 @@ void FilmDelegate::requestReadyToRead(QObject* object)
             regexp1.indexIn(page);*/
             QString filmId = splittenUrl.size() > 5 ? splittenUrl.at(5) : "";
 
-            QString jsonUrl = filmId.isEmpty() ? "" : QString("http://org-www.arte.tv/papi/tvguide/videos/stream/player/F/%0_PLUS7-F/ALL/ALL.json").arg(filmId);
+            QString languageCharacter = Preferences::getInstance()->applicationLanguage().left(1).toUpper();
+
+            QString jsonUrl = filmId.isEmpty() ? "" : QString("http://org-www.arte.tv/papi/tvguide/videos/stream/player/%0/%1_PLUS7-%2/ALL/ALL.json")
+                                                 .arg(languageCharacter)
+                                                 .arg(filmId)
+                                                 .arg(languageCharacter);
 
             if (jsonUrl.isEmpty())
             {

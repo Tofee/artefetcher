@@ -107,6 +107,14 @@ public:
         return m_resultCountPerPage;
     }
 
+    const QStringList favoriteStreamTypes() const {
+        return m_favoriteStreamTypes;
+    }
+
+    void setFavoriteStreamTypes(const QStringList newList) {
+        m_favoriteStreamTypes = newList;
+    }
+
     virtual void load() = 0;
     virtual void save() = 0;
 
@@ -121,6 +129,8 @@ protected:
     bool    m_saveImagePreview;
     bool    m_saveMetaInInfoFile;
     int     m_resultCountPerPage;
+    /* Stream types in a favorite order */
+    QStringList m_favoriteStreamTypes;
 
     /* Proxy : */
     bool    m_proxyEnabled;

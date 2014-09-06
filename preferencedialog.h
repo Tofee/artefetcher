@@ -40,6 +40,10 @@ private slots:
     void browse();
     void checkIsAcceptable();
     void updateProxyConfigVisibility();
+
+    void upStreamType();
+    void downStreamType();
+
 private:
     Ui::PreferenceDialog *ui;
 };
