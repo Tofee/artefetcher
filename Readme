@@ -24,6 +24,9 @@ along with ArteFetcher.  If not, see <http://www.gnu.org/licenses/>.
 
 
 Release notes :
+v0.5.1
+  Fix segfault
+  Fix recent Arte.tv API changes
 v0.4.2
   Optimizations (download film details abortion when no longer necessary)
   Improvement on playlist update
