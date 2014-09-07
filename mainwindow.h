@@ -117,6 +117,8 @@ private:
     bool isReadyForDownload(const FilmDetails * const film) const;
     FilmDetails* getCurrentFilm() const;
     bool fileExistForTheFilm(const FilmDetails * const) const;
+    void updateFilmStreamCombobox(FilmDetails * const);
+    void updateButtonsVisibility(const FilmDetails * const);
 
     void resizeEvent(QResizeEvent * event);
     void closeEvent(QCloseEvent* event);

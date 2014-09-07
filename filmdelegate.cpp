@@ -542,13 +542,10 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                     film->m_metadata.insert(Channels, labels.join(", "));
                 }
 
-
-
                 if (mymap.value("videoSwitchLang").toMap().size() > 1)
                 {
                     qDebug () << "[Warning] more than german and french available";
                 }
-                emit filmHasBeenUpdated(film);
 
                 QString thumbnail = mymap.value(JSON_FILMPAGE_PREVIEW).toMap()
                         .value(JSON_FILMPAGE_PREVIEW_URL).toString();
@@ -564,6 +561,8 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                         film->m_allStreams[map.value("versionLibelle").toString()] = map.value("url").toString();
                     }
                 }
+
+                emit filmHasBeenUpdated(film);
             }
         }
         else if (itemStep == MAPPER_STEP_CODE_4_PREVIEW)

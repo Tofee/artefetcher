@@ -151,9 +151,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->streamComboBox, SIGNAL(currentIndexChanged(int)),
             SLOT(clearAndLoadTable()));
 
-    connect(ui->filmStreamComboBox, SIGNAL(currentTextChanged(QString)),
-            SLOT(streamTypeChanged()));
-
     connect(ui->playButton, SIGNAL(clicked()),
             SLOT(playFilm()));
     connect(ui->openDirectoryButton, SIGNAL(clicked()),
@@ -555,14 +552,6 @@ void MainWindow::updateCurrentDetails() {
      if (film == NULL)
          return;
 
-     bool hasDownloadStarted = film && (film->m_downloadStatus == DL_DOWNLOADING || film->m_downloadStatus == DL_DOWNLOADED || film->m_downloadStatus == DL_ERROR || fileExistForTheFilm(film));
-
-     ui->openDirectoryButton->setVisible(hasDownloadStarted);
-     ui->playButton->setVisible(hasDownloadStarted);
-     ui->downloadButton->setVisible(isReadyForDownload(film));
-     ui->cancelSelectedFilmButton->setVisible(film != NULL &&
-             (film->m_downloadStatus == DL_DOWNLOADING || film->m_downloadStatus == DL_REQUESTED));
-
     ui->detailsGroupBox->setTitle(film->m_title);
 
     QString prefix;
@@ -604,27 +593,53 @@ void MainWindow::updateCurrentDetails() {
 
     clicOnPreview(false);
 
-    ui->filmStreamComboBox->clear();
-    ui->filmStreamComboBox->addItems(film->m_allStreams.keys());
+    updateFilmStreamCombobox(film);
 
-    ui->filmStreamComboBox->setVisible(ui->filmStreamComboBox->count());
+    // Ceci doit être fait après updateFilmStreamCombobox car updateFilmStreamCombobox calcule le type de vidéo à télécharger donc le nom du fichier
+    updateButtonsVisibility(film);
+
+}
+
+void MainWindow::updateFilmStreamCombobox(FilmDetails * const film) {
+    // Gestion assez complexe de filmStream combobox
+    disconnect(ui->filmStreamComboBox, SIGNAL(currentTextChanged(QString)),
+            this, SLOT(streamTypeChanged()));
+    ui->filmStreamComboBox->clear();
+    if (film->m_allStreams.keys().size()){
+        ui->filmStreamComboBox->addItems(film->m_allStreams.keys());
+    }
+
     int streamTypeIndexToSelect = -1;
     ui->filmStreamComboBox->setVisible(ui->filmStreamComboBox->count() && !filmWillBeDownloaded(film));
 
-    if (streamTypeIndexToSelect < 0){
+    if (ui->filmStreamComboBox->isVisible()){
         if (! film->m_choosenStreamType.isEmpty()){
             streamTypeIndexToSelect = ui->filmStreamComboBox->findText(film->m_choosenStreamType);
-        }
-        int indexInFavorites = 0;
-        while (streamTypeIndexToSelect < 0 && indexInFavorites < Preferences::getInstance()->favoriteStreamTypes().size()) {
-            streamTypeIndexToSelect = ui->filmStreamComboBox->findText(Preferences::getInstance()->favoriteStreamTypes().at(indexInFavorites++));
+        } else {
+            int indexInFavorites = 0;
+            while (streamTypeIndexToSelect < 0 && indexInFavorites < Preferences::getInstance()->favoriteStreamTypes().size()) {
+                streamTypeIndexToSelect = ui->filmStreamComboBox->findText(Preferences::getInstance()->favoriteStreamTypes().at(indexInFavorites));
+                indexInFavorites++;
+            }
         }
         if (streamTypeIndexToSelect >= 0){
+            film->m_choosenStreamType = ui->filmStreamComboBox->itemText(streamTypeIndexToSelect);
             ui->filmStreamComboBox->setCurrentIndex(streamTypeIndexToSelect);
+
+            connect(ui->filmStreamComboBox, SIGNAL(currentTextChanged(QString)),
+                    SLOT(streamTypeChanged()));
         }
     }
 }
+void MainWindow::updateButtonsVisibility(const FilmDetails * const film){
+    bool hasDownloadStarted = film && (film->m_downloadStatus == DL_DOWNLOADING || film->m_downloadStatus == DL_DOWNLOADED || film->m_downloadStatus == DL_ERROR || fileExistForTheFilm(film));
 
+    ui->openDirectoryButton->setVisible(hasDownloadStarted);
+    ui->playButton->setVisible(hasDownloadStarted);
+    ui->downloadButton->setVisible(isReadyForDownload(film));
+    ui->cancelSelectedFilmButton->setVisible(film != NULL &&
+            (film->m_downloadStatus == DL_DOWNLOADING || film->m_downloadStatus == DL_REQUESTED));
+}
 
 QString cleanFilenameForFileSystem(const QString filename) {
     QString cleanedFilename(filename);
@@ -861,10 +876,13 @@ void MainWindow::openFilmDirectory() {
 
 void MainWindow::streamTypeChanged() {
     FilmDetails* film = getCurrentFilm();
-    if (film == NULL || ui->filmStreamComboBox->currentText().isEmpty()){
+    // Si film->m_choosenStreamType.isEmpty() ça veut dire qu'on n'a encore jamais appliqué l'algorithme
+    // permettant de prendre le soustitrage favori. Il ne faut donc pas prendre en compte la combobox
+    if (film == NULL || film->m_choosenStreamType.isEmpty() || ui->filmStreamComboBox->currentText().isEmpty()){
         return;
     }
     film->m_choosenStreamType = ui->filmStreamComboBox->currentText();
+    updateButtonsVisibility(film);
 }
 
 void MainWindow::showAboutWindow() {
