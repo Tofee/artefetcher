@@ -19,6 +19,7 @@
 
 #include "preferences.h"
 #include <QDir>
+#include <QMessageBox>
 #include <filmdelegate.h>
 
 #define DEF_OPT_STR_LANGUAGE          "stream_language"
@@ -90,6 +91,13 @@ void Preferences::load()
     m_proxyHttpPort = settings.value(DEF_OPT_PROXY_HTTP_PORT, 3128).toInt();
 
     if (settings.value(DEF_LAST_VERSION_USED, "0.5.1").toString() == "0.5.1"){
+//        const QString newFileNamePattern = "[%language] %title";
+//        QMessageBox::information(NULL, QObject::tr("New version"),
+//                                 QObject::tr("Your filename pattern was: %0.\nQuality is no longer supported.\nThus the pattern has been replaced with %1.\nYou can change it in the preference dialog.")
+//                                 .arg(m_filenamePattern)
+//                                 .arg(newFileNamePattern));
+//        m_filenamePattern = newFileNamePattern;
+        // Note : previous pending downloads will start from the beginning rather than continuing.
     }
 }
 
