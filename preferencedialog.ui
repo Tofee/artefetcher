@@ -213,7 +213,7 @@
       <item row="3" column="0">
        <widget class="QLabel" name="label_8">
         <property name="text">
-         <string>Favorite streams:</string>
+         <string>Favorite video translation:</string>
         </property>
        </widget>
       </item>
@@ -285,6 +285,11 @@ SQ: top quality - 2200 (1280 x 720)</string>
         <item>
          <property name="text">
           <string notr="true">100</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>All results</string>
          </property>
         </item>
        </widget>

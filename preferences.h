@@ -104,7 +104,7 @@ public:
 
     int resultCountPerPage()
     {
-        return m_resultCountPerPage;
+        return m_resultCountPerPage ? m_resultCountPerPage : 100000;
     }
 
     const QStringList favoriteStreamTypes() const {
@@ -128,6 +128,7 @@ protected:
     bool    m_dedicatedDirectoryForSeries;
     bool    m_saveImagePreview;
     bool    m_saveMetaInInfoFile;
+    // 0 if all results shown in the page
     int     m_resultCountPerPage;
     /* Stream types in a favorite order */
     QStringList m_favoriteStreamTypes;

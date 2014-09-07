@@ -50,7 +50,7 @@ PreferenceDialog::PreferenceDialog(QWidget *parent) :
     ui->proxyHttpUrlLineEdit->setText(Preferences::getInstance()->m_proxyHttpUrl);
     ui->proxyHttpPortSpinBox->setValue(Preferences::getInstance()->m_proxyHttpPort);
     QString countPerPageString = QString::number(Preferences::getInstance()->m_resultCountPerPage);
-    ui->resultCountComboBox->setCurrentIndex(ui->resultCountComboBox->findText(countPerPageString));
+    ui->resultCountComboBox->setCurrentIndex(ui->resultCountComboBox->findText(countPerPageString) < 0 ? ui->resultCountComboBox->count() - 1: ui->resultCountComboBox->findText(countPerPageString));
 
     ui->favoriteStreamListWidget->addItems(Preferences::getInstance()->favoriteStreamTypes());
 
@@ -92,6 +92,7 @@ void PreferenceDialog::accept()
 
     Preferences::getInstance()->m_saveMetaInInfoFile = ui->metaInfoCheckBox->isChecked();
     Preferences::getInstance()->m_saveImagePreview = ui->imagePreviewCheckBox->isChecked();
+
     Preferences::getInstance()->m_resultCountPerPage = ui->resultCountComboBox->currentText().toInt();
 
     Preferences::getInstance()->m_proxyEnabled = ui->proxyCheckBox->isChecked();
