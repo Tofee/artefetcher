@@ -570,18 +570,20 @@ void FilmDelegate::requestReadyToRead(QObject* object)
             if (!film->m_preview.contains(reply->url().toString()))
             {
                 QImage image;
-                image.load(reply, "jpg");
+                if (! reply->error()){
+                    image.load(reply, "jpg");
 
-                if (! image.isNull())
-                {
-                    film->m_preview[reply->url().toString()] = image.scaled(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-                    // No need to update current image if an image has already been loaded
-                    if (film->m_preview.size() == 1)
-                        emit filmHasBeenUpdated(film);
-                }
-                else
-                {
-                    emit(errorOccured(film->m_infoUrl,tr("Cannot load the preview image")));
+                    if (! image.isNull())
+                    {
+                        film->m_preview[reply->url().toString()] = image.scaled(MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+                        // No need to update current image if an image has already been loaded
+                        if (film->m_preview.size() == 1)
+                            emit filmHasBeenUpdated(film);
+                    }
+                    else
+                    {
+                        emit(errorOccured(film->m_infoUrl,tr("Cannot load the preview image")));
+                    }
                 }
             }
         }
