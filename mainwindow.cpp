@@ -910,7 +910,7 @@ void MainWindow::clicOnPreview(bool fromTimer) {
     if (film == NULL)
         return;
 
-    ui->previewLabel->setVisible(true);
+    updateBigImageVisibility();
     if (!film->m_preview.isEmpty())
     {
         ui->previewLabel->setPixmap(QPixmap::fromImage(film->m_preview.values().value(m_currentPreview % film->m_preview.size())));
@@ -1148,8 +1148,12 @@ void MainWindow::webPageButtonClicked()
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event) {
-    ui->previewLabel->setVisible(width() > 950);
+    updateBigImageVisibility();
     event->accept();
+}
+
+void MainWindow::updateBigImageVisibility(){
+    ui->previewLabel->setVisible(width() > 950);
 }
 
 void MainWindow::filmHasBeenUpdated(const FilmDetails * const film){

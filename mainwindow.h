@@ -119,6 +119,7 @@ private:
     bool fileExistForTheFilm(const FilmDetails * const) const;
     void updateFilmStreamCombobox(FilmDetails * const);
     void updateButtonsVisibility(const FilmDetails * const);
+    void updateBigImageVisibility();
 
     void resizeEvent(QResizeEvent * event);
     void closeEvent(QCloseEvent* event);
