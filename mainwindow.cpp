@@ -223,7 +223,7 @@ void MainWindow::loadStreamComboBox() {
     ui->streamComboBox->addItem(tr("Last chance"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7/derniere_chance.json");
     ui->streamComboBox->addItem(tr("All"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7.json");
     //ui->streamComboBox->addItem(tr("Test"), "http://www.arte.tv/papi/tvguide/epg/live/F/L3/1.json");
-    ui->streamComboBox->addItem(tr("By date"), DATE_STREAM_PREFIX);
+    // ui->streamComboBox->addItem(tr("By date"), DATE_STREAM_PREFIX); // BROKEN Since 2014-09-01
     ui->streamComboBox->addItem(tr("Downloads"), DOWNLOAD_STREAM);
     //ui->streamComboBox->addItem(tr("Search"), SEARCH_PREFIX);
     if (previousIndex >=0 )
