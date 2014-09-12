@@ -602,7 +602,7 @@ void MainWindow::updateCurrentDetails() {
 
 void MainWindow::updateFilmStreamCombobox(FilmDetails * const film) {
     // Gestion assez complexe de filmStream combobox
-    disconnect(ui->filmStreamComboBox, SIGNAL(currentTextChanged(QString)),
+    disconnect(ui->filmStreamComboBox, SIGNAL(currentIndexChanged(QString)),
             this, SLOT(streamTypeChanged()));
     ui->filmStreamComboBox->clear();
     if (film->m_allStreams.keys().size()){
@@ -626,7 +626,7 @@ void MainWindow::updateFilmStreamCombobox(FilmDetails * const film) {
             film->m_choosenStreamType = ui->filmStreamComboBox->itemText(streamTypeIndexToSelect);
             ui->filmStreamComboBox->setCurrentIndex(streamTypeIndexToSelect);
 
-            connect(ui->filmStreamComboBox, SIGNAL(currentTextChanged(QString)),
+            connect(ui->filmStreamComboBox, SIGNAL(currentIndexChanged(QString)),
                     SLOT(streamTypeChanged()));
         }
     }
