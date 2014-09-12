@@ -971,7 +971,9 @@ void MainWindow::downloadProgressed(QString filmUrl, double progression, double 
     statusBar()->showMessage((tr("%1 item(s) in queue").arg(thread->queueSize())));
 
     updateRowInTable(film);
-    updateCurrentDetails();
+    if (getCurrentFilm() == film){
+        updateButtonsVisibility(film);
+    }
 }
 
 void MainWindow::downloadCancelled(QString filmUrl)
@@ -981,7 +983,9 @@ void MainWindow::downloadCancelled(QString filmUrl)
     {
         film->m_downloadStatus = DL_CANCELLED;
         updateRowInTable(film);
-        updateCurrentDetails();
+        if (getCurrentFilm() == film){
+            updateButtonsVisibility(film);
+        }
     }
 }
 
