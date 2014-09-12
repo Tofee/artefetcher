@@ -24,6 +24,10 @@ along with ArteFetcher.  If not, see <http://www.gnu.org/licenses/>.
 
 
 Release notes:
+v0.5.3
+  Fixes:
+    - build on Qt4 caused No such signal QComboBox::currentTextChanged(QString)
+    - blinking language combobox during download
 v0.5.2
   New features:
     - choose language and subtitles of the video
