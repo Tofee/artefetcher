@@ -652,12 +652,12 @@ Geschwindigkeit %2 kB/s  -  Restzeit: %3</translation>
         <location filename="preferencedialog.ui" line="216"/>
         <source>Favorite video translation:</source>
         <oldsource>Favorite streams:</oldsource>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lieblingsübersetzung:</translation>
     </message>
     <message>
         <location filename="preferencedialog.ui" line="230"/>
         <source>Down</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Unten</translation>
     </message>
     <message>
         <location filename="preferencedialog.ui" line="237"/>
@@ -672,12 +672,12 @@ Geschwindigkeit %2 kB/s  -  Restzeit: %3</translation>
     <message>
         <location filename="preferencedialog.ui" line="247"/>
         <source>Up</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Oben</translation>
     </message>
     <message>
         <location filename="preferencedialog.ui" line="292"/>
         <source>All results</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alle Ergebnisse</translation>
     </message>
     <message>
         <location filename="preferencedialog.ui" line="300"/>

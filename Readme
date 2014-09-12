@@ -23,7 +23,18 @@ along with ArteFetcher.  If not, see <http://www.gnu.org/licenses/>.
 *****************************************************************************
 
 
-Release notes :
+Release notes:
+v0.5.2
+  New features:
+    - choose language and subtitles of the video
+    - favourite language and subtitles in preferences
+    - show all results in the video list
+    - save episode number everytime needed - prevents some filename conflicts
+  Fixes:
+    - video picture was blinking on small resolution screens
+    - en_US failed to list movies
+    - german getting no video available since 0.5.1 changes
+    - corrupt JPEG data: premature end of data segment
 v0.5.1
   Fix segfault
   Fix recent Arte.tv API changes
