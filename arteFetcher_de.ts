@@ -182,7 +182,7 @@
     <message>
         <location filename="mainwindow.ui" line="40"/>
         <source>dd/MM/yy</source>
-        <translation>dd/MM/yy</translation>
+        <translation type="unfinished">Tag/Monat/Jahr</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="50"/>
@@ -652,12 +652,12 @@ Geschwindigkeit %2 kB/s  -  Restzeit: %3</translation>
         <location filename="preferencedialog.ui" line="216"/>
         <source>Favorite video translation:</source>
         <oldsource>Favorite streams:</oldsource>
-        <translation type="unfinished">Lieblingsübersetzung:</translation>
+        <translation type="unfinished">Bevorzugte Übersetzung:</translation>
     </message>
     <message>
         <location filename="preferencedialog.ui" line="230"/>
         <source>Down</source>
-        <translation type="unfinished">Unten</translation>
+        <translation type="unfinished">Runter</translation>
     </message>
     <message>
         <location filename="preferencedialog.ui" line="237"/>
@@ -672,7 +672,7 @@ Geschwindigkeit %2 kB/s  -  Restzeit: %3</translation>
     <message>
         <location filename="preferencedialog.ui" line="247"/>
         <source>Up</source>
-        <translation type="unfinished">Oben</translation>
+        <translation type="unfinished">Hoch</translation>
     </message>
     <message>
         <location filename="preferencedialog.ui" line="292"/>

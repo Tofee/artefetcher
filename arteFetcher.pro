@@ -12,7 +12,7 @@ isEmpty(PREFIX) {
  PREFIX = /usr/bin
 }
 
-VERSION = 0.5.3
+VERSION = 0.5.4
 
 QMAKE_CXXFLAGS_DEBUG += -pg
 QMAKE_LFLAGS_DEBUG += -pg
