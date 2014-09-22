@@ -37,13 +37,13 @@ SOURCES += main.cpp\
     aboutdialog.cpp
 
 HEADERS  += mainwindow.h \
-    FilmDetails.h \
     filmdelegate.h \
     preferencedialog.h \
     preferences.h \
     downloadManager.h \
     queuedownloader.h \
-    aboutdialog.h
+    aboutdialog.h \
+    filmdetails.h
 TRANSLATIONS    = arteFetcher_de.ts \
                   arteFetcher_fr.ts
 

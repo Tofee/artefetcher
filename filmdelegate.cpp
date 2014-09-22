@@ -21,7 +21,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QtGui>
-#include <FilmDetails.h>
+#include <filmdetails.h>
 #include <QXmlQuery>
 #include <QXmlFormatter>
 #include <QXmlResultItems>

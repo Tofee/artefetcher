@@ -22,7 +22,7 @@
 #include <QMap>
 #include <QObject>
 #include <QNetworkReply>
-#include <FilmDetails.h>
+#include <filmdetails.h>
 #include <QDebug>
 #include <preferences.h>
 

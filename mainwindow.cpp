@@ -28,7 +28,7 @@
 
 #include <preferencedialog.h>
 #include <filmdelegate.h>
-#include <FilmDetails.h>
+#include <filmdetails.h>
 #include <downloadManager.h>
 #include <aboutdialog.h>
 
