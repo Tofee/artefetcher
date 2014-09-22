@@ -34,7 +34,8 @@ SOURCES += main.cpp\
     preferences.cpp \
     downloadManager.cpp \
     queuedownloader.cpp \
-    aboutdialog.cpp
+    aboutdialog.cpp \
+    catalogs/artemaincatalog.cpp
 
 HEADERS  += mainwindow.h \
     filmdelegate.h \
@@ -43,7 +44,9 @@ HEADERS  += mainwindow.h \
     downloadManager.h \
     queuedownloader.h \
     aboutdialog.h \
-    filmdetails.h
+    filmdetails.h \
+    catalogs/artemaincatalog.h \
+    catalogs/icatalog.h
 TRANSLATIONS    = arteFetcher_de.ts \
                   arteFetcher_fr.ts
 

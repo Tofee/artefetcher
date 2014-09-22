@@ -26,6 +26,7 @@
 #include <QMessageBox>
 #include <QtGui>
 
+#include <catalogs/artemaincatalog.h>
 #include <preferencedialog.h>
 #include <filmdelegate.h>
 #include <filmdetails.h>
@@ -64,6 +65,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_trayIcon->show();
 
     delegate = new FilmDelegate(manager);
+    delegate->addCatalog(new ArteMainCatalog(this));
 
     QStringList header;
     header
@@ -142,9 +144,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->reloadFilmButton, SIGNAL(clicked()),
             SLOT(reloadCurrentRow()));
 
-    connect(ui->manualAddButton, SIGNAL(clicked()),
-            SLOT(addFilmManuallyFromUrl()));
-
     connect(ui->settingsButton, SIGNAL(clicked()),
             SLOT(showPreferences()));
 
@@ -215,8 +214,12 @@ void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
 }
 
 void MainWindow::loadStreamComboBox() {
-    int previousIndex = ui->streamComboBox->currentIndex();
+    //int previousIndex = ui->streamComboBox->currentIndex();
     ui->streamComboBox->clear();
+    ui->streamComboBox->addItems(delegate->listCatalogNames());
+
+
+/*
     ui->streamComboBox->addItem(tr("Arte selection"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7/selection.json");
     ui->streamComboBox->addItem(tr("Most recent"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7/plus_recentes.json");
     ui->streamComboBox->addItem(tr("Most seen"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7/plus_vues.json");
@@ -227,7 +230,7 @@ void MainWindow::loadStreamComboBox() {
     ui->streamComboBox->addItem(tr("Downloads"), DOWNLOAD_STREAM);
     //ui->streamComboBox->addItem(tr("Search"), SEARCH_PREFIX);
     if (previousIndex >=0 )
-        ui->streamComboBox->setCurrentIndex(previousIndex);
+        ui->streamComboBox->setCurrentIndex(previousIndex);*/
 }
 
 void MainWindow::streamIndexLoaded(int resultCount, int currentPage, int pageCount){
@@ -280,19 +283,10 @@ void MainWindow::updateItemProgressBar(){
 
 void MainWindow::clearAndLoadTable()
 {
-    QString url = ui->streamComboBox->itemData(ui->streamComboBox->currentIndex()).toString();
-    bool dateCurrentlyShown = false;
+    QString url;
+    bool dateCurrentlyShown = delegate->isDateCatalog(ui->streamComboBox->currentText());
     bool searchEditShown = false;
-    if (url == DATE_STREAM_PREFIX)
-    {
-        dateCurrentlyShown = true;
-        url.append(Preferences::getInstance()->applicationLanguage()).append(":");
-        url.append(ui->dateEdit->date().toString("yyyyMMdd"));
-    } else if (url == SEARCH_PREFIX) {
-        searchEditShown = true;
-        url.append(Preferences::getInstance()->applicationLanguage()).append(":");
-        url.append(ui->searchEdit->text());
-    }
+
     ui->searchEdit->setVisible(searchEditShown);
     ui->searchButton->setVisible(searchEditShown);
     ui->dateEdit->setVisible(dateCurrentlyShown);
@@ -300,17 +294,17 @@ void MainWindow::clearAndLoadTable()
     ui->tableWidget->clearContents();
     ui->pageLabel->setText(tr("Loading..."));
 
-    delegate->loadPlayList(url);
+    delegate->loadPlayList(ui->streamComboBox->currentText(), ui->dateEdit->date());
 }
 
 void MainWindow::nextPage()
 {
-    delegate->loadNextPage();
+    delegate->loadNextPage(ui->streamComboBox->currentText());
 }
 
 void MainWindow::previousPage()
 {
-    delegate->loadPreviousPage();
+    delegate->loadPreviousPage(ui->streamComboBox->currentText());
 }
 
 
@@ -1064,14 +1058,6 @@ void MainWindow::reloadCurrentRow()
     }
     delegate->reloadFilm(delegate->visibleFilms()[currentRow]);
 }
-
-
-void MainWindow::addFilmManuallyFromUrl()
-{
-    QString url = QInputDialog::getText(this, tr("Add a new Film from URL"),tr("Enter the URL of your arte film page"));
-    delegate->addMovieFromUrl(url);
-}
-
 
 void MainWindow::errorOccured(QString filmUrl, QString errorMessage)
 {

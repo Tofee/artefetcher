@@ -34,6 +34,7 @@
 #define DATE_STREAM_PREFIX  "about:date:"
 #define SEARCH_PREFIX       "about:search:"
 
+class ICatalog;
 class FilmDetails;
 class QNetworkAccessManager;
 class QSignalMapper;
@@ -62,7 +63,9 @@ public:
      * Call this method to launch the request.
      * playlistLoaded() will be called when the page is ready.
      */
-    void loadPlayList(QString url);
+    void loadPlayList(QString catalogName, QDate date);
+
+    bool isDateCatalog(QString catalogName) const;
 
     const QList<FilmDetails*> visibleFilms() const { QList<FilmDetails*> result;
                                               foreach(QString key, m_visibleFilms)
@@ -72,10 +75,10 @@ public:
                                                                                     return result; }
 
     void reloadFilm(FilmDetails* film);
-    bool addMovieFromUrl(const QString url, QString title = QString());
+    bool addMovieFromUrl(QString catalogName, const QString url, QString title = QString());
 
-    void loadNextPage();
-    void loadPreviousPage();
+    void loadNextPage(QString catalogName);
+    void loadPreviousPage(QString catalogName);
 
     /**
      * @brief getLineForUrl for an URL of a film
@@ -101,6 +104,9 @@ public:
     QStringList downloadList() const {
         return m_currentDownloads;
     }
+
+    void addCatalog(ICatalog* catalog) {m_catalogs << catalog;}
+    QStringList listCatalogNames() const;
 
     double computeTotalDownloadProgress() const;
     double computeTotalDownloadRequestedDuration() const;
@@ -129,6 +135,7 @@ private:
     void playListLoaded(const QString page);
     /**
      * @brief downloadUrl Download a page from the url
+     * @param catalogName catalog that requested the download
      * @param url remote url where the page is available
      * @param destinationKey index of the film in the map where the movie has been downloaded,<br/>
      * NULL if it's index page.
@@ -139,7 +146,7 @@ private:
      * requestReadyToRead() is called with a MyPair key of the destinationKey and the step.
      * TODO use an enum for step
      */
-    void downloadUrl(const QString& url, int requestPageId, const QString& destinationKey, const QString &step);
+    void downloadUrl(const QString &catalogName, const QString& url, int requestPageId, const QString& destinationKey, const QString &step);
     /**
      * @brief getStreamUrlFromResponse Get the Flash stream url from the video xml page.<br/>
      * There is one page per language.
@@ -150,9 +157,9 @@ private:
     QString getStreamUrlFromResponse(const QString &page, const QString &quality);
 
     int getFilmId(FilmDetails*film) const;
-    void commonLoadPlaylist(QString type);
+    void commonLoadPlaylist(QString catalogName, QString type);
 
-    void fetchImagesFromUrlsInPage(const QString& htmlPage, const FilmDetails * const film, const int pageRequestId);
+    void fetchImagesFromUrlsInPage(const QString catalogName, const QString& htmlPage, const FilmDetails * const film, const int pageRequestId);
 
     void abortDownloadItemsInProgress();
 
@@ -176,13 +183,16 @@ private:
      */
     bool m_initialyCatalog;
 
+    QList<ICatalog*> m_catalogs;
+
 };
 
+//TODO rename mypair
 class MyPair : public QObject{
     Q_OBJECT
 public:
 
-    MyPair(int pageRequestId, QString s1, QString s2): pageRequestId(pageRequestId), first(s1), second(s2)
+    MyPair(QString catalogName, int pageRequestId, QString s1, QString s2): catalogName(catalogName), pageRequestId(pageRequestId), first(s1), second(s2)
     {
         // qDebug() << "on en est a" << currentCountReference(true);
 
@@ -192,6 +202,7 @@ public:
         // qDebug() << "on en est a" << currentCountReference(false);
     }
 
+    QString catalogName;
     int pageRequestId;
     QString first;
     QString second;

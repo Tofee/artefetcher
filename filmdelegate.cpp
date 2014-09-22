@@ -29,6 +29,7 @@
 #include <QDebug>
 #include <QScriptEngine>
 #include <QScriptValue>
+#include <catalogs/icatalog.h>
 
 #define ARTE_PLAYLIST_URL "http://videos.arte.tv/fr/videos/playlistplaylist/index--3259492.html"
 #define ARTE_SEARCH_URL_FR "http://www.arte.tv/guide/fr/resultats-de-recherche?keyword=%1"
@@ -131,10 +132,26 @@ FilmDelegate::~FilmDelegate()
     {
         delete film;
     }
+
+    while(!m_catalogs.empty()){
+        delete m_catalogs.takeFirst();
+    }
 }
 
-void FilmDelegate::loadPlayList(QString url)
+void FilmDelegate::loadPlayList(QString catalogName, QDate date)
 {
+    QString url;
+    foreach(ICatalog* catalog, m_catalogs){
+        url = catalog->getUrlForCatalogNames(catalogName, QDate(date)); // ui->dateEdit->date().toString("yyyyMMdd")
+        if (!url.isEmpty()){
+            break;
+        }
+    }
+    if (url.isEmpty()){
+        qDebug() << "No catalog found for name:" << catalogName;
+        return;
+    }
+
     abortDownloadItemsInProgress();
     QString type  = MAPPER_STEP_CATALOG;
     if (url == DOWNLOAD_STREAM)
@@ -143,7 +160,7 @@ void FilmDelegate::loadPlayList(QString url)
 
         foreach(QString filmUrl, m_currentDownloads) {
             if (!m_films.contains(filmUrl)) {
-                addMovieFromUrl(filmUrl);
+                addMovieFromUrl("FAKE"/* TODO */, filmUrl);
             } else {
                 m_visibleFilms << filmUrl;
             }
@@ -188,24 +205,34 @@ void FilmDelegate::loadPlayList(QString url)
     }
     m_currentPage = 1;
     m_lastPlaylistUrl = url;
-    commonLoadPlaylist(type);
+    commonLoadPlaylist(catalogName, type);
 }
 
+bool FilmDelegate::isDateCatalog(QString catalogName) const{
+    QString url;
+    foreach(ICatalog* catalog, m_catalogs){
+        url = catalog->getUrlForCatalogNames(catalogName, QDate());
+        if (!url.isEmpty()){
+            return catalog->isDateCatalog();
+        }
+    }
+    return false;
+}
 
-void FilmDelegate::loadNextPage(){
+void FilmDelegate::loadNextPage(QString catalogName){
     if (m_currentPage >= m_currentPageCount)
         return;
     ++m_currentPage;
     abortDownloadItemsInProgress();
-    commonLoadPlaylist(m_initialyCatalog ? MAPPER_STEP_CATALOG : MAPPER_STEP_DATE);
+    commonLoadPlaylist(catalogName, m_initialyCatalog ? MAPPER_STEP_CATALOG : MAPPER_STEP_DATE);
 }
 
-void FilmDelegate::loadPreviousPage(){
+void FilmDelegate::loadPreviousPage(QString catalogName){
     if (m_currentPage <= 1)
         return;
     --m_currentPage;
     abortDownloadItemsInProgress();
-    commonLoadPlaylist(m_initialyCatalog ? MAPPER_STEP_CATALOG : MAPPER_STEP_DATE);
+    commonLoadPlaylist(catalogName, m_initialyCatalog ? MAPPER_STEP_CATALOG : MAPPER_STEP_DATE);
 }
 
 void FilmDelegate::abortDownloadItemsInProgress() {
@@ -217,12 +244,12 @@ void FilmDelegate::abortDownloadItemsInProgress() {
     }
 }
 
-void FilmDelegate::commonLoadPlaylist(QString type) {
+void FilmDelegate::commonLoadPlaylist(QString catalogName, QString type/*TODO type ne sert plus à rien*/) {
     ++m_lastRequestPageId;
 
     m_visibleFilms.clear();
     m_initialyCatalog = (type == MAPPER_STEP_CATALOG);
-    downloadUrl(m_lastPlaylistUrl, m_lastRequestPageId, QString(), type);
+    downloadUrl(catalogName, m_lastPlaylistUrl, m_lastRequestPageId, QString(), type);
 }
 
 
@@ -251,7 +278,7 @@ QString extractUniqueResult(const QString& document, const QString& xpath)
     return result;
 }
 
-void FilmDelegate::downloadUrl(const QString& url, int requestPageId, const QString& destinationKey, const QString& step)
+void FilmDelegate::downloadUrl(const QString& catalogName, const QString& url, int requestPageId, const QString& destinationKey, const QString& step)
 {
     if (requestPageId < m_lastRequestPageId)
     {
@@ -259,7 +286,7 @@ void FilmDelegate::downloadUrl(const QString& url, int requestPageId, const QStr
         return;
     }
     QNetworkReply* xmlReply = m_manager->get(QNetworkRequest(QUrl(url)));
-    m_signalMapper->setMapping(xmlReply, new MyPair(requestPageId, destinationKey, step));
+    m_signalMapper->setMapping(xmlReply, new MyPair(catalogName, requestPageId, destinationKey, step));
     connect(xmlReply, SIGNAL(finished()), m_signalMapper, SLOT(map()));
 }
 
@@ -282,7 +309,7 @@ void addMetadataIfNotEmpty(FilmDetails* film, QVariantMap inputMap, QString fiel
     }
 }
 
-void FilmDelegate::fetchImagesFromUrlsInPage(const QString& htmlPage,
+void FilmDelegate::fetchImagesFromUrlsInPage(const QString catalogName, const QString& htmlPage,
                                              const FilmDetails * const film,
                                              const int pageRequestId)
 {
@@ -301,7 +328,7 @@ void FilmDelegate::fetchImagesFromUrlsInPage(const QString& htmlPage,
         QString imageUrl = imageRegExp.capturedTexts().at(0);
         if (film->m_preview.contains(imageUrl) || fetchedImage.contains(imageUrl))
             continue;
-        downloadUrl(imageUrl, pageRequestId, film->m_infoUrl, MAPPER_STEP_CODE_4_PREVIEW);
+        downloadUrl(catalogName, imageUrl, pageRequestId, film->m_infoUrl, MAPPER_STEP_CODE_4_PREVIEW);
         fetchedImage << imageUrl;
     }
 }
@@ -349,7 +376,7 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                  }
                  if (!m_films.contains(newUrl))
                  {
-                     addMovieFromUrl(newUrl);
+                     addMovieFromUrl(pair->catalogName, newUrl);
                  }
                  else {
                      m_visibleFilms << newUrl;
@@ -360,6 +387,7 @@ void FilmDelegate::requestReadyToRead(QObject* object)
         }
         else if (itemStep == MAPPER_STEP_CATALOG || itemStep == MAPPER_STEP_DATE) {
             const QString page(QString::fromUtf8(reply->readAll()));
+
 
             QScriptEngine engine;
             QScriptValue json = engine.evaluate("JSON.parse").call(QScriptValue(),
@@ -394,9 +422,7 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                         continue;
                     }
 
-                    FilmDetails* newFilm = new FilmDetails();
-                    newFilm->m_title = title;
-                    newFilm->m_infoUrl = url;
+                    FilmDetails* newFilm = new FilmDetails(pair->catalogName, title, url, /*TODO*/"Arte id ");
 
                     // addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_AIRDATE_LONG, First_broadcast_long);
                     // addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_RIGHTS_UNTIL, Available_until);
@@ -448,7 +474,7 @@ void FilmDelegate::requestReadyToRead(QObject* object)
             regexp1.setMinimal(true);
             regexp1.indexIn(page);*/
             QString filmId = splittenUrl.size() > 5 ? splittenUrl.at(5) : "";
-            film->arteId = filmId;
+            film->m_arteId = filmId;
             QStringList splittenCode = filmId.split("-");
             film->episodeNumber = splittenCode.value(1).toInt();
 
@@ -466,12 +492,12 @@ void FilmDelegate::requestReadyToRead(QObject* object)
             }
             else
             {
-                downloadUrl(jsonUrl, pageRequestId, film->m_infoUrl, MAPPER_STEP_CODE_2_XML);
+                downloadUrl(pair->catalogName, jsonUrl, pageRequestId, film->m_infoUrl, MAPPER_STEP_CODE_2_XML);
             }
 
 
             // Fetch all images for the page
-            fetchImagesFromUrlsInPage(page, film, pageRequestId);
+            fetchImagesFromUrlsInPage(pair->catalogName, page, film, pageRequestId);
 
 
 
@@ -551,7 +577,7 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                         .value(JSON_FILMPAGE_PREVIEW_URL).toString();
                 if (!thumbnail.isEmpty() && !film->m_preview.contains(thumbnail))
                 {
-                    downloadUrl(thumbnail, pageRequestId, film->m_infoUrl, MAPPER_STEP_CODE_4_PREVIEW);
+                    downloadUrl(pair->catalogName, thumbnail, pageRequestId, film->m_infoUrl, MAPPER_STEP_CODE_4_PREVIEW);
                 }
 
                 foreach (QVariant streamJson, mymap.value("VSR").toMap().values()){
@@ -631,6 +657,16 @@ FilmDetails* FilmDelegate::findFilmByUrl(QString filmUrl)
     return m_films.contains(filmUrl) ? m_films[filmUrl] : NULL;
 }
 
+QStringList FilmDelegate::listCatalogNames() const {
+    QStringList list;
+    foreach (ICatalog* catalog, m_catalogs){
+        foreach(QString name, catalog->listSupportedCatalogNames()){
+            list << name;
+        }
+    }
+    return list;
+}
+
 double FilmDelegate::computeTotalDownloadProgress() const {
     double totalDurationInMinute(0);
     double completedDurationInMinute(0);
@@ -699,10 +735,10 @@ void FilmDelegate::reloadFilm(FilmDetails* film)
     QString videoPageUrl(film->m_infoUrl);
     // Download video web page:
     film->m_errors.clear();
-    downloadUrl(videoPageUrl, m_lastRequestPageId, film->m_infoUrl, MAPPER_STEP_CODE_1_HTML);
+    downloadUrl(film->m_catalogName, videoPageUrl, m_lastRequestPageId, film->m_infoUrl, MAPPER_STEP_CODE_1_HTML);
 }
 
-bool FilmDelegate::addMovieFromUrl(const QString url, QString title)
+bool FilmDelegate::addMovieFromUrl(QString catalogName, const QString url, QString title)
 {
     if (!url.startsWith("http://www.arte.tv/guide/"))
     {
@@ -717,9 +753,7 @@ bool FilmDelegate::addMovieFromUrl(const QString url, QString title)
     }
     else
     {
-        film = new FilmDetails();
-        film->m_title = title;
-        film->m_infoUrl = url;
+        film = new FilmDetails(catalogName, title, url, /*TODO*/ "arteId");
         m_films.insert(film->m_infoUrl, film);
         reloadFilm(film);
     }

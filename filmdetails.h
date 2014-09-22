@@ -83,15 +83,22 @@ class FilmDetails {
 
     //TODO mettre tout en privé sauf les accesseurs
 public:
-    QString arteId;
-    int episodeNumber;
+    FilmDetails(QString originCatalog, QString title, QString filmUrl, QString arteId)
+        :m_catalogName(originCatalog), m_title(title), m_infoUrl(filmUrl), m_arteId(arteId)
+    {}
+    QString m_catalogName;
     QString m_title;
+    QString m_infoUrl;
+    QString m_arteId;
+
+    int episodeNumber;
+
     QMap<QString, QImage> m_preview; // preview indexed by image url
     QString m_summary;
 
     double m_rating;
     uint m_numberOfViews;
-    QString m_infoUrl;
+
 
     int m_durationInMinutes;
     int m_year;

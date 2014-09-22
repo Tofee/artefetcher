@@ -98,8 +98,6 @@ private slots:
     void nextPage();
     void previousPage();
 
-    void addFilmManuallyFromUrl();
-
     void showPreferences();
     void showAboutWindow();
 
