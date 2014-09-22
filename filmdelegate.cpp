@@ -140,17 +140,12 @@ FilmDelegate::~FilmDelegate()
 
 void FilmDelegate::loadPlayList(QString catalogName, QDate date)
 {
-    QString url;
-    foreach(ICatalog* catalog, m_catalogs){
-        url = catalog->getUrlForCatalogNames(catalogName, QDate(date)); // ui->dateEdit->date().toString("yyyyMMdd")
-        if (!url.isEmpty()){
-            break;
-        }
-    }
-    if (url.isEmpty()){
+    ICatalog* catalog = getCatalogForName(catalogName);
+    if (!catalog){
         qDebug() << "No catalog found for name:" << catalogName;
         return;
     }
+    QString url = catalog->getUrlForCatalogNames(catalogName, date);
 
     abortDownloadItemsInProgress();
     QString type  = MAPPER_STEP_CATALOG;
@@ -208,15 +203,9 @@ void FilmDelegate::loadPlayList(QString catalogName, QDate date)
     commonLoadPlaylist(catalogName, type);
 }
 
-bool FilmDelegate::isDateCatalog(QString catalogName) const{
-    QString url;
-    foreach(ICatalog* catalog, m_catalogs){
-        url = catalog->getUrlForCatalogNames(catalogName, QDate());
-        if (!url.isEmpty()){
-            return catalog->isDateCatalog();
-        }
-    }
-    return false;
+bool FilmDelegate::isDateCatalog(QString catalogName) {
+    ICatalog* catalog = getCatalogForName(catalogName);
+    return catalog && catalog->isDateCatalog();
 }
 
 void FilmDelegate::loadNextPage(QString catalogName){
@@ -297,6 +286,8 @@ int FilmDelegate::getFilmId(FilmDetails * film) const
 
 void addMetadataIfNotEmpty(FilmDetails* film, QVariantMap inputMap, QString fieldName, MetaType internalFieldName, bool isDate = false)
 {
+    // TODO à supprimer !!
+    qDebug() << "Méthode à supprimer !";
     if (!inputMap.value(fieldName).isValid())
         return;
     QString value = inputMap.value(fieldName).toString();
@@ -333,6 +324,18 @@ void FilmDelegate::fetchImagesFromUrlsInPage(const QString catalogName, const QS
     }
 }
 
+
+ICatalog* FilmDelegate::getCatalogForName(QString catalogName) {
+    foreach(ICatalog* catalog, m_catalogs){
+        QString url = catalog->getUrlForCatalogNames(catalogName, QDate());//TODO c'est moche d'avoir une date nulle ici
+        // Il faudrait faire une méthode accept et faire une autre méthode getUrl qui prend la date en paramètre
+        if (!url.isEmpty()){
+            return catalog;
+        }
+    }
+    return NULL;
+}
+
 void FilmDelegate::requestReadyToRead(QObject* object)
 {
     QNetworkReply* reply = qobject_cast<QNetworkReply *>(m_signalMapper->mapping(object));
@@ -356,86 +359,31 @@ void FilmDelegate::requestReadyToRead(QObject* object)
 
     if (itemName.isEmpty())
     {
-        if (itemStep ==  MAPPER_STEP_SEARCH)
-        {
-            // result count: <div class="span4 mini">      <strong>
-            // Current page:
-            // each href of the video-placeholder
-            const QString page(QString::fromUtf8(reply->readAll()));
-            QRegExp regexp("<a class=\"video-placeholder\" href=\"([^\"]+)\"");
-            regexp.setMinimal(true);
-
-            int pos = 0;
-            int count = 0;
-            while ((pos = regexp.indexIn(page, pos)) != -1) {
-                 ++count;
-                 pos += regexp.matchedLength();
-                 QString newUrl = regexp.cap(1);
-                 if (newUrl.isEmpty()) {
-                     continue;
-                 }
-                 if (!m_films.contains(newUrl))
-                 {
-                     addMovieFromUrl(pair->catalogName, newUrl);
-                 }
-                 else {
-                     m_visibleFilms << newUrl;
-                 }
-             }
-             emit(playListHasBeenUpdated());
-
-        }
-        else if (itemStep == MAPPER_STEP_CATALOG || itemStep == MAPPER_STEP_DATE) {
-            const QString page(QString::fromUtf8(reply->readAll()));
-
-
-            QScriptEngine engine;
-            QScriptValue json = engine.evaluate("JSON.parse").call(QScriptValue(),
-                                                                   QScriptValueList() << QString(page));
-            int i = 0;
-            QList<QVariant> list;
-            if (itemStep == MAPPER_STEP_CATALOG)
-                list = json.toVariant().toMap().value("videos").toList();
-            else // MAPPER_STEP_DATE
-                list = json.toVariant().toList();
-
+        if (itemStep == MAPPER_STEP_CATALOG || itemStep == MAPPER_STEP_DATE) {
             const int resultCountPerPage(Preferences::getInstance()->resultCountPerPage());
-            foreach(QVariant catalogItem, list)
-            {
-                ++i;
+            const QString page(QString::fromUtf8(reply->readAll()));
 
-                if (i > resultCountPerPage * (m_currentPage - 1) && i <= resultCountPerPage * m_currentPage) {
+            int i;
+            QList<FilmDetails*> foundInCatalogPage = getCatalogForName(pair->catalogName)
+                    ->listFilmsFromCatalogAnswer(pair->catalogName, page, resultCountPerPage * (m_currentPage - 1), resultCountPerPage * m_currentPage, i);
 
-                    QString url = catalogItem.toMap().value(itemStep == MAPPER_STEP_CATALOG ? "url" : "details_url").toString();
-                    url.prepend("http://www.arte.tv");
-                    QString title = catalogItem.toMap().value("title").toString();
+            foreach(FilmDetails* film, foundInCatalogPage){
+                QString url = film->m_infoUrl;
+                m_visibleFilms << url;
 
-                    if (m_films.contains(url))
+                if (m_films.contains(url))
+                {
+
+                    if (m_films.value(url)->m_preview.isEmpty() || m_films.value(url)->m_allStreams.isEmpty())
                     {
-                        m_visibleFilms << url;
-                        if (m_films.value(url)->m_preview.isEmpty() || m_films.value(url)->m_allStreams.isEmpty())
-                        {
-                            // refresh incomplete cache
-                            reloadFilm(m_films.value(url));
-                        }
-                        // Continue with cache
-                        continue;
+                        // refresh incomplete cache
+                        reloadFilm(m_films.value(url));
                     }
-
-                    FilmDetails* newFilm = new FilmDetails(pair->catalogName, title, url, /*TODO*/"Arte id ");
-
-                    // addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_AIRDATE_LONG, First_broadcast_long);
-                    // addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_RIGHTS_UNTIL, Available_until);
-                    // addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_AIRDATE, First_broadcast);
-                    // addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_AIRTIME, First_broadcast_time);
-
-                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_DESC, Description);
-                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_VIEWS, Views);
-                    addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_VIDEO_CHANNEL, Channels);
-
-                    m_films.insert(newFilm->m_infoUrl, newFilm);
-                    m_visibleFilms << newFilm->m_infoUrl;
-                    reloadFilm(newFilm);
+                    // Continue with cache
+                    continue;
+                } else {
+                    m_films.insert(film->m_infoUrl, film);
+                    reloadFilm(m_films.value(url));
                 }
             }
 
@@ -660,9 +608,7 @@ FilmDetails* FilmDelegate::findFilmByUrl(QString filmUrl)
 QStringList FilmDelegate::listCatalogNames() const {
     QStringList list;
     foreach (ICatalog* catalog, m_catalogs){
-        foreach(QString name, catalog->listSupportedCatalogNames()){
-            list << name;
-        }
+        list << catalog->listSupportedCatalogNames();
     }
     return list;
 }

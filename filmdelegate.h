@@ -65,7 +65,7 @@ public:
      */
     void loadPlayList(QString catalogName, QDate date);
 
-    bool isDateCatalog(QString catalogName) const;
+    bool isDateCatalog(QString catalogName);
 
     const QList<FilmDetails*> visibleFilms() const { QList<FilmDetails*> result;
                                               foreach(QString key, m_visibleFilms)
@@ -162,6 +162,8 @@ private:
     void fetchImagesFromUrlsInPage(const QString catalogName, const QString& htmlPage, const FilmDetails * const film, const int pageRequestId);
 
     void abortDownloadItemsInProgress();
+
+    ICatalog* getCatalogForName(QString catalogName);
 
     // List of the film description paged shown in the UI
     QList<QString> m_visibleFilms;
