@@ -31,45 +31,9 @@
 #include <QScriptValue>
 #include <catalogs/icatalog.h>
 
-#define ARTE_PLAYLIST_URL "http://videos.arte.tv/fr/videos/playlistplaylist/index--3259492.html"
-#define ARTE_SEARCH_URL_FR "http://www.arte.tv/guide/fr/resultats-de-recherche?keyword=%1"
-#define ARTE_SEARCH_URL_DE "http://www.arte.tv/guide/de/suchergebnisse?keyword=%1"
-
-#define VIDEO_LINE_HTML_BEGIN "<div id=\"myPlaylistCont\">" //aaa<h2><a href=\"/fr/videos/"
-
-#define VIDEO_URL_PREFIX "http://videos.arte.tv/fr/videos/"
-
-#define MAPPER_STEP_DATE "DATE"
-#define MAPPER_STEP_SEARCH "SEARCH"
 #define MAPPER_STEP_CATALOG "CATALOG"
-#define MAPPER_STEP_CODE_1_HTML "HTML"
 #define MAPPER_STEP_CODE_2_XML "XML"
 #define MAPPER_STEP_CODE_4_IMAGE "PREVIEW"
-
-#define JSON_AIRDATE        "airdate"
-#define JSON_AIRDATE_LONG   "airdate_long"
-#define JSON_AIRTIME        "airtime"
-#define JSON_DESC           "desc"
-#define JSON_RIGHTS_UNTIL   "video_rights_until"
-#define JSON_VIEWS          "video_views"
-#define JSON_VIDEO_CHANNEL  "video_channels"
-#define JSON_RANK           "video_rank"
-
-#define JSON_FILMPAGE_TYPE              "VCG"
-#define JSON_FILMPAGE_FIRST_BROADCAST   "VDA"
-#define JSON_FILMPAGE_AVAILABILITY      "VRU"
-#define JSON_FILMPAGE_VIDEO_TYPE        "VTX"
-#define JSON_FILMPAGE_VSU               "VSU"
-#define JSON_FILMPAGE_VIEWS             "VVI"
-// #define JSON_FILMPAGE_RANK              "videoRank"// useless, it just gives the position in the carousel...
-#define JSON_FILMPAGE_DESCRIPTION       "V7T"
-#define JSON_FILMPAGE_DURATION_SECONDS  "VTI"
-#define JSON_FILMPAGE_SUMMARY           "VDE"
-#define JSON_FILMPAGE_CHANNELS          "VCH"
-#define JSON_FILMPAGE_CHANNELS_LABEL    "label"
-#define JSON_FILMPAGE_PREVIEW           "VTU"
-#define JSON_FILMPAGE_PREVIEW_URL       "IUR"
-
 
 QList<QString> FilmDelegate::listLanguages()
 {
@@ -190,7 +154,7 @@ void FilmDelegate::loadNextPage(QString catalogName){
         return;
     ++m_currentPage;
     abortDownloadItemsInProgress();
-    commonLoadPlaylist(catalogName, m_initialyCatalog ? MAPPER_STEP_CATALOG : MAPPER_STEP_DATE);
+    commonLoadPlaylist(catalogName, MAPPER_STEP_CATALOG);
 }
 
 void FilmDelegate::loadPreviousPage(QString catalogName){
@@ -198,7 +162,7 @@ void FilmDelegate::loadPreviousPage(QString catalogName){
         return;
     --m_currentPage;
     abortDownloadItemsInProgress();
-    commonLoadPlaylist(catalogName, m_initialyCatalog ? MAPPER_STEP_CATALOG : MAPPER_STEP_DATE);
+    commonLoadPlaylist(catalogName, MAPPER_STEP_CATALOG);
 }
 
 void FilmDelegate::abortDownloadItemsInProgress() {
@@ -261,45 +225,6 @@ int FilmDelegate::getFilmId(FilmDetails * film) const
     return m_films.values().indexOf(film);
 }
 
-void addMetadataIfNotEmpty(FilmDetails* film, QVariantMap inputMap, QString fieldName, MetaType internalFieldName, bool isDate = false)
-{
-    // TODO à supprimer !!
-    qDebug() << "Méthode à supprimer !";
-    if (!inputMap.value(fieldName).isValid())
-        return;
-    QString value = inputMap.value(fieldName).toString();
-    if (!isDate) {
-        film->m_metadata.insert(internalFieldName, value);
-    }
-    else {
-        // convert "25/10/2013 08:30:09 +0200" into "25/10/2013 08:30:09"
-        film->m_metadata.insert(internalFieldName, value.left(19));
-    }
-}
-
-void FilmDelegate::fetchImagesFromUrlsInPage(const QString catalogName, const QString& htmlPage,
-                                             const FilmDetails * const film,
-                                             const int pageRequestId)
-{
-    // Search for the "Photo" section in the page to skip images of related videos
-    QRegExp photoSectionRegExp("#content-photo");
-    int pos = photoSectionRegExp.indexIn(htmlPage, 0);
-
-    // Search for any image file matching this URL:
-    QRegExp imageRegExp("(http://www\\.arte\\.tv/papi/tvguide/images[^\"]+.jpg)");
-    imageRegExp.setMinimal(true);
-
-    QSet<QString> fetchedImage;
-    while ((pos = imageRegExp.indexIn(htmlPage, pos)) != -1) {
-         pos += imageRegExp.matchedLength();
-
-        QString imageUrl = imageRegExp.capturedTexts().at(0);
-        if (film->m_preview.contains(imageUrl) || fetchedImage.contains(imageUrl))
-            continue;
-        downloadUrl(catalogName, imageUrl, pageRequestId, film->m_infoUrl, MAPPER_STEP_CODE_4_IMAGE);
-        fetchedImage << imageUrl;
-    }
-}
 
 void FilmDelegate::downloadImage(FilmDetails *film, QString imageUrl){
     downloadUrl(film->m_catalogName, imageUrl, m_lastRequestPageId, film->m_infoUrl, MAPPER_STEP_CODE_4_IMAGE);
@@ -338,7 +263,7 @@ void FilmDelegate::requestReadyToRead(QObject* object)
 
     if (itemName.isEmpty())
     {
-        if (itemStep == MAPPER_STEP_CATALOG || itemStep == MAPPER_STEP_DATE) {
+        if (itemStep == MAPPER_STEP_CATALOG) {
             const int resultCountPerPage(Preferences::getInstance()->resultCountPerPage());
             const QString page(QString::fromUtf8(reply->readAll()));
 
@@ -350,11 +275,8 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                 QString url = film->m_infoUrl;
                 m_visibleFilms << url;
 
-                if (m_films.contains(url))
-                {
-
-                    if (m_films.value(url)->m_preview.isEmpty() || m_films.value(url)->m_allStreams.isEmpty())
-                    {
+                if (m_films.contains(url)) {
+                    if (m_films.value(url)->m_preview.isEmpty() || m_films.value(url)->m_allStreams.isEmpty()) {
                         // refresh incomplete cache
                         reloadFilm(m_films.value(url));
                     }
@@ -384,82 +306,9 @@ void FilmDelegate::requestReadyToRead(QObject* object)
         if (!m_films.contains(itemName))
             return;
         FilmDetails* film = m_films[itemName];
-
-        if (itemStep == MAPPER_STEP_CODE_1_HTML)
+        if (itemStep == MAPPER_STEP_CODE_2_XML)
         {
-            const QString page(QString::fromUtf8(reply->readAll()));
-            // this page is further information for the film
-
-
-            // reply.url est égal à http://www.arte.tv/guide/fr/051912-001/28-minutes
-            // on en extrait le code ou en faisant
-            //       <input name='id' type='hidden' value=****ici se trouve l'identifiant du film***
-            //    ou en le prenant de l'URL
-            // Et on reconstruit l'URL ainsi :  http://org-www.arte.tv/papi/tvguide/videos/stream/player/F/{identifiant du film}_PLUS7-F/ALL/ALL.json
-            QStringList splittenUrl = reply->url().toString().split('/');
-            /*QRegExp regexp1("<input name='id' type='hidden' value='([0-9-]+)'");
-            regexp1.setMinimal(true);
-            regexp1.indexIn(page);*/
-            QString filmId = splittenUrl.size() > 5 ? splittenUrl.at(5) : "";
-            film->m_arteId = filmId;
-            QStringList splittenCode = filmId.split("-");
-            film->episodeNumber = splittenCode.value(1).toInt();
-
-            QString languageCharacter = Preferences::getInstance()->applicationLanguage().left(1).toUpper();
-
-            QString jsonUrl = filmId.isEmpty() ? "" : QString("http://org-www.arte.tv/papi/tvguide/videos/stream/player/%0/%1_PLUS7-%2/ALL/ALL.json")
-                                                 .arg(languageCharacter)
-                                                 .arg(filmId)
-                                                 .arg(languageCharacter);
-
-            if (jsonUrl.isEmpty())
-            {
-                emit(errorOccured(film->m_infoUrl, tr("Cannot find the main information for the movie")));
-                qDebug() << "[ERROR] No json link in page" << reply->request().url().toString();
-            }
-            else
-            {
-                downloadUrl(pair->catalogName, jsonUrl, pageRequestId, film->m_infoUrl, MAPPER_STEP_CODE_2_XML);
-            }
-
-
-            // Fetch all images for the page
-            fetchImagesFromUrlsInPage(pair->catalogName, page, film, pageRequestId);
-
-
-
-            // jsonUrl = http://org-www.arte.tv/papi/tvguide/videos/stream/player/F/048473-089_PLUS7-F/ALL/ALL.json
-        }
-        else if (itemStep == MAPPER_STEP_CODE_2_XML)
-        {
-            const QString page(QString::fromUtf8(reply->readAll()));
-
-            /*
-             * Nouvelle version
-             * Quand on lit le json de premier niveau (celui mentionné dans le HTML), c'est à dire :
-             *   http://org-www.arte.tv/papi/tvguide/videos/stream/player/F/048373-005_PLUS7-F/ALL/ALL.json
-             *
-             *     avant l'URL json des vidéos qu'on trouvait dans le JSON de premier niveau était :
-             *       http://www.arte.tv/papi/tvguide/videos/stream/F/048120-000_PLUS7-F/ALL/ALL.json
-             *
-             *     maintenant on ne trouve que le lien vers ce json.
-             *
-             * Mais il n'est pas difficile de convertir un lien vers l'autre à partir du moment où on a l'ID du film (048373-005 ou 048120-000).
-             */
-//            if (reply->url().toString().split("/").size() < 10)
-//            {
-//                reply->deleteLater();
-//                return;
-//            }
-            //QString filmCode = reply->url().toString().split("/").at(9);
-
-//            QString videoStreamUrl = "http://www.arte.tv/papi/tvguide/videos/stream/";
-//            videoStreamUrl.append(Preferences::getInstance()->applicationLanguage() == "fr" ? "F/" : "D/");
-//            videoStreamUrl.append(filmCode);
-//            videoStreamUrl.append("/ALL/ALL.json");
-
-
-            getCatalogForName(pair->catalogName)->processFilmDetails(film, page);
+            getCatalogForName(pair->catalogName)->processFilmDetails(film, QString::fromUtf8(reply->readAll()));
             emit filmHasBeenUpdated(film);
         }
         else if (itemStep == MAPPER_STEP_CODE_4_IMAGE)
@@ -489,22 +338,6 @@ void FilmDelegate::requestReadyToRead(QObject* object)
     reply->deleteLater();
 
 }
-
-QString FilmDelegate::getStreamUrlFromResponse(const QString& page, const QString& quality)
-{
-    return extractUniqueResult(page, QString("/video/urls/url[@quality='%1']/string()").arg(quality));
-}
-
-StreamType FilmDelegate::getStreamTypeByHumanName(const QString& humanName) throw (NotFoundException)
-{
-    foreach (StreamType current, listStreamTypes())
-    {
-        if (current.humanCode == humanName)
-            return current;
-    }
-    throw NotFoundException(humanName);
-}
-
 
 QList<int> FilmDelegate::getLineForUrl(QString filmUrl)
 {
@@ -601,7 +434,7 @@ StreamType FilmDelegate::getStreamTypeByLanguageAndQuality(QString languageCode,
 
 void FilmDelegate::reloadFilm(FilmDetails* film)
 {
-    QString jsonUrl = getCatalogForName(film->m_catalogName)->fetchFilmDetails(film);
+    QString jsonUrl = getCatalogForName(film->m_catalogName)->getFilmDetailsUrl(film);
     if (film->m_replayAvailable && !jsonUrl.isEmpty()){
         film->m_errors.clear();
         downloadUrl(film->m_catalogName, jsonUrl, m_lastRequestPageId, film->m_infoUrl, MAPPER_STEP_CODE_2_XML);

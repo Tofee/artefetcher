@@ -69,7 +69,7 @@ public:
     virtual QList<FilmDetails*> listFilmsFromCatalogAnswer(QString catalogName, const QString& catalogAnswer, int fromIndex, int toIndex, int& finalIndex) = 0;
 
     // TODO renommer la méthode
-    virtual QString fetchFilmDetails(FilmDetails* film) = 0;
+    virtual QString getFilmDetailsUrl(FilmDetails* film) = 0;
 
     virtual void processFilmDetails(FilmDetails* film, QString httpAnswer) = 0;
 

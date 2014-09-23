@@ -10,11 +10,11 @@ public:
 
     bool isDateCatalog() const { return true; }
 
-    QString getUrlForCatalogNames(QString catalogName, QDate catalogDate) const;
+    QString getUrlForCatalogNames(QString, QDate catalogDate) const;
 
     QList<FilmDetails*> listFilmsFromCatalogAnswer(QString catalogName, const QString& catalogAnswer, int fromIndex, int toIndex, int& index);
 
-    QString fetchFilmDetails(FilmDetails* film);
+    QString getFilmDetailsUrl(FilmDetails* film);
 
     void processFilmDetails(FilmDetails* film, QString httpAnswer);
 signals:

@@ -209,32 +209,17 @@ void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
     case QSystemTrayIcon::DoubleClick:
         this->setVisible(!this->isVisible());
         break;
-    case QSystemTrayIcon::MiddleClick:
-        //showMessage();
-        break;
     default:
         ;
     }
 }
 
 void MainWindow::loadStreamComboBox() {
-    //int previousIndex = ui->streamComboBox->currentIndex();
     ui->streamComboBox->clear();
     ui->streamComboBox->addItems(delegate->listCatalogNames());
 
-
-/*
-    ui->streamComboBox->addItem(tr("Arte selection"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7/selection.json");
-    ui->streamComboBox->addItem(tr("Most recent"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7/plus_recentes.json");
-    ui->streamComboBox->addItem(tr("Most seen"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7/plus_vues.json");
-    ui->streamComboBox->addItem(tr("Last chance"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7/derniere_chance.json");
-    ui->streamComboBox->addItem(tr("All"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7.json");
-    //ui->streamComboBox->addItem(tr("Test"), "http://www.arte.tv/papi/tvguide/epg/live/F/L3/1.json");
-    // ui->streamComboBox->addItem(tr("By date"), DATE_STREAM_PREFIX); // BROKEN Since 2014-09-01
-    ui->streamComboBox->addItem(tr("Downloads"), DOWNLOAD_STREAM);
-    //ui->streamComboBox->addItem(tr("Search"), SEARCH_PREFIX);
-    if (previousIndex >=0 )
-        ui->streamComboBox->setCurrentIndex(previousIndex);*/
+    // TODO downloads
+    // ui->streamComboBox->addItem(tr("Downloads"), DOWNLOAD_STREAM);
 }
 
 void MainWindow::streamIndexLoaded(int resultCount, int currentPage, int pageCount){
@@ -481,7 +466,7 @@ void MainWindow::updateRowInTable(const FilmDetails* const film){
         if (film->m_preview.isEmpty())
             previewItem->setIcon(QIcon(QPixmap(DEFAULT_FILM_ICON).scaled(TABLE_PREVIEW_MAX_WIDTH, TABLE_PREVIEW_MAX_HEIGHT, Qt::KeepAspectRatio)));
         else {
-            QImage image = film->m_preview.values().first();// TODO
+            QImage image = film->m_preview.values().first();
             if (film->m_downloadProgress > 0) {
                 QPainter painter(&image);
 
@@ -620,6 +605,10 @@ void MainWindow::updateFilmStreamCombobox(FilmDetails * const film) {
                 indexInFavorites++;
             }
         }
+        // If nothing has been found, that means the stream name is unknown. Then we fallback to the first item
+        if (streamTypeIndexToSelect == -1 && ui->filmStreamComboBox->count()){
+            streamTypeIndexToSelect = 0;
+        }
         if (streamTypeIndexToSelect >= 0){
             film->m_choosenStreamType = ui->filmStreamComboBox->itemText(streamTypeIndexToSelect);
             ui->filmStreamComboBox->setCurrentIndex(streamTypeIndexToSelect);
@@ -720,13 +709,6 @@ QString MainWindow::getFileName(const FilmDetails * const film) const
     const QString& episodeName = film->m_metadata.value(Episode_name);
 
     const QString& targetDirectory = Preferences::getInstance()->destinationDir();
-//    QString extension = "flv";
-//    if (remoteFilename != "")
-//    {
-//        QFileInfo remoteFile(remoteFilename);
-//        if (remoteFile.suffix().size() == 3 || remoteFile.suffix().size() == 4)
-//            extension = remoteFile.suffix();
-//    }
 
     QString cleanedTitle;
 
@@ -786,23 +768,6 @@ void MainWindow::downloadFilm(FilmDetails* film){
     {
         futureFileName = getFileName(film);
     }
-
-    // If a pending download has the same name, append a file suffix number
-    //int fileSuffixNumber = 1;
-//    foreach(QString otherFilmUrl, delegate->downloadList())
-//    {
-//        // TODO ça ne marche pas ça...
-//        FilmDetails* otherFilm = delegate->findFilmByUrl(otherFilmUrl);
-//        if (otherFilm)
-//        {
-//            if (otherFilm->m_targetFileName == futureFileName)
-//            {
-//                // TODO faut aussi stocker ce futureFileName dans le fichier de conf de l'appli,
-//                //      sinon au redémarrage, si on reprend le téléchargement dans un ordre différent, les vidéos seront mélangées.
-//                futureFileName = getFileName(film, fileSuffixNumber);
-//            }
-//        }
-//    }
 
     // Check the file (not .part) does not exist.
     if (QFile(futureFileName).exists()

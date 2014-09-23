@@ -8,11 +8,11 @@
 ArteMainCatalog::ArteMainCatalog(QObject *parent)
     :QObject(parent)
 {
-    m_urlByCatalogName[tr("All")] = "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7.json";
-    m_urlByCatalogName[tr("Arte selection")] = "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7/selection.json";
-    m_urlByCatalogName[tr("Most recent")] = "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7/plus_recentes.json";
-    m_urlByCatalogName[tr("Most seen")] = "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7/plus_vues.json";
-    m_urlByCatalogName[tr("Last chance")] = "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7/derniere_chance.json";
+    m_urlByCatalogName.insert(tr("All"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7.json");
+    m_urlByCatalogName.insert(tr("Arte selection"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7/selection.json");
+    m_urlByCatalogName.insert(tr("Most recent"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7/plus_recentes.json");
+    m_urlByCatalogName.insert(tr("Most seen"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7/plus_vues.json");
+    m_urlByCatalogName.insert(tr("Last chance"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7/derniere_chance.json");
 }
 
 
@@ -42,7 +42,6 @@ QList<FilmDetails*> ArteMainCatalog::listFilmsFromCatalogAnswer(QString catalogN
             addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_VIEWS, Views);
             addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_VIDEO_CHANNEL, Channels);
 
-            qDebug() << "Ajout de " << newFilm->title() << newFilm->m_arteId;
             result << newFilm;
 
             QString imageUrl = catalogItem.toMap().value("image_url").toString();
@@ -56,7 +55,7 @@ QList<FilmDetails*> ArteMainCatalog::listFilmsFromCatalogAnswer(QString catalogN
     return result;
 }
 
-QString ArteMainCatalog::fetchFilmDetails(FilmDetails* film){
+QString ArteMainCatalog::getFilmDetailsUrl(FilmDetails* film){
 
     QString languageCharacter = Preferences::getInstance()->applicationLanguage().left(1).toUpper();
 
@@ -65,7 +64,6 @@ QString ArteMainCatalog::fetchFilmDetails(FilmDetails* film){
                                          .arg(film->m_arteId)
                                          .arg(languageCharacter);
     return jsonUrl;
-    // TODO faut télécharger ce qui était fait dans reloadFilm();
 }
 
 void ArteMainCatalog::processFilmDetails(FilmDetails* film, QString httpAnswer){

@@ -111,12 +111,8 @@ public:
     double computeTotalDownloadProgress() const;
     double computeTotalDownloadRequestedDuration() const;
 
-    static QString getStreamHumanName(int i);
-    static QString getStreamLanguageCode(int i);
-    static QString getStreamQualityCode(int i);
     static StreamType getStreamTypeByLanguageAndQuality(QString languageCode, QString qualityCode) throw (NotFoundException);
     static QList<StreamType> &listStreamTypes();
-    static StreamType getStreamTypeByHumanName(const QString &humanName) throw (NotFoundException);
     static QList<QString> listLanguages();
     static QList<QString> listQualities();
 
@@ -148,19 +144,9 @@ private:
      * TODO use an enum for step
      */
     void downloadUrl(const QString &catalogName, const QString& url, int requestPageId, const QString& destinationKey, const QString &step);
-    /**
-     * @brief getStreamUrlFromResponse Get the Flash stream url from the video xml page.<br/>
-     * There is one page per language.
-     * @param page content of the page where the flash stream url is written
-     * @param quality the quality of the stream
-     * @return an empty string if the page parsing fails, else the stream url
-     */
-    QString getStreamUrlFromResponse(const QString &page, const QString &quality);
 
     int getFilmId(FilmDetails*film) const;
     void commonLoadPlaylist(QString catalogName, QString type);
-
-    void fetchImagesFromUrlsInPage(const QString catalogName, const QString& htmlPage, const FilmDetails * const film, const int pageRequestId);
 
     void abortDownloadItemsInProgress();
 

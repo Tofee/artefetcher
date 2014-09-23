@@ -7,13 +7,13 @@
 ArteDateCatalog::ArteDateCatalog(QObject *parent)
     :QObject(parent)
 {
-    m_urlByCatalogName[tr("By date")] = "::arteDate";
+    m_urlByCatalogName.insert(tr("By date"),"::arteDate::");
     // No need to provide a real url, there is only one url for dates and the final url
     // will be built according to the given date
 }
 
 
-QString ArteDateCatalog::getUrlForCatalogNames(QString catalogName, QDate catalogDate) const {
+QString ArteDateCatalog::getUrlForCatalogNames(QString, QDate catalogDate) const {
     QString baseUrl("http://www.arte.tv/papi/tvguide/epg/schedule/F/L3/%1-%2-%3/%4-%5-%6.json");
     return baseUrl.arg(catalogDate.year())
                 .arg(catalogDate.month(), 2, 10, QChar('0'))
@@ -50,7 +50,6 @@ QList<FilmDetails*> ArteDateCatalog::listFilmsFromCatalogAnswer(QString catalogN
 
             newFilm->m_replayAvailable = catalogItem.toMap().value("VDO").toMap().value("VTY").toString() == QString("ARTE_PLUS_SEVEN");
 
-            qDebug() << "  Ajout de " << newFilm->title() << newFilm->m_arteId << newFilm->m_infoUrl;
             result << newFilm;
 
             QString imageUrl = catalogItem.toMap().value("VDO").toMap().value("programImage").toString();
@@ -65,7 +64,7 @@ QList<FilmDetails*> ArteDateCatalog::listFilmsFromCatalogAnswer(QString catalogN
     return result;
 }
 
-QString ArteDateCatalog::fetchFilmDetails(FilmDetails *film){
+QString ArteDateCatalog::getFilmDetailsUrl(FilmDetails *film){
     QString languageCharacter = Preferences::getInstance()->applicationLanguage().left(1).toUpper();
 
     QString jsonUrl = film->m_arteId.isEmpty() ? "" : QString("http://org-www.arte.tv/papi/tvguide/videos/stream/player/%0/%1_PLUS7-%2/ALL/ALL.json")

@@ -7,12 +7,12 @@
 
 ArteLiveCatalog::ArteLiveCatalog(QObject *parent) : QObject(parent)
 {
-    m_urlByCatalogName[tr("Live - Selection")] = "http://www.arte.tv/concert/" +  Preferences::getInstance()->applicationLanguage() + "/api/hbbtv/selection";
-    m_urlByCatalogName[tr("Live - Classical")] = "http://www.arte.tv/concert/" +  Preferences::getInstance()->applicationLanguage() + "/api/hbbtv/classic";
-    m_urlByCatalogName[tr("Live - Rock")] = "http://www.arte.tv/concert/" +  Preferences::getInstance()->applicationLanguage() + "/api/hbbtv/rock";
-    m_urlByCatalogName[tr("Live - Jazz")] = "http://www.arte.tv/concert/" +  Preferences::getInstance()->applicationLanguage() + "/api/hbbtv/jazz";
-    m_urlByCatalogName[tr("Live - World")] = "http://www.arte.tv/concert/" +  Preferences::getInstance()->applicationLanguage() + "/api/hbbtv/world";
-    m_urlByCatalogName[tr("Live - Dance")] = "http://www.arte.tv/concert/" +  Preferences::getInstance()->applicationLanguage() + "/api/hbbtv/dance";
+    m_urlByCatalogName.insert(tr("Live - Selection"), "http://www.arte.tv/concert/" +  Preferences::getInstance()->applicationLanguage() + "/api/hbbtv/selection");
+    m_urlByCatalogName.insert(tr("Live - Classical"), "http://www.arte.tv/concert/" +  Preferences::getInstance()->applicationLanguage() + "/api/hbbtv/classic");
+    m_urlByCatalogName.insert(tr("Live - Rock"), "http://www.arte.tv/concert/" +  Preferences::getInstance()->applicationLanguage() + "/api/hbbtv/rock");
+    m_urlByCatalogName.insert(tr("Live - Jazz"), "http://www.arte.tv/concert/" +  Preferences::getInstance()->applicationLanguage() + "/api/hbbtv/jazz");
+    m_urlByCatalogName.insert(tr("Live - World"), "http://www.arte.tv/concert/" +  Preferences::getInstance()->applicationLanguage() + "/api/hbbtv/world");
+    m_urlByCatalogName.insert(tr("Live - Dance"), "http://www.arte.tv/concert/" +  Preferences::getInstance()->applicationLanguage() + "/api/hbbtv/dance");
 }
 
 QList<FilmDetails*> ArteLiveCatalog::listFilmsFromCatalogAnswer(QString catalogName, const QString& catalogAnswer, int fromIndex, int toIndex, int& lastIndex){
@@ -48,7 +48,6 @@ QList<FilmDetails*> ArteLiveCatalog::listFilmsFromCatalogAnswer(QString catalogN
                 }
             }
 
-            qDebug() << "Ajout de " << newFilm->title() << newFilm->m_arteId;
             result << newFilm;
 
             QString imageUrl = catalogItem.toMap().value("VTU").toMap().value("IUR").toString();
@@ -62,7 +61,7 @@ QList<FilmDetails*> ArteLiveCatalog::listFilmsFromCatalogAnswer(QString catalogN
     return result;
 }
 
-QString ArteLiveCatalog::fetchFilmDetails(FilmDetails*){
+QString ArteLiveCatalog::getFilmDetailsUrl(FilmDetails*){
     // Nothing to do here. Everything is fetched in listFilmsFromCatalogAnswer
     return QString();
 }
