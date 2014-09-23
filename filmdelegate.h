@@ -189,17 +189,16 @@ private:
 
 };
 
-//TODO rename mypair
-class MyPair : public QObject{
+class Context : public QObject{
     Q_OBJECT
 public:
 
-    MyPair(QString catalogName, int pageRequestId, QString s1, QString s2): catalogName(catalogName), pageRequestId(pageRequestId), first(s1), second(s2)
+    Context(QString catalogName, int pageRequestId, QString s1, QString s2): catalogName(catalogName), pageRequestId(pageRequestId), first(s1), second(s2)
     {
         // qDebug() << "on en est a" << currentCountReference(true);
 
     }
-    ~MyPair()
+    ~Context()
     {
         // qDebug() << "on en est a" << currentCountReference(false);
     }

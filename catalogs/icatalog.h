@@ -14,11 +14,36 @@
 #define JSON_VIDEO_CHANNEL  "video_channels"
 #define JSON_RANK           "video_rank"
 
+#define JSON_FILMPAGE_TYPE              "VCG"
+#define JSON_FILMPAGE_FIRST_BROADCAST   "VDA"
+#define JSON_FILMPAGE_AVAILABILITY      "VRU"
+#define JSON_FILMPAGE_VIDEO_TYPE        "VTX"
+#define JSON_FILMPAGE_VSU               "VSU"
+#define JSON_FILMPAGE_VIEWS             "VVI"
+// #define JSON_FILMPAGE_RANK              "videoRank"// useless, it just gives the position in the carousel...
+#define JSON_FILMPAGE_DESCRIPTION       "V7T"
+#define JSON_FILMPAGE_DURATION_SECONDS  "VTI"
+#define JSON_FILMPAGE_SUMMARY           "VDE"
+#define JSON_FILMPAGE_CHANNELS          "VCH"
+#define JSON_FILMPAGE_CHANNELS_LABEL    "label"
+#define JSON_FILMPAGE_PREVIEW           "VTU"
+#define JSON_FILMPAGE_PREVIEW_URL       "IUR"
+
 #include <filmdetails.h>
 class ICatalog {
 public:
 
     virtual ~ICatalog(){}
+
+
+    /**
+     * @brief accept
+     * @param catalogName
+     * @return true if the catalog manage the catalogName
+     */
+    virtual bool accept(QString catalogName) const { return m_urlByCatalogName.contains(catalogName); }
+
+    virtual bool isDateCatalog() const { return false; }
 
     QStringList listSupportedCatalogNames() const {
         return m_urlByCatalogName.keys();
@@ -43,31 +68,14 @@ public:
      */
     virtual QList<FilmDetails*> listFilmsFromCatalogAnswer(QString catalogName, const QString& catalogAnswer, int fromIndex, int toIndex, int& finalIndex) = 0;
 
-    virtual bool isDateCatalog() const { return false; }
+    // TODO renommer la méthode
+    virtual QString fetchFilmDetails(FilmDetails* film) = 0;
 
-    /**
-     * @brief accept
-     * @param catalogName
-     * @return true if the catalog manage the catalogName
-     */
-    virtual bool accept(QString catalogName) const { return m_urlByCatalogName.contains(catalogName); }
+    virtual void processFilmDetails(FilmDetails* film, QString httpAnswer) = 0;
 
-    // TODO bouger dans un fichier d'implem !!
-    void addMetadataIfNotEmpty(FilmDetails* film, QVariantMap inputMap, QString fieldName, MetaType internalFieldName, bool isDate = false)
-    {
-        if (!inputMap.value(fieldName).isValid())
-            return;
-        QString value = inputMap.value(fieldName).toString();
-        if (!isDate) {
-            film->m_metadata.insert(internalFieldName, value);
-        }
-        else {
-            // convert "25/10/2013 08:30:09 +0200" into "25/10/2013 08:30:09"
-            film->m_metadata.insert(internalFieldName, value.left(19));
-        }
-    }
 
 protected:
+    void addMetadataIfNotEmpty(FilmDetails* film, QVariantMap inputMap, QString fieldName, MetaType internalFieldName, bool isDate = false);
     QMap<QString, QString> m_urlByCatalogName;
 };
 

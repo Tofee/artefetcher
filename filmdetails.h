@@ -84,7 +84,7 @@ class FilmDetails {
     //TODO mettre tout en privé sauf les accesseurs
 public:
     FilmDetails(QString originCatalog, QString title, QString filmUrl, QString arteId)
-        :m_catalogName(originCatalog), m_title(title), m_infoUrl(filmUrl), m_arteId(arteId)
+        :m_catalogName(originCatalog), m_title(title), m_infoUrl(filmUrl), m_arteId(arteId), m_downloadStatus(DL_NONE)
     {}
     QString m_catalogName;
     QString m_title;

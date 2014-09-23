@@ -44,7 +44,7 @@
 #define MAPPER_STEP_CATALOG "CATALOG"
 #define MAPPER_STEP_CODE_1_HTML "HTML"
 #define MAPPER_STEP_CODE_2_XML "XML"
-#define MAPPER_STEP_CODE_4_PREVIEW "PREVIEW"
+#define MAPPER_STEP_CODE_4_IMAGE "PREVIEW"
 
 #define JSON_AIRDATE        "airdate"
 #define JSON_AIRDATE_LONG   "airdate_long"
@@ -275,7 +275,7 @@ void FilmDelegate::downloadUrl(const QString& catalogName, const QString& url, i
         return;
     }
     QNetworkReply* xmlReply = m_manager->get(QNetworkRequest(QUrl(url)));
-    m_signalMapper->setMapping(xmlReply, new MyPair(catalogName, requestPageId, destinationKey, step));
+    m_signalMapper->setMapping(xmlReply, new Context(catalogName, requestPageId, destinationKey, step));
     connect(xmlReply, SIGNAL(finished()), m_signalMapper, SLOT(map()));
 }
 
@@ -319,7 +319,7 @@ void FilmDelegate::fetchImagesFromUrlsInPage(const QString catalogName, const QS
         QString imageUrl = imageRegExp.capturedTexts().at(0);
         if (film->m_preview.contains(imageUrl) || fetchedImage.contains(imageUrl))
             continue;
-        downloadUrl(catalogName, imageUrl, pageRequestId, film->m_infoUrl, MAPPER_STEP_CODE_4_PREVIEW);
+        downloadUrl(catalogName, imageUrl, pageRequestId, film->m_infoUrl, MAPPER_STEP_CODE_4_IMAGE);
         fetchedImage << imageUrl;
     }
 }
@@ -343,7 +343,7 @@ void FilmDelegate::requestReadyToRead(QObject* object)
     if (reply == NULL || object == NULL)
         return;
 
-    MyPair* pair = qobject_cast<MyPair* >(object) ;
+    Context* pair = qobject_cast<Context* >(object) ;
     if (pair == NULL)
         return;
     QString itemName = pair->first;
@@ -467,79 +467,23 @@ void FilmDelegate::requestReadyToRead(QObject* object)
              *
              * Mais il n'est pas difficile de convertir un lien vers l'autre à partir du moment où on a l'ID du film (048373-005 ou 048120-000).
              */
-            if (reply->url().toString().split("/").size() < 10)
-            {
-                reply->deleteLater();
-                return;
-            }
-            QString filmCode = reply->url().toString().split("/").at(9);
+//            if (reply->url().toString().split("/").size() < 10)
+//            {
+//                reply->deleteLater();
+//                return;
+//            }
+            //QString filmCode = reply->url().toString().split("/").at(9);
 
-            QString videoStreamUrl = "http://www.arte.tv/papi/tvguide/videos/stream/";
-            videoStreamUrl.append(Preferences::getInstance()->applicationLanguage() == "fr" ? "F/" : "D/");
-            videoStreamUrl.append(filmCode);
-            videoStreamUrl.append("/ALL/ALL.json");
+//            QString videoStreamUrl = "http://www.arte.tv/papi/tvguide/videos/stream/";
+//            videoStreamUrl.append(Preferences::getInstance()->applicationLanguage() == "fr" ? "F/" : "D/");
+//            videoStreamUrl.append(filmCode);
+//            videoStreamUrl.append("/ALL/ALL.json");
 
-            QScriptEngine engine;
-            QScriptValue json = engine.evaluate("JSON.parse").call(QScriptValue(),
-                                                                   QScriptValueList() << QString(page));
 
-            QMap<QString, QVariant> mymap = json.toVariant().toMap().value("videoJsonPlayer").toMap();
-            if (mymap.isEmpty())
-            {
-                qDebug() << "[ERROR] Cannot find 'videoJsonPlayer' for" << film->m_infoUrl << " in" << reply->request().url() << page;
-                emit(errorOccured(film->m_infoUrl,tr("Cannot load stream details")));
-            }
-            else {
-
-                if (mymap.value(JSON_FILMPAGE_DURATION_SECONDS).toString() != "" && film->m_title == "")
-                {
-                    film->m_title = mymap.value(JSON_FILMPAGE_DURATION_SECONDS).toString();
-                }
-                film->m_durationInMinutes = mymap.value("videoDurationSeconds").toInt() /60;
-                film->m_summary = mymap.value(JSON_FILMPAGE_SUMMARY).toString();
-
-                addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_TYPE,              Type);
-                addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_FIRST_BROADCAST,   RAW_First_Broadcast, true); // 25/04/2013 20:50:30 +0200
-                addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_AVAILABILITY,      RAW_Available_until, true); // 02/05/2013 20:20:30 +0200
-                addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_VIDEO_TYPE,        Preview_Or_ArteP7); // EXTRAIT (AUSSCHNITT in german) or ARTE+7
-                addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_VSU,               Episode_name); // if not null, it belongs to a serie
-                addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_VIEWS,             Views); // different from the one in the catalog: this is just a number
-                addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_DESCRIPTION,       Description);
-
-                QStringList labels;
-                foreach (QVariant channelItem, mymap.value(JSON_FILMPAGE_CHANNELS).toList())
-                {
-                    labels << channelItem.toMap().value(JSON_FILMPAGE_CHANNELS_LABEL).toString();
-                }
-                if (!labels.isEmpty())
-                {
-                    film->m_metadata.insert(Channels, labels.join(", "));
-                }
-
-                if (mymap.value("videoSwitchLang").toMap().size() > 1)
-                {
-                    qDebug () << "[Warning] more than german and french available";
-                }
-
-                QString thumbnail = mymap.value(JSON_FILMPAGE_PREVIEW).toMap()
-                        .value(JSON_FILMPAGE_PREVIEW_URL).toString();
-                if (!thumbnail.isEmpty() && !film->m_preview.contains(thumbnail))
-                {
-                    downloadUrl(pair->catalogName, thumbnail, pageRequestId, film->m_infoUrl, MAPPER_STEP_CODE_4_PREVIEW);
-                }
-
-                foreach (QVariant streamJson, mymap.value("VSR").toMap().values()){
-                    QMap<QString, QVariant> map = streamJson.toMap();
-                    if (map.value("videoFormat").toString() == "HBBTV" && map.value("VQU").toString().toLower() == Preferences::getInstance()->selectedQuality())
-                    {
-                        film->m_allStreams[map.value("versionLibelle").toString()] = map.value("url").toString();
-                    }
-                }
-
-                emit filmHasBeenUpdated(film);
-            }
+            getCatalogForName(pair->catalogName)->processFilmDetails(film, page);
+            emit filmHasBeenUpdated(film);
         }
-        else if (itemStep == MAPPER_STEP_CODE_4_PREVIEW)
+        else if (itemStep == MAPPER_STEP_CODE_4_IMAGE)
         {
             if (!film->m_preview.contains(reply->url().toString()))
             {
@@ -678,10 +622,9 @@ StreamType FilmDelegate::getStreamTypeByLanguageAndQuality(QString languageCode,
 
 void FilmDelegate::reloadFilm(FilmDetails* film)
 {
-    QString videoPageUrl(film->m_infoUrl);
-    // Download video web page:
+    QString jsonUrl = getCatalogForName(film->m_catalogName)->fetchFilmDetails(film);
     film->m_errors.clear();
-    downloadUrl(film->m_catalogName, videoPageUrl, m_lastRequestPageId, film->m_infoUrl, MAPPER_STEP_CODE_1_HTML);
+    downloadUrl(film->m_catalogName, jsonUrl, m_lastRequestPageId, film->m_infoUrl, MAPPER_STEP_CODE_2_XML);
 }
 
 bool FilmDelegate::addMovieFromUrl(QString catalogName, const QString url, QString title)

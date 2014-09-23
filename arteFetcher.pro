@@ -35,7 +35,8 @@ SOURCES += main.cpp\
     downloadManager.cpp \
     queuedownloader.cpp \
     aboutdialog.cpp \
-    catalogs/artemaincatalog.cpp
+    catalogs/artemaincatalog.cpp \
+    catalogs/icatalog.cpp
 
 HEADERS  += mainwindow.h \
     filmdelegate.h \
