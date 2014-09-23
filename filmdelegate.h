@@ -105,7 +105,7 @@ public:
         return m_currentDownloads;
     }
 
-    void addCatalog(ICatalog* catalog) {m_catalogs << catalog;}
+    void addCatalog(ICatalog* catalog);
     QStringList listCatalogNames() const;
 
     double computeTotalDownloadProgress() const;
@@ -128,6 +128,7 @@ signals:
 
 private slots:
     void requestReadyToRead(QObject*);
+    void downloadImage(FilmDetails*, QString);
 
 private:
     const QMap<QString, FilmDetails*> films() const { return m_films; }

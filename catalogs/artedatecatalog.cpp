@@ -1,51 +1,60 @@
-#include "artemaincatalog.h"
-#include <preferences.h>
+#include "artedatecatalog.h"
+#include <QDate>
+#include <QDebug>//TODO remove that ugly thing
 #include <QScriptEngine>
-#include <QScriptValue>
-#include <filmdetails.h>
-#include <QDebug> // TODO
+#include <preferences.h>
 
-ArteMainCatalog::ArteMainCatalog(QObject *parent)
+ArteDateCatalog::ArteDateCatalog(QObject *parent)
     :QObject(parent)
 {
-    m_urlByCatalogName[tr("All")] = "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7.json";
-    m_urlByCatalogName[tr("Arte selection")] = "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7/selection.json";
-    m_urlByCatalogName[tr("Most recent")] = "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7/plus_recentes.json";
-    m_urlByCatalogName[tr("Most seen")] = "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7/plus_vues.json";
-    m_urlByCatalogName[tr("Last chance")] = "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7/derniere_chance.json";
+    m_urlByCatalogName[tr("By date")] = "::arteDate";
+    // No need to provide a real url, there is only one url for dates and the final url
+    // will be built according to the given date
 }
 
 
-QList<FilmDetails*> ArteMainCatalog::listFilmsFromCatalogAnswer(QString catalogName, const QString& catalogAnswer, int fromIndex, int toIndex, int& lastIndex){
+QString ArteDateCatalog::getUrlForCatalogNames(QString catalogName, QDate catalogDate) const {
+    QString baseUrl("http://www.arte.tv/papi/tvguide/epg/schedule/F/L3/%1-%2-%3/%4-%5-%6.json");
+    return baseUrl.arg(catalogDate.year())
+                .arg(catalogDate.month(), 2, 10, QChar('0'))
+                .arg(catalogDate.day(), 2, 10, QChar('0'))
+                .arg(catalogDate.year())
+                .arg(catalogDate.month())
+                .arg(catalogDate.day());
+}
+
+QList<FilmDetails*> ArteDateCatalog::listFilmsFromCatalogAnswer(QString catalogName, const QString &catalogAnswer, int fromIndex, int toIndex, int &lastIndex)
+{
     QList<FilmDetails*> result;
 
     QScriptEngine engine;
     QScriptValue json = engine.evaluate("JSON.parse").call(QScriptValue(),
                                                            QScriptValueList() << QString(catalogAnswer));
     int i = -1;
-    QList<QVariant> list = json.toVariant().toMap().value("videos").toList();
-
+    QList<QVariant> list = json.toVariant().toMap().value("abstractBroadcastList").toList();
 
     foreach(QVariant catalogItem, list)
     {
         ++i;
 
         if (i >= fromIndex && i < toIndex) {
-            QString url = catalogItem.toMap().value("url").toString();
-            url.prepend("http://www.arte.tv");
-            QString title = catalogItem.toMap().value("title").toString();
-            QString arteId = catalogItem.toMap().value("em").toString();
+            QString url = catalogItem.toMap().value("PUR").toString();
+            QString title = catalogItem.toMap().value("TIT").toString();
+            QString arteId = catalogItem.toMap().value("PID").toString();
 
             FilmDetails* newFilm = new FilmDetails(catalogName, title, url, arteId);
 
-            addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_DESC, Description);
-            addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_VIEWS, Views);
-            addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_VIDEO_CHANNEL, Channels);
+            addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), "DLO", Description);
+            //TODO addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_VIEWS, Views);
+            // TODO addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_VIDEO_CHANNEL, Channels);
 
-            qDebug() << "Ajout de " << newFilm->title() << newFilm->m_arteId;
+            newFilm->m_replayAvailable = catalogItem.toMap().value("VDO").toMap().value("VTY").toString() == QString("ARTE_PLUS_SEVEN");
+
+            qDebug() << "  Ajout de " << newFilm->title() << newFilm->m_arteId << newFilm->m_infoUrl;
             result << newFilm;
 
-            QString imageUrl = catalogItem.toMap().value("image_url").toString();
+            QString imageUrl = catalogItem.toMap().value("VDO").toMap().value("programImage").toString();
+            // Other possibility IMG/IUR but it seems the format is not always valid.
             if (!imageUrl.isEmpty()){
                 emit requestImageDownload(newFilm, imageUrl);
             }
@@ -56,8 +65,7 @@ QList<FilmDetails*> ArteMainCatalog::listFilmsFromCatalogAnswer(QString catalogN
     return result;
 }
 
-QString ArteMainCatalog::fetchFilmDetails(FilmDetails* film){
-
+QString ArteDateCatalog::fetchFilmDetails(FilmDetails *film){
     QString languageCharacter = Preferences::getInstance()->applicationLanguage().left(1).toUpper();
 
     QString jsonUrl = film->m_arteId.isEmpty() ? "" : QString("http://org-www.arte.tv/papi/tvguide/videos/stream/player/%0/%1_PLUS7-%2/ALL/ALL.json")
@@ -65,10 +73,10 @@ QString ArteMainCatalog::fetchFilmDetails(FilmDetails* film){
                                          .arg(film->m_arteId)
                                          .arg(languageCharacter);
     return jsonUrl;
-    // TODO faut télécharger ce qui était fait dans reloadFilm();
 }
 
-void ArteMainCatalog::processFilmDetails(FilmDetails* film, QString httpAnswer){
+void ArteDateCatalog::processFilmDetails(FilmDetails *film, QString httpAnswer){
+    // TODO c'est un vulgaire copier coller depuis ArteMainCatalog
     QScriptEngine engine;
     QScriptValue json = engine.evaluate("JSON.parse").call(QScriptValue(),
                                                            QScriptValueList() << QString(httpAnswer));
@@ -76,10 +84,9 @@ void ArteMainCatalog::processFilmDetails(FilmDetails* film, QString httpAnswer){
     QMap<QString, QVariant> mymap = json.toVariant().toMap().value("videoJsonPlayer").toMap();
     if (mymap.isEmpty())
     {
-        // TODO
+        qDebug() << "[ERROR] Cannot find 'videoJsonPlayer' for" << film->m_infoUrl << " in" << httpAnswer;
+        //TODO emit(errorOccured(film->m_infoUrl,tr("Cannot load stream details")));
         return;
-        //qDebug() << "[ERROR] Cannot find 'videoJsonPlayer' for" << film->m_infoUrl << " in" << reply->request().url() << page;
-        //emit(errorOccured(film->m_infoUrl,tr("Cannot load stream details")));
     }
     else {
 
@@ -130,4 +137,5 @@ void ArteMainCatalog::processFilmDetails(FilmDetails* film, QString httpAnswer){
             }
         }
     }
+
 }

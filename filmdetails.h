@@ -72,7 +72,8 @@ enum MetaType {
     RAW_First_Broadcast,
     RAW_Available_until,
     Episode_name /* This is only available for series */,
-    Preview_Or_ArteP7
+    Preview_Or_ArteP7,
+    Genre
 };
 
 enum EDownloadStatus {
@@ -84,7 +85,7 @@ class FilmDetails {
     //TODO mettre tout en privé sauf les accesseurs
 public:
     FilmDetails(QString originCatalog, QString title, QString filmUrl, QString arteId)
-        :m_catalogName(originCatalog), m_title(title), m_infoUrl(filmUrl), m_arteId(arteId), m_downloadStatus(DL_NONE)
+        :m_catalogName(originCatalog), m_title(title), m_infoUrl(filmUrl), m_arteId(arteId), m_durationInMinutes(-1), m_downloadStatus(DL_NONE), m_downloadProgress(0), m_replayAvailable(true)
     {}
     QString m_catalogName;
     QString m_title;
@@ -114,6 +115,11 @@ public:
     QString m_targetFileName;
     QString m_choosenStreamType;
 
+    /**
+     * @brief m_replayAvailable true if replay is available for the film
+     */
+    bool m_replayAvailable;
+
     QStringList m_errors;
 
     QString title() const { return m_title; }
@@ -131,7 +137,8 @@ public:
              QT_TRANSLATE_NOOP("FilmDetails","First Broadcast"),
              QT_TRANSLATE_NOOP("FilmDetails","Available until"),
              QT_TRANSLATE_NOOP("FilmDetails","Episode"),
-             QT_TRANSLATE_NOOP("FilmDetails","Broadcast type")
+             QT_TRANSLATE_NOOP("FilmDetails","Broadcast type"),
+             QT_TRANSLATE_NOOP("FilmDetails", "Genre")
         };
 
 

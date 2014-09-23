@@ -1,13 +1,16 @@
-#ifndef ARTEMAINCATALOG_H
-#define ARTEMAINCATALOG_H
+#ifndef ARTEDATECATALOG_H
+#define ARTEDATECATALOG_H
 #include <catalogs/icatalog.h>
 
-class ArteMainCatalog : public QObject, public ICatalog
+class ArteDateCatalog : public QObject, public ICatalog
 {
     Q_OBJECT
-
 public:
-    ArteMainCatalog(QObject* parent);
+    ArteDateCatalog(QObject* parent);
+
+    bool isDateCatalog() const { return true; }
+
+    QString getUrlForCatalogNames(QString catalogName, QDate catalogDate) const;
 
     QList<FilmDetails*> listFilmsFromCatalogAnswer(QString catalogName, const QString& catalogAnswer, int fromIndex, int toIndex, int& index);
 
@@ -18,4 +21,4 @@ signals:
     void requestImageDownload(FilmDetails* film, QString imageUrl);
 };
 
-#endif // ARTEMAINCATALOG_H
+#endif // ARTEDATECATALOG_H

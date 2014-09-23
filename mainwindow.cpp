@@ -27,6 +27,8 @@
 #include <QtGui>
 
 #include <catalogs/artemaincatalog.h>
+#include <catalogs/artedatecatalog.h>
+#include <catalogs/artelivecatalog.h>
 #include <preferencedialog.h>
 #include <filmdelegate.h>
 #include <filmdetails.h>
@@ -66,6 +68,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     delegate = new FilmDelegate(manager);
     delegate->addCatalog(new ArteMainCatalog(this));
+    delegate->addCatalog(new ArteDateCatalog(this));
+    delegate->addCatalog(new ArteLiveCatalog(this));
 
     QStringList header;
     header
@@ -518,7 +522,7 @@ const QList<MetaType>& MainWindow::listInterestingDetails() {
     {
         shownMetadata // << Available_until
                 << Description // << RAW_First_Broadcast
-                << Type << Views << Episode_name;
+                << Type << Views << Episode_name << Genre;
     }
     return shownMetadata;
 }

@@ -36,7 +36,9 @@ SOURCES += main.cpp\
     queuedownloader.cpp \
     aboutdialog.cpp \
     catalogs/artemaincatalog.cpp \
-    catalogs/icatalog.cpp
+    catalogs/icatalog.cpp \
+    catalogs/artedatecatalog.cpp \
+    catalogs/artelivecatalog.cpp
 
 HEADERS  += mainwindow.h \
     filmdelegate.h \
@@ -47,7 +49,9 @@ HEADERS  += mainwindow.h \
     aboutdialog.h \
     filmdetails.h \
     catalogs/artemaincatalog.h \
-    catalogs/icatalog.h
+    catalogs/icatalog.h \
+    catalogs/artedatecatalog.h \
+    catalogs/artelivecatalog.h
 TRANSLATIONS    = arteFetcher_de.ts \
                   arteFetcher_fr.ts
 

@@ -113,6 +113,12 @@ FilmDelegate::FilmDelegate(QNetworkAccessManager * in_manager)
     m_currentDownloads = Preferences::getInstance()->pendingDownloads();
 }
 
+void FilmDelegate::addCatalog(ICatalog* catalog) {
+    m_catalogs << catalog;
+    connect(dynamic_cast<QObject*>(catalog), SIGNAL(requestImageDownload(FilmDetails*, QString)),
+            SLOT(downloadImage(FilmDetails*, QString)));
+}
+
 FilmDelegate::~FilmDelegate()
 {
     QList<QString> pendingDownloads;
@@ -141,6 +147,9 @@ FilmDelegate::~FilmDelegate()
 void FilmDelegate::loadPlayList(QString catalogName, QDate date)
 {
     ICatalog* catalog = getCatalogForName(catalogName);
+    if (!date.isValid()){
+        return;
+    }
     if (!catalog){
         qDebug() << "No catalog found for name:" << catalogName;
         return;
@@ -149,55 +158,23 @@ void FilmDelegate::loadPlayList(QString catalogName, QDate date)
 
     abortDownloadItemsInProgress();
     QString type  = MAPPER_STEP_CATALOG;
-    if (url == DOWNLOAD_STREAM)
-    {
-        m_visibleFilms.clear();
+//    if (url == DOWNLOAD_STREAM)
+//    {
+//        m_visibleFilms.clear();
 
-        foreach(QString filmUrl, m_currentDownloads) {
-            if (!m_films.contains(filmUrl)) {
-                addMovieFromUrl("FAKE"/* TODO */, filmUrl);
-            } else {
-                m_visibleFilms << filmUrl;
-            }
-        }
-        m_currentPageCount = 1;
-        emit(streamIndexLoaded(m_visibleFilms.size(), 1, m_currentPageCount));
-        emit(playListHasBeenUpdated());
-        return;
-    } else if (url.startsWith(DATE_STREAM_PREFIX))
-    {
-        m_visibleFilms.clear();
-        QStringList urlParts = url.split(":");
-        QString language = urlParts.at(2);
-        QString dateString = urlParts.at(3);
-        url = QString("http://www.arte.tv/guide/%1/%2.json")
-                .arg(language)
-                .arg(dateString);
-        type = MAPPER_STEP_DATE;
-
-    } else if (url.startsWith(SEARCH_PREFIX))
-    {
-        QStringList urlParts = url.split(":");
-        QString language = urlParts.at(2);
-        QString search = urlParts.at(3);
-        type = MAPPER_STEP_SEARCH;
-        if (search.isEmpty())
-        {
-            m_visibleFilms.clear();
-            m_currentPageCount = 1;
-            emit(streamIndexLoaded(m_visibleFilms.size(), 1, m_currentPageCount));
-            emit(playListHasBeenUpdated());
-            return;
-        }
-        else if (language.toLower() == "fr"){
-            url = QString(ARTE_SEARCH_URL_FR)
-                .arg(search);
-        }
-        else {
-            url = QString(ARTE_SEARCH_URL_DE)
-                .arg(search);
-        }
-    }
+//        foreach(QString filmUrl, m_currentDownloads) {
+//            if (!m_films.contains(filmUrl)) {
+//                addMovieFromUrl("FAKE"/* TODO */, filmUrl);
+//            } else {
+//                m_visibleFilms << filmUrl;
+//            }
+//        }
+//        m_currentPageCount = 1;
+//        emit(streamIndexLoaded(m_visibleFilms.size(), 1, m_currentPageCount));
+//        emit(playListHasBeenUpdated());
+//        return;
+//        }
+//    }
     m_currentPage = 1;
     m_lastPlaylistUrl = url;
     commonLoadPlaylist(catalogName, type);
@@ -324,12 +301,14 @@ void FilmDelegate::fetchImagesFromUrlsInPage(const QString catalogName, const QS
     }
 }
 
+void FilmDelegate::downloadImage(FilmDetails *film, QString imageUrl){
+    downloadUrl(film->m_catalogName, imageUrl, m_lastRequestPageId, film->m_infoUrl, MAPPER_STEP_CODE_4_IMAGE);
+}
+
 
 ICatalog* FilmDelegate::getCatalogForName(QString catalogName) {
     foreach(ICatalog* catalog, m_catalogs){
-        QString url = catalog->getUrlForCatalogNames(catalogName, QDate());//TODO c'est moche d'avoir une date nulle ici
-        // Il faudrait faire une méthode accept et faire une autre méthode getUrl qui prend la date en paramètre
-        if (!url.isEmpty()){
+        if (catalog->accept(catalogName)){
             return catalog;
         }
     }
@@ -623,8 +602,10 @@ StreamType FilmDelegate::getStreamTypeByLanguageAndQuality(QString languageCode,
 void FilmDelegate::reloadFilm(FilmDetails* film)
 {
     QString jsonUrl = getCatalogForName(film->m_catalogName)->fetchFilmDetails(film);
-    film->m_errors.clear();
-    downloadUrl(film->m_catalogName, jsonUrl, m_lastRequestPageId, film->m_infoUrl, MAPPER_STEP_CODE_2_XML);
+    if (film->m_replayAvailable && !jsonUrl.isEmpty()){
+        film->m_errors.clear();
+        downloadUrl(film->m_catalogName, jsonUrl, m_lastRequestPageId, film->m_infoUrl, MAPPER_STEP_CODE_2_XML);
+    }
 }
 
 bool FilmDelegate::addMovieFromUrl(QString catalogName, const QString url, QString title)
