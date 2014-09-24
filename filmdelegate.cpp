@@ -67,12 +67,11 @@ FilmDelegate::~FilmDelegate()
     Preferences::getInstance()->setPendingDownloads(pendingDownloads);
 
     FilmDetails* film;
-    foreach(film, m_films)
-    {
+    foreach(film, m_films) {
         delete film;
     }
 
-    while(!m_catalogs.empty()){
+    while(!m_catalogs.empty()) {
         delete m_catalogs.takeFirst();
     }
 }
@@ -80,10 +79,10 @@ FilmDelegate::~FilmDelegate()
 void FilmDelegate::loadPlayList(QString catalogName, QDate date)
 {
     ICatalog* catalog = getCatalogForName(catalogName);
-    if (!date.isValid()){
+    if (!date.isValid()) {
         return;
     }
-    if (!catalog){
+    if (!catalog) {
         // We could write a catalog dedicated to all current downloads
         // But the related movies are already in cache, thus there is no need to fetch anything
         // If the previously downloaded films are getting managed,
@@ -102,12 +101,11 @@ void FilmDelegate::loadPlayList(QString catalogName, QDate date)
         emit(playListHasBeenUpdated());
         return;
     }
-    QString url = catalog->getUrlForCatalogNames(catalogName, date);
 
     abortDownloadItemsInProgress();
 
     m_currentPage = 1;
-    m_lastPlaylistUrl = url;
+    m_lastPlaylistUrl = catalog->getUrlForCatalogNames(catalogName, date);;
     commonLoadPlaylist(catalogName, MAPPER_STEP_CATALOG);
 }
 
@@ -225,15 +223,12 @@ void FilmDelegate::requestReadyToRead(QObject* object)
 
             if (i % resultCountPerPage == 0) {
                 m_currentPageCount = i/ resultCountPerPage;
-                emit(streamIndexLoaded(i, m_currentPage, m_currentPageCount));
             }
-            else
-            {
+            else {
                 m_currentPageCount = (i / resultCountPerPage) + 1;
-                emit(streamIndexLoaded(i, m_currentPage, m_currentPageCount));
             }
-            emit (playListHasBeenUpdated());
-
+            emit streamIndexLoaded(i, m_currentPage, m_currentPageCount);
+            emit playListHasBeenUpdated();
         }
     }
     else
@@ -278,8 +273,7 @@ QList<int> FilmDelegate::getLineForUrl(QString filmUrl)
 {
     QList<int> indexes;
     int offset(0);
-    while ((offset = m_visibleFilms.indexOf(filmUrl, offset)) >= 0)
-    {
+    while ((offset = m_visibleFilms.indexOf(filmUrl, offset)) >= 0) {
         indexes << offset;
         offset++;
     }
@@ -307,7 +301,7 @@ QStringList FilmDelegate::listCatalogNames() const {
 double FilmDelegate::computeTotalDownloadProgress() const {
     double totalDurationInMinute(0);
     double completedDurationInMinute(0);
-    foreach (QString url, m_currentDownloads){
+    foreach (QString url, m_currentDownloads) {
         FilmDetails* film = m_films.value(url);
         switch (film->m_downloadStatus)
         {
@@ -377,28 +371,18 @@ void FilmDelegate::reloadFilm(FilmDetails* film)
     }
 }
 
-bool FilmDelegate::addMovieFromUrl(QString catalogName, const QString url, QString title)
+bool FilmDelegate::addMovieFromUrl(QString /*catalogName*/, const QString url, QString /*title*/)
 {
-    if (!url.startsWith("http://www.arte.tv/guide/"))
-    {
-        qWarning() << QString("Warning: cannot add %1: %2 is not compatible with ArteFetcher").arg(title, url);
-        return false;
-    }
-
     FilmDetails* film;
-    if (m_films.contains(url))
-    {
+    if (m_films.contains(url)) {
         film = m_films[url];
+    } else {
+        // TODO
+//        film = new FilmDetails(catalogName, title, url, arteId);
+//        m_films.insert(film->m_infoUrl, film);
+//        reloadFilm(film);
     }
-    else
-    {
-        film = new FilmDetails(catalogName, title, url, /*TODO*/ "arteId");
-        m_films.insert(film->m_infoUrl, film);
-        reloadFilm(film);
-    }
-
     m_visibleFilms << film->m_infoUrl;
     emit(playListHasBeenUpdated());
-
     return true;
 }
