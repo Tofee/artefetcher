@@ -20,7 +20,7 @@
 #define DOWNLOADMANAGER_H
 
 #include <queuedownloader.h>
-#include <filmdetails.h>
+#include <film/filmdetails.h>
 
 class QNetworkAccessManager;
 

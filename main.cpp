@@ -18,7 +18,7 @@
 ****************************************************************************/
 
 #include <QApplication>
-#include "mainwindow.h"
+#include "view/mainwindow.h"
 #include <QTranslator>
 
 int main(int argc, char *argv[])

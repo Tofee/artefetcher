@@ -68,8 +68,8 @@ void Preferences::load()
 {
     QString defaultWorkingPath(QDir::homePath().append(QDir::separator()).append("arteFetcher"));
 
-    m_applicationLanguage = settings.value(DEF_OPT_STR_LANGUAGE, FilmDelegate::listLanguages().first()).toString();
-    m_selectedQuality = settings.value(DEF_OPT_STR_QUALITY, FilmDelegate::listQualities().first()).toString();
+    m_applicationLanguage = settings.value(DEF_OPT_STR_LANGUAGE, StreamType::listLanguages().first()).toString();
+    m_selectedQuality = settings.value(DEF_OPT_STR_QUALITY, StreamType::listQualities().first()).toString();
     m_filenamePattern = settings.value(DEF_OPT_FILENAME_PATTERN, "[%language %quality] %title").toString();
     m_favoriteStreamTypes = settings.value(DEF_OPT_FAVORITE_STREAM_TYPE, listVideoStreamTypes()).toStringList();
     // If a favorite is missing, we have to add it at the end of the list

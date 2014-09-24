@@ -24,41 +24,6 @@
 #include <QMap>
 #include <QStringList>
 #include <QApplication>
-struct StreamType {
-
-public:
-    StreamType(){}
-    StreamType(StreamType& other)
-        :humanCode(other.humanCode), languageCode(other.languageCode), qualityCode(other.qualityCode)
-    {}
-    StreamType(const StreamType& other)
-        :humanCode(other.humanCode), languageCode(other.languageCode), qualityCode(other.qualityCode)
-    {}
-    virtual ~StreamType(){}
-
-    StreamType(const QString& in_humanCode, const QString& in_languageCode, const QString& in_qualityCode)
-        :humanCode(in_humanCode), languageCode(in_languageCode), qualityCode(in_qualityCode)
-    {}
-
-    bool operator==(const StreamType& other) const
-    {
-        return other.humanCode == humanCode &&
-                other.languageCode == languageCode &&
-                other.qualityCode == qualityCode;
-    }
-    int operator<(const StreamType& other) const
-    {
-        if (other.humanCode == humanCode &&
-                other.languageCode == languageCode &&
-                other.qualityCode == qualityCode)
-            return 0;
-        return -1;
-    }
-
-    QString humanCode;
-    QString languageCode;
-    QString qualityCode;
-};
 
 enum MetaType {
 //    First_broadcast, // useless, see RAW_First_Broadcast
@@ -92,7 +57,7 @@ public:
     QString m_infoUrl;
     QString m_arteId;
 
-    int episodeNumber;
+    int m_episodeNumber;
 
     QMap<QString, QImage> m_preview; // preview indexed by image url
     QString m_summary;

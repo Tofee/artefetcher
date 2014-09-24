@@ -1,9 +1,9 @@
 #include "artelivecatalog.h"
-#include <preferences.h>
 #include <QScriptEngine>
 #include <QScriptValue>
-#include <filmdetails.h>
 #include <QDebug> // TODO
+#include <film/filmdetails.h>
+#include <preferences.h>
 
 ArteLiveCatalog::ArteLiveCatalog(QObject *parent) : QObject(parent)
 {

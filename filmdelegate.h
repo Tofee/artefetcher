@@ -22,10 +22,10 @@
 #include <QMap>
 #include <QObject>
 #include <QNetworkReply>
-#include <filmdetails.h>
+#include <film/filmdetails.h>
 #include <QDebug>
 #include <preferences.h>
-
+#include <film/streamtype.h>
 
 #define MAX_IMAGE_WIDTH 400
 #define MAX_IMAGE_HEIGHT 226
@@ -112,9 +112,8 @@ public:
     double computeTotalDownloadRequestedDuration() const;
 
     static StreamType getStreamTypeByLanguageAndQuality(QString languageCode, QString qualityCode) throw (NotFoundException);
-    static QList<StreamType> &listStreamTypes();
-    static QList<QString> listLanguages();
-    static QList<QString> listQualities();
+
+
 
 signals:
     void playListHasBeenUpdated();

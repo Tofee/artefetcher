@@ -21,7 +21,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QtGui>
-#include <filmdetails.h>
+#include <film/filmdetails.h>
 #include <QXmlQuery>
 #include <QXmlFormatter>
 #include <QXmlResultItems>
@@ -35,39 +35,7 @@
 #define MAPPER_STEP_CODE_2_XML "XML"
 #define MAPPER_STEP_CODE_4_IMAGE "PREVIEW"
 
-QList<QString> FilmDelegate::listLanguages()
-{
-    return QList<QString>() << "fr" << "de";
-}
-QList<QString> FilmDelegate::listQualities()
-{
-    return QList<QString>() << "sq" << "hq" << "eq";
-}
 
-QList<StreamType>& FilmDelegate::listStreamTypes()
-{
-    static QList<StreamType> streamTypes;
-    static bool first(true);
-    if (first)
-    {
-        QString language;
-        QString quality;
-        foreach (language, listLanguages())
-        {
-            foreach (quality, listQualities())
-            {
-                QString humanLanguage(language);
-                humanLanguage.replace(0, 1, language.left(1).toUpper());
-
-                streamTypes << StreamType(QString("%1 %2").arg(humanLanguage, quality.toUpper()),
-                                          language,
-                                          quality);
-            }
-        }
-        first = false;
-    }
-    return streamTypes;
-}
 
 FilmDelegate::FilmDelegate(QNetworkAccessManager * in_manager)
     :m_manager(in_manager), m_signalMapper(new QSignalMapper(this)), m_currentPageCount(0), m_lastRequestPageId(0)
@@ -420,7 +388,7 @@ double FilmDelegate::computeTotalDownloadRequestedDuration() const {
 
 StreamType FilmDelegate::getStreamTypeByLanguageAndQuality(QString languageCode, QString qualityCode) throw (NotFoundException)
 {
-    QList<StreamType> & streamTypeList = listStreamTypes();
+    QList<StreamType> & streamTypeList = StreamType::listStreamTypes();
     for (QList<StreamType>::const_iterator it = streamTypeList.constBegin();
          it != streamTypeList.constEnd(); ++it)
     {

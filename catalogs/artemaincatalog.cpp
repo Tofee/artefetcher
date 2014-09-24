@@ -2,7 +2,7 @@
 #include <preferences.h>
 #include <QScriptEngine>
 #include <QScriptValue>
-#include <filmdetails.h>
+#include <film/filmdetails.h>
 #include <QDebug> // TODO
 
 ArteMainCatalog::ArteMainCatalog(QObject *parent)

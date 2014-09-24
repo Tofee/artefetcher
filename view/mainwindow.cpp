@@ -29,11 +29,11 @@
 #include <catalogs/artemaincatalog.h>
 #include <catalogs/artedatecatalog.h>
 #include <catalogs/artelivecatalog.h>
-#include <preferencedialog.h>
+#include <view/preferencedialog.h>
 #include <filmdelegate.h>
-#include <filmdetails.h>
+#include <film/filmdetails.h>
 #include <downloadManager.h>
-#include <aboutdialog.h>
+#include <view/aboutdialog.h>
 
 #define COLUMN_FOR_TITLE 1
 #define COLUMN_FOR_DURATION 2
@@ -308,7 +308,7 @@ bool hasFilmAnEpisodeName(const FilmDetails* const film){
 }
 
 bool isFilmAnEpisode(const FilmDetails* const film){
-    return (film->episodeNumber > 0) || hasFilmAnEpisodeName(film);
+    return (film->m_episodeNumber > 0) || hasFilmAnEpisodeName(film);
 }
 
 void appendWithNewLine(QString& stringToChange, const QString & addition)
@@ -731,9 +731,9 @@ QString MainWindow::getFileName(const FilmDetails * const film) const
                 .replace("%quality", getStreamType().qualityCode.toUpper());
 
         cleanedTitle = cleanFilenameForFileSystem(serieName).append(QDir::separator()).append(cleanFilenameForFileSystem(filename));
-    } else if (film->episodeNumber){
+    } else if (film->m_episodeNumber){
         QString filename = Preferences::getInstance()->filenamePattern();;
-        filename.replace("%title", QString("%0 (%1)").arg(title).arg(film->episodeNumber))
+        filename.replace("%title", QString("%0 (%1)").arg(title).arg(film->m_episodeNumber))
                 .replace("%language", film->m_choosenStreamType)
                 .replace("%quality", getStreamType().qualityCode.toUpper());
 

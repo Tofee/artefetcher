@@ -12,10 +12,11 @@ isEmpty(PREFIX) {
  PREFIX = /usr/bin
 }
 
-VERSION = 0.5.4
+VERSION = 0.6.0
 
 QMAKE_CXXFLAGS_DEBUG += -pg
 QMAKE_LFLAGS_DEBUG += -pg
+CONFIG += warn_on
 
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
@@ -28,36 +29,40 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
     filmdelegate.cpp \
-    preferencedialog.cpp \
     preferences.cpp \
     downloadManager.cpp \
     queuedownloader.cpp \
-    aboutdialog.cpp \
     catalogs/artemaincatalog.cpp \
     catalogs/icatalog.cpp \
     catalogs/artedatecatalog.cpp \
-    catalogs/artelivecatalog.cpp
+    catalogs/artelivecatalog.cpp \
+    film/streamtype.cpp \
+    view/aboutdialog.cpp \
+    view/mainwindow.cpp \
+    view/preferencedialog.cpp
 
-HEADERS  += mainwindow.h \
+HEADERS  += \
     filmdelegate.h \
-    preferencedialog.h \
     preferences.h \
     downloadManager.h \
     queuedownloader.h \
-    aboutdialog.h \
-    filmdetails.h \
     catalogs/artemaincatalog.h \
     catalogs/icatalog.h \
     catalogs/artedatecatalog.h \
-    catalogs/artelivecatalog.h
+    catalogs/artelivecatalog.h \
+    film/streamtype.h \
+    film/filmdetails.h \
+    view/aboutdialog.h \
+    view/mainwindow.h \
+    view/preferencedialog.h
 TRANSLATIONS    = arteFetcher_de.ts \
                   arteFetcher_fr.ts
 
-FORMS    += mainwindow.ui \
-    preferencedialog.ui \
-    aboutdialog.ui
+FORMS    += \
+    view/aboutdialog.ui \
+    view/mainwindow.ui \
+    view/preferencedialog.ui
 
 INCLUDEPATH += /usr/lib64
 DEPENDPATH += /usr/lib64

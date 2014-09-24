@@ -32,10 +32,10 @@ PreferenceDialog::PreferenceDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->languageComboBox->addItems(FilmDelegate::listLanguages());
+    ui->languageComboBox->addItems(StreamType::listLanguages());
     ui->languageComboBox->setCurrentIndex(ui->languageComboBox->findText(Preferences::getInstance()->applicationLanguage()));
 
-    ui->qualityComboBox->addItems(FilmDelegate::listQualities());
+    ui->qualityComboBox->addItems(StreamType::listQualities());
     ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findText(Preferences::getInstance()->selectedQuality()));
 
     ui->destinationDirectoryLineEdit->setText(Preferences::getInstance()->m_destinationDir);

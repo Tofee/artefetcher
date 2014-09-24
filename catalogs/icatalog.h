@@ -29,7 +29,7 @@
 #define JSON_FILMPAGE_PREVIEW           "VTU"
 #define JSON_FILMPAGE_PREVIEW_URL       "IUR"
 
-#include <filmdetails.h>
+#include <film/filmdetails.h>
 class ICatalog {
 public:
 
