@@ -58,9 +58,9 @@ QStringList listVideoStreamTypes() {
 
     list.append("Dt. Version");
     list.append("Frz. Version");
-    list.append("Hörfilm");
+    list.append(QString::fromUtf8("Hörfilm"));
     list.append("OmU");
-    list.append("UT Hörgeschädigte");
+    list.append(QString::fromUtf8("UT Hörgeschädigte"));
     return list;
 }
 
@@ -91,6 +91,8 @@ void Preferences::load()
     m_proxyHttpPort = settings.value(DEF_OPT_PROXY_HTTP_PORT, 3128).toInt();
 
     if (settings.value(DEF_LAST_VERSION_USED, "0.5.1").toString() == "0.5.1"){
+        // TODO migration des langues pourries dans les préférences
+//http://stackoverflow.com/questions/6832596/how-to-compare-software-version-number-using-js-only-number
 //        const QString newFileNamePattern = "[%language] %title";
 //        QMessageBox::information(NULL, QObject::tr("New version"),
 //                                 QObject::tr("Your filename pattern was: %0.\nQuality is no longer supported.\nThus the pattern has been replaced with %1.\nYou can change it in the preference dialog.")
