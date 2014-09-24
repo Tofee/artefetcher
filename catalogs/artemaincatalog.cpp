@@ -1,8 +1,7 @@
 #include "artemaincatalog.h"
 #include <preferences.h>
-#include <QScriptEngine>
-#include <QScriptValue>
 #include <film/filmdetails.h>
+#include "artedefinitions.h"
 #include <QDebug> // TODO
 
 ArteMainCatalog::ArteMainCatalog(QObject *parent)
@@ -17,14 +16,9 @@ ArteMainCatalog::ArteMainCatalog(QObject *parent)
 
 
 QList<FilmDetails*> ArteMainCatalog::listFilmsFromCatalogAnswer(QString catalogName, const QString& catalogAnswer, int fromIndex, int toIndex, int& lastIndex){
+    QList<QVariant> list = extractJsonMapFromAnswer(catalogAnswer).value("videos").toList();
     QList<FilmDetails*> result;
-
-    QScriptEngine engine;
-    QScriptValue json = engine.evaluate("JSON.parse").call(QScriptValue(),
-                                                           QScriptValueList() << QString(catalogAnswer));
     int i = -1;
-    QList<QVariant> list = json.toVariant().toMap().value("videos").toList();
-
 
     foreach(QVariant catalogItem, list)
     {
@@ -67,11 +61,7 @@ QString ArteMainCatalog::getFilmDetailsUrl(FilmDetails* film){
 }
 
 void ArteMainCatalog::processFilmDetails(FilmDetails* film, QString httpAnswer){
-    QScriptEngine engine;
-    QScriptValue json = engine.evaluate("JSON.parse").call(QScriptValue(),
-                                                           QScriptValueList() << QString(httpAnswer));
-
-    QMap<QString, QVariant> mymap = json.toVariant().toMap().value("videoJsonPlayer").toMap();
+    QMap<QString, QVariant> mymap = extractJsonMapFromAnswer(httpAnswer).value("videoJsonPlayer").toMap();
     if (mymap.isEmpty())
     {
         // TODO
@@ -107,25 +97,6 @@ void ArteMainCatalog::processFilmDetails(FilmDetails* film, QString httpAnswer){
             film->m_metadata.insert(Channels, labels.join(", "));
         }
 
-        if (mymap.value("videoSwitchLang").toMap().size() > 1)
-        {
-            qDebug () << "[Warning] more than german and french available";
-        }
-
-        QString thumbnail = mymap.value(JSON_FILMPAGE_PREVIEW).toMap()
-                .value(JSON_FILMPAGE_PREVIEW_URL).toString();
-        if (!thumbnail.isEmpty() && !film->m_preview.contains(thumbnail))
-        {
-            // TODO estce vraiment utile ?
-            emit requestImageDownload(film, thumbnail);
-        }
-
-        foreach (QVariant streamJson, mymap.value("VSR").toMap().values()){
-            QMap<QString, QVariant> map = streamJson.toMap();
-            if (map.value("videoFormat").toString() == "HBBTV" && map.value("VQU").toString().toLower() == Preferences::getInstance()->selectedQuality())
-            {
-                film->m_allStreams[map.value("versionLibelle").toString()] = map.value("url").toString();
-            }
-        }
+        extractArteVideoStreamsFromMap(mymap, film, true);
     }
 }

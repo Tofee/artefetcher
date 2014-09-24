@@ -30,28 +30,10 @@
 #define MAX_IMAGE_WIDTH 400
 #define MAX_IMAGE_HEIGHT 226
 
-#define DOWNLOAD_STREAM     "about:downloads"
-#define DATE_STREAM_PREFIX  "about:date:"
-#define SEARCH_PREFIX       "about:search:"
-
 class ICatalog;
 class FilmDetails;
 class QNetworkAccessManager;
 class QSignalMapper;
-
-class NotFoundException{
-public:
-    NotFoundException(QString itemSearched)
-        :m_searchedItem(itemSearched)
-    {
-        qDebug() << "Not found exception for " << itemSearched;
-
-    }
-    QString itemSearched() const;
-private:
-    QString m_searchedItem;
-
-};
 
 class FilmDelegate: public QObject
 {
@@ -111,7 +93,7 @@ public:
     double computeTotalDownloadProgress() const;
     double computeTotalDownloadRequestedDuration() const;
 
-    static StreamType getStreamTypeByLanguageAndQuality(QString languageCode, QString qualityCode) throw (NotFoundException);
+    static StreamType getStreamTypeByLanguageAndQuality(QString languageCode, QString qualityCode);
 
 
 
@@ -139,12 +121,11 @@ private:
      * NULL if it's index page.<br/>
      * <br/>
      * This method is asynchronous. It starts the download and as soon as the page is downloaded,<br/>
-     * requestReadyToRead() is called with a MyPair key of the destinationKey and the step.
+     * requestReadyToRead() is called with a Context
      * TODO use an enum for step
      */
     void downloadUrl(const QString &catalogName, const QString& url, int requestPageId, const QString& destinationKey, const QString &step);
 
-    int getFilmId(FilmDetails*film) const;
     void commonLoadPlaylist(QString catalogName, QString type);
 
     void abortDownloadItemsInProgress();
@@ -175,34 +156,5 @@ private:
 
 };
 
-class Context : public QObject{
-    Q_OBJECT
-public:
-
-    Context(QString catalogName, int pageRequestId, QString s1, QString s2): catalogName(catalogName), pageRequestId(pageRequestId), first(s1), second(s2)
-    {
-        // qDebug() << "on en est a" << currentCountReference(true);
-
-    }
-    ~Context()
-    {
-        // qDebug() << "on en est a" << currentCountReference(false);
-    }
-
-    QString catalogName;
-    int pageRequestId;
-    QString first;
-    QString second;
-private:
-    int currentCountReference(bool add)
-    {
-        static int count(0);
-        if (add)
-            count++;
-        else
-            count --;
-        return count;
-    }
-};
 
 #endif // FILMDELEGATE_H

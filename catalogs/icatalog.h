@@ -5,29 +5,6 @@
 #include <QDate>
 #include <QVariant>
 
-#define JSON_AIRDATE        "airdate"
-#define JSON_AIRDATE_LONG   "airdate_long"
-#define JSON_AIRTIME        "airtime"
-#define JSON_DESC           "desc"
-#define JSON_RIGHTS_UNTIL   "video_rights_until"
-#define JSON_VIEWS          "video_views"
-#define JSON_VIDEO_CHANNEL  "video_channels"
-#define JSON_RANK           "video_rank"
-
-#define JSON_FILMPAGE_TYPE              "VCG"
-#define JSON_FILMPAGE_FIRST_BROADCAST   "VDA"
-#define JSON_FILMPAGE_AVAILABILITY      "VRU"
-#define JSON_FILMPAGE_VIDEO_TYPE        "VTX"
-#define JSON_FILMPAGE_VSU               "VSU"
-#define JSON_FILMPAGE_VIEWS             "VVI"
-// #define JSON_FILMPAGE_RANK              "videoRank"// useless, it just gives the position in the carousel...
-#define JSON_FILMPAGE_DESCRIPTION       "V7T"
-#define JSON_FILMPAGE_DURATION_SECONDS  "VTI"
-#define JSON_FILMPAGE_SUMMARY           "VDE"
-#define JSON_FILMPAGE_CHANNELS          "VCH"
-#define JSON_FILMPAGE_CHANNELS_LABEL    "label"
-#define JSON_FILMPAGE_PREVIEW           "VTU"
-#define JSON_FILMPAGE_PREVIEW_URL       "IUR"
 
 #include <film/filmdetails.h>
 class ICatalog {
@@ -35,7 +12,7 @@ public:
 
     virtual ~ICatalog(){}
 
-
+// TODO super doc
     /**
      * @brief accept
      * @param catalogName
@@ -68,11 +45,11 @@ public:
      */
     virtual QList<FilmDetails*> listFilmsFromCatalogAnswer(QString catalogName, const QString& catalogAnswer, int fromIndex, int toIndex, int& finalIndex) = 0;
 
-    // TODO renommer la méthode
     virtual QString getFilmDetailsUrl(FilmDetails* film) = 0;
 
     virtual void processFilmDetails(FilmDetails* film, QString httpAnswer) = 0;
 
+    QMap<QString, QVariant> extractJsonMapFromAnswer(QString httpAnswer);
 
 protected:
     void addMetadataIfNotEmpty(FilmDetails* film, QVariantMap inputMap, QString fieldName, MetaType internalFieldName, bool isDate = false);

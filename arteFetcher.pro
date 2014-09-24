@@ -12,7 +12,7 @@ isEmpty(PREFIX) {
  PREFIX = /usr/bin
 }
 
-VERSION = 0.6.0
+VERSION = 0.6.0-SNAPSHOT
 
 QMAKE_CXXFLAGS_DEBUG += -pg
 QMAKE_LFLAGS_DEBUG += -pg
@@ -40,7 +40,8 @@ SOURCES += main.cpp\
     film/streamtype.cpp \
     view/aboutdialog.cpp \
     view/mainwindow.cpp \
-    view/preferencedialog.cpp
+    view/preferencedialog.cpp \
+    catalogs/artedefinitions.cpp
 
 HEADERS  += \
     filmdelegate.h \
@@ -55,7 +56,9 @@ HEADERS  += \
     film/filmdetails.h \
     view/aboutdialog.h \
     view/mainwindow.h \
-    view/preferencedialog.h
+    view/preferencedialog.h \
+    catalogs/artedefinitions.h \
+    context.h
 TRANSLATIONS    = arteFetcher_de.ts \
                   arteFetcher_fr.ts
 

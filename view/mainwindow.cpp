@@ -46,7 +46,7 @@
 #define PROGRESS_PEN_WIDTH 16
 #define PROGRESS_Y_POS_ON_IMAGE MAX_IMAGE_HEIGHT - PROGRESS_PEN_WIDTH / 2
 
-
+#define DOWNLOAD_STREAM "::download::"
 #define DEFAULT_FILM_ICON ":/img/unknown"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -218,8 +218,7 @@ void MainWindow::loadStreamComboBox() {
     ui->streamComboBox->clear();
     ui->streamComboBox->addItems(delegate->listCatalogNames());
 
-    // TODO downloads
-    // ui->streamComboBox->addItem(tr("Downloads"), DOWNLOAD_STREAM);
+    ui->streamComboBox->addItem(tr("Downloads"), DOWNLOAD_STREAM);
 }
 
 void MainWindow::streamIndexLoaded(int resultCount, int currentPage, int pageCount){
@@ -272,7 +271,6 @@ void MainWindow::updateItemProgressBar(){
 
 void MainWindow::clearAndLoadTable()
 {
-    QString url;
     bool dateCurrentlyShown = delegate->isDateCatalog(ui->streamComboBox->currentText());
     bool searchEditShown = false;
 
@@ -592,10 +590,10 @@ void MainWindow::updateFilmStreamCombobox(FilmDetails * const film) {
         ui->filmStreamComboBox->addItems(film->m_allStreams.keys());
     }
 
-    int streamTypeIndexToSelect = -1;
     ui->filmStreamComboBox->setVisible(ui->filmStreamComboBox->count() && !filmWillBeDownloaded(film));
 
     if (ui->filmStreamComboBox->isVisible()){
+        int streamTypeIndexToSelect = -1;
         if (! film->m_choosenStreamType.isEmpty()){
             streamTypeIndexToSelect = ui->filmStreamComboBox->findText(film->m_choosenStreamType);
         } else {

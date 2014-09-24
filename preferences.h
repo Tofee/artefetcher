@@ -31,7 +31,9 @@ public:
     friend class PreferenceDialog;
     friend class MainWindow;
 
-    IPreferences(){}
+    IPreferences()
+        : m_dedicatedDirectoryForSeries(false), m_saveImagePreview(true), m_saveMetaInInfoFile(true), m_resultCountPerPage(10), m_proxyEnabled(false), m_proxyHttpPort(3128)
+    {}
     virtual ~IPreferences(){}
 
     /**

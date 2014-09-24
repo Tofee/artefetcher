@@ -1,9 +1,8 @@
 #include "artelivecatalog.h"
-#include <QScriptEngine>
-#include <QScriptValue>
 #include <QDebug> // TODO
 #include <film/filmdetails.h>
 #include <preferences.h>
+#include "artedefinitions.h"
 
 ArteLiveCatalog::ArteLiveCatalog(QObject *parent) : QObject(parent)
 {
@@ -18,11 +17,8 @@ ArteLiveCatalog::ArteLiveCatalog(QObject *parent) : QObject(parent)
 QList<FilmDetails*> ArteLiveCatalog::listFilmsFromCatalogAnswer(QString catalogName, const QString& catalogAnswer, int fromIndex, int toIndex, int& lastIndex){
     QList<FilmDetails*> result;
 
-    QScriptEngine engine;
-    QScriptValue json = engine.evaluate("JSON.parse").call(QScriptValue(),
-                                                           QScriptValueList() << QString(catalogAnswer));
     int i = -1;
-    QList<QVariant> list = json.toVariant().toMap().value("videos").toList();
+    QList<QVariant> list = extractJsonMapFromAnswer(catalogAnswer).value("videos").toList();
 
     foreach(QVariant catalogItem, list)
     {
@@ -40,13 +36,7 @@ QList<FilmDetails*> ArteLiveCatalog::listFilmsFromCatalogAnswer(QString catalogN
             //addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_VIEWS, Views);
             //addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_VIDEO_CHANNEL, Channels);
 
-            foreach (QVariant streamJson, catalogItem.toMap().value("VSR").toMap().values()){
-                QMap<QString, QVariant> map = streamJson.toMap();
-                if (map.value("VQU").toString().toLower() == Preferences::getInstance()->selectedQuality())
-                {
-                    newFilm->m_allStreams[map.value("versionLibelle").toString()] = map.value("url").toString();
-                }
-            }
+            extractArteVideoStreamsFromMap(catalogItem.toMap(), newFilm, false);
 
             result << newFilm;
 

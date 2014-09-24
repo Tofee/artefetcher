@@ -30,6 +30,7 @@
 #include <QScriptEngine>
 #include <QScriptValue>
 #include <catalogs/icatalog.h>
+#include "context.h"
 
 #define MAPPER_STEP_CATALOG "CATALOG"
 #define MAPPER_STEP_CODE_2_XML "XML"
@@ -83,33 +84,31 @@ void FilmDelegate::loadPlayList(QString catalogName, QDate date)
         return;
     }
     if (!catalog){
-        qDebug() << "No catalog found for name:" << catalogName;
+        // We could write a catalog dedicated to all current downloads
+        // But the related movies are already in cache, thus there is no need to fetch anything
+        // If the previously downloaded films are getting managed,
+        // we can put a dedicated catalog which lists the films in the hard drive and fetch the related metadata
+        m_visibleFilms.clear();
+
+        foreach(QString filmUrl, m_currentDownloads) {
+            if (!m_films.contains(filmUrl)) {
+                addMovieFromUrl("FAKE"/* TODO */, filmUrl);
+            } else {
+                m_visibleFilms << filmUrl;
+            }
+        }
+        m_currentPageCount = 1;
+        emit(streamIndexLoaded(m_visibleFilms.size(), 1, m_currentPageCount));
+        emit(playListHasBeenUpdated());
         return;
     }
     QString url = catalog->getUrlForCatalogNames(catalogName, date);
 
     abortDownloadItemsInProgress();
-    QString type  = MAPPER_STEP_CATALOG;
-//    if (url == DOWNLOAD_STREAM)
-//    {
-//        m_visibleFilms.clear();
 
-//        foreach(QString filmUrl, m_currentDownloads) {
-//            if (!m_films.contains(filmUrl)) {
-//                addMovieFromUrl("FAKE"/* TODO */, filmUrl);
-//            } else {
-//                m_visibleFilms << filmUrl;
-//            }
-//        }
-//        m_currentPageCount = 1;
-//        emit(streamIndexLoaded(m_visibleFilms.size(), 1, m_currentPageCount));
-//        emit(playListHasBeenUpdated());
-//        return;
-//        }
-//    }
     m_currentPage = 1;
     m_lastPlaylistUrl = url;
-    commonLoadPlaylist(catalogName, type);
+    commonLoadPlaylist(catalogName, MAPPER_STEP_CATALOG);
 }
 
 bool FilmDelegate::isDateCatalog(QString catalogName) {
@@ -150,32 +149,6 @@ void FilmDelegate::commonLoadPlaylist(QString catalogName, QString type/*TODO ty
     downloadUrl(catalogName, m_lastPlaylistUrl, m_lastRequestPageId, QString(), type);
 }
 
-
-
-QString extractUniqueResult(const QString& document, const QString& xpath)
-{
-    QXmlQuery query;
-    query.setFocus(document);
-    query.setQuery(xpath);
-
-    QXmlResultItems items;
-    if (!query.isValid())
-    {
-        return QString();
-    }
-
-    query.evaluateTo(&items);
-
-    QXmlItem item(items.next());
-    if (item.isNull())
-    {
-        return QString();
-    }
-    QString result = item.toAtomicValue().toString();
-    Q_ASSERT(items.next().isNull());
-    return result;
-}
-
 void FilmDelegate::downloadUrl(const QString& catalogName, const QString& url, int requestPageId, const QString& destinationKey, const QString& step)
 {
     if (requestPageId < m_lastRequestPageId)
@@ -187,12 +160,6 @@ void FilmDelegate::downloadUrl(const QString& catalogName, const QString& url, i
     m_signalMapper->setMapping(xmlReply, new Context(catalogName, requestPageId, destinationKey, step));
     connect(xmlReply, SIGNAL(finished()), m_signalMapper, SLOT(map()));
 }
-
-int FilmDelegate::getFilmId(FilmDetails * film) const
-{
-    return m_films.values().indexOf(film);
-}
-
 
 void FilmDelegate::downloadImage(FilmDetails *film, QString imageUrl){
     downloadUrl(film->m_catalogName, imageUrl, m_lastRequestPageId, film->m_infoUrl, MAPPER_STEP_CODE_4_IMAGE);
@@ -215,14 +182,14 @@ void FilmDelegate::requestReadyToRead(QObject* object)
     if (reply == NULL || object == NULL)
         return;
 
-    Context* pair = qobject_cast<Context* >(object) ;
-    if (pair == NULL)
+    Context* context = qobject_cast<Context* >(object) ;
+    if (context == NULL)
         return;
-    QString itemName = pair->first;
-    QString itemStep = pair->second;
-    int pageRequestId = pair->pageRequestId;
+    QString itemName = context->destinationKey;
+    QString itemStep = context->step;
+    int pageRequestId = context->pageRequestId;
 
-    pair->deleteLater();
+    context->deleteLater();
     if (pageRequestId < m_lastRequestPageId)
     {
         // This download request is out dated. No need to continue
@@ -236,8 +203,8 @@ void FilmDelegate::requestReadyToRead(QObject* object)
             const QString page(QString::fromUtf8(reply->readAll()));
 
             int i;
-            QList<FilmDetails*> foundInCatalogPage = getCatalogForName(pair->catalogName)
-                    ->listFilmsFromCatalogAnswer(pair->catalogName, page, resultCountPerPage * (m_currentPage - 1), resultCountPerPage * m_currentPage, i);
+            QList<FilmDetails*> foundInCatalogPage = getCatalogForName(context->catalogName)
+                    ->listFilmsFromCatalogAnswer(context->catalogName, page, resultCountPerPage * (m_currentPage - 1), resultCountPerPage * m_currentPage, i);
 
             foreach(FilmDetails* film, foundInCatalogPage){
                 QString url = film->m_infoUrl;
@@ -276,7 +243,7 @@ void FilmDelegate::requestReadyToRead(QObject* object)
         FilmDetails* film = m_films[itemName];
         if (itemStep == MAPPER_STEP_CODE_2_XML)
         {
-            getCatalogForName(pair->catalogName)->processFilmDetails(film, QString::fromUtf8(reply->readAll()));
+            getCatalogForName(context->catalogName)->processFilmDetails(film, QString::fromUtf8(reply->readAll()));
             emit filmHasBeenUpdated(film);
         }
         else if (itemStep == MAPPER_STEP_CODE_4_IMAGE)
@@ -386,7 +353,7 @@ double FilmDelegate::computeTotalDownloadRequestedDuration() const {
     return totalDurationInMinute;
 }
 
-StreamType FilmDelegate::getStreamTypeByLanguageAndQuality(QString languageCode, QString qualityCode) throw (NotFoundException)
+StreamType FilmDelegate::getStreamTypeByLanguageAndQuality(QString languageCode, QString qualityCode)
 {
     QList<StreamType> & streamTypeList = StreamType::listStreamTypes();
     for (QList<StreamType>::const_iterator it = streamTypeList.constBegin();
@@ -397,7 +364,8 @@ StreamType FilmDelegate::getStreamTypeByLanguageAndQuality(QString languageCode,
                 && streamType.qualityCode.compare(qualityCode) == 0)
             return streamType;
     }
-    throw NotFoundException(QString("%1/%2").arg(languageCode, qualityCode));
+    qCritical() << "Cannot find StreamType for:" << languageCode << qualityCode;
+    return StreamType();
 }
 
 void FilmDelegate::reloadFilm(FilmDetails* film)
