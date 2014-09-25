@@ -37,23 +37,26 @@ public:
     }
 
     /**
-     * @brief listFilmsFromCatalogAnswer
-     * @param catalogAnswer
-     * @param fromIndex first item to fetch
-     * @param toIndex last item to fetch (included)
-     * @return
+     * @brief listFilmsFromCatalogAnswer List the films of the catalog in the range of the page
+     * @param catalogName name of the catalog
+     * @param catalogAnswer html answer page
+     * @param fromIndex index of the first item in the page
+     * @param toIndex index of the last item in the page (excluded)
+     * @param totalCount count of all the items in the catalog (even if not in the current page)
+     * @return list of the items in the page
      */
-    virtual QList<FilmDetails*> listFilmsFromCatalogAnswer(QString catalogName, const QString& catalogAnswer, int fromIndex, int toIndex, int& finalIndex) = 0;
+    virtual QList<FilmDetails*> listFilmsFromCatalogAnswer(QString catalogName, const QString& catalogAnswer, int fromIndex, int toIndex, int& totalCount) = 0;
 
     virtual QString getFilmDetailsUrl(FilmDetails* film) = 0;
 
     virtual void processFilmDetails(FilmDetails* film, QString httpAnswer) = 0;
 
-    QMap<QString, QVariant> extractJsonMapFromAnswer(QString httpAnswer);
-
 protected:
-    void addMetadataIfNotEmpty(FilmDetails* film, QVariantMap inputMap, QString fieldName, MetaType internalFieldName, bool isDate = false);
+
     QMap<QString, QString> m_urlByCatalogName;
 };
+
+void addMetadataIfNotEmpty(FilmDetails* film, QVariantMap inputMap, QString fieldName, MetaType internalFieldName, bool isDate = false);
+QMap<QString, QVariant> extractJsonMapFromAnswer(QString httpAnswer);
 
 #endif // ICATALOG_H

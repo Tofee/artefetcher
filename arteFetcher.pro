@@ -41,7 +41,8 @@ SOURCES += main.cpp\
     view/aboutdialog.cpp \
     view/mainwindow.cpp \
     view/preferencedialog.cpp \
-    catalogs/artedefinitions.cpp
+    catalogs/artedefinitions.cpp \
+    catalogs/incompletedownloads.cpp
 
 HEADERS  += \
     filmdelegate.h \
@@ -58,7 +59,8 @@ HEADERS  += \
     view/mainwindow.h \
     view/preferencedialog.h \
     catalogs/artedefinitions.h \
-    context.h
+    context.h \
+    catalogs/incompletedownloads.h
 TRANSLATIONS    = arteFetcher_de.ts \
                   arteFetcher_fr.ts
 

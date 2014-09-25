@@ -26,15 +26,15 @@
 #include <QMessageBox>
 #include <QtGui>
 
-#include <catalogs/artemaincatalog.h>
-#include <catalogs/artedatecatalog.h>
-#include <catalogs/artelivecatalog.h>
-#include <view/preferencedialog.h>
-#include <filmdelegate.h>
-#include <film/filmdetails.h>
-#include <downloadManager.h>
-#include <view/aboutdialog.h>
-
+#include "catalogs/artemaincatalog.h"
+#include "catalogs/artedatecatalog.h"
+#include "catalogs/artelivecatalog.h"
+#include "catalogs/incompletedownloads.h"
+#include "view/preferencedialog.h"
+#include "filmdelegate.h"
+#include "film/filmdetails.h"
+#include "downloadManager.h"
+#include "view/aboutdialog.h"
 #define COLUMN_FOR_TITLE 1
 #define COLUMN_FOR_DURATION 2
 #define COLUMN_FOR_PREVIEW 0
@@ -66,10 +66,21 @@ MainWindow::MainWindow(QWidget *parent) :
     this->resize(Preferences::getInstance()->preferredWindowSize());
     m_trayIcon->show();
 
+
+
     delegate = new FilmDelegate(manager);
     delegate->addCatalog(new ArteMainCatalog(this));
     delegate->addCatalog(new ArteDateCatalog(this));
     delegate->addCatalog(new ArteLiveCatalog(this));
+
+    ICatalog* incompleteCatalog = new IncompleteDownloads(this);
+    delegate->addCatalog(incompleteCatalog);
+
+    loadStreamComboBox();
+    if (!Preferences::getInstance()->pendingDownloads().isEmpty())
+    {
+        ui->streamComboBox->setCurrentIndex(ui->streamComboBox->findText(incompleteCatalog->listSupportedCatalogNames().first()));
+    }
 
     QStringList header;
     header
@@ -125,11 +136,6 @@ MainWindow::MainWindow(QWidget *parent) :
     m_imageTimer->start(3000 /*ms*/);
     connect(m_imageTimer, SIGNAL(timeout()), SLOT(clicOnPreview()));
 
-    loadStreamComboBox();
-    if (!Preferences::getInstance()->pendingDownloads().isEmpty())
-    {
-        ui->streamComboBox->setCurrentIndex(ui->streamComboBox->findText(tr("Downloads")));
-    }
 
     connect(delegate, SIGNAL(playListHasBeenUpdated()),
             SLOT(refreshTable()));
@@ -286,12 +292,12 @@ void MainWindow::clearAndLoadTable()
 
 void MainWindow::nextPage()
 {
-    delegate->loadNextPage(ui->streamComboBox->currentText());
+    delegate->loadPage(ui->streamComboBox->currentText(), 1);
 }
 
 void MainWindow::previousPage()
 {
-    delegate->loadPreviousPage(ui->streamComboBox->currentText());
+    delegate->loadPage(ui->streamComboBox->currentText(), -1);
 }
 
 
@@ -590,8 +596,6 @@ void MainWindow::updateFilmStreamCombobox(FilmDetails * const film) {
         ui->filmStreamComboBox->addItems(film->m_allStreams.keys());
     }
 
-    ui->filmStreamComboBox->setVisible(ui->filmStreamComboBox->count() && !filmWillBeDownloaded(film));
-
     if (ui->filmStreamComboBox->isVisible()){
         int streamTypeIndexToSelect = -1;
         if (! film->m_choosenStreamType.isEmpty()){
@@ -624,6 +628,8 @@ void MainWindow::updateButtonsVisibility(const FilmDetails * const film){
     ui->downloadButton->setVisible(isReadyForDownload(film));
     ui->cancelSelectedFilmButton->setVisible(film != NULL &&
             (film->m_downloadStatus == DL_DOWNLOADING || film->m_downloadStatus == DL_REQUESTED));
+    ui->filmStreamComboBox->setVisible(ui->filmStreamComboBox->count());
+    ui->filmStreamComboBox->setEnabled(!filmWillBeDownloaded(film));
 }
 
 QString cleanFilenameForFileSystem(const QString filename) {

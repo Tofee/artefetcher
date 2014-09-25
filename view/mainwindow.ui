@@ -17,7 +17,7 @@
    </size>
   </property>
   <property name="windowIcon">
-   <iconset resource="resources.qrc">
+   <iconset resource="../resources.qrc">
     <normaloff>:/img/icon</normaloff>:/img/icon</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
@@ -73,7 +73,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="resources.qrc">
+         <iconset resource="../resources.qrc">
           <normaloff>:/img/configure</normaloff>:/img/configure</iconset>
         </property>
        </widget>
@@ -87,7 +87,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="resources.qrc">
+         <iconset resource="../resources.qrc">
           <normaloff>:/img/about</normaloff>:/img/about</iconset>
         </property>
        </widget>
@@ -172,7 +172,7 @@
               <string/>
              </property>
              <property name="pixmap">
-              <pixmap resource="resources.qrc">:/img/locked</pixmap>
+              <pixmap resource="../resources.qrc">:/img/locked</pixmap>
              </property>
             </widget>
            </item>
@@ -197,30 +197,16 @@
             </spacer>
            </item>
            <item>
-            <widget class="QPushButton" name="cancelSelectedFilmButton">
+            <widget class="QPushButton" name="openDirectoryButton">
              <property name="toolTip">
-              <string>Cancel the download of the selected film</string>
+              <string>Open the directory containing the video</string>
              </property>
              <property name="text">
               <string/>
              </property>
              <property name="icon">
-              <iconset resource="resources.qrc">
-               <normaloff>:/img/cancelled</normaloff>:/img/cancelled</iconset>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QComboBox" name="filmStreamComboBox"/>
-           </item>
-           <item>
-            <widget class="QPushButton" name="downloadButton">
-             <property name="toolTip">
-              <string>Download this video</string>
-             </property>
-             <property name="icon">
-              <iconset resource="resources.qrc">
-               <normaloff>:/img/download</normaloff>:/img/download</iconset>
+              <iconset resource="../resources.qrc">
+               <normaloff>:/img/directory</normaloff>:/img/directory</iconset>
              </property>
             </widget>
            </item>
@@ -233,22 +219,36 @@
               <string/>
              </property>
              <property name="icon">
-              <iconset resource="resources.qrc">
+              <iconset resource="../resources.qrc">
                <normaloff>:/img/play</normaloff>:/img/play</iconset>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="openDirectoryButton">
+            <widget class="QComboBox" name="filmStreamComboBox"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="cancelSelectedFilmButton">
              <property name="toolTip">
-              <string>Open the directory containing the video</string>
+              <string>Cancel the download of the selected film</string>
              </property>
              <property name="text">
               <string/>
              </property>
              <property name="icon">
-              <iconset resource="resources.qrc">
-               <normaloff>:/img/directory</normaloff>:/img/directory</iconset>
+              <iconset resource="../resources.qrc">
+               <normaloff>:/img/cancelled</normaloff>:/img/cancelled</iconset>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="downloadButton">
+             <property name="toolTip">
+              <string>Download this video</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../resources.qrc">
+               <normaloff>:/img/download</normaloff>:/img/download</iconset>
              </property>
             </widget>
            </item>
@@ -258,7 +258,7 @@
               <string>Refresh the video information</string>
              </property>
              <property name="icon">
-              <iconset resource="resources.qrc">
+              <iconset resource="../resources.qrc">
                <normaloff>:/img/refresh</normaloff>:/img/refresh</iconset>
              </property>
             </widget>
@@ -269,7 +269,7 @@
               <string>Open the video page in an external browser</string>
              </property>
              <property name="icon">
-              <iconset resource="resources.qrc">
+              <iconset resource="../resources.qrc">
                <normaloff>:/img/web</normaloff>:/img/web</iconset>
              </property>
             </widget>
@@ -389,7 +389,7 @@
               <string>Pause all downloads</string>
              </property>
              <property name="icon">
-              <iconset resource="resources.qrc">
+              <iconset resource="../resources.qrc">
                <normaloff>:/img/pause</normaloff>:/img/pause</iconset>
              </property>
             </widget>
@@ -400,7 +400,7 @@
               <string>Cancel the download in progress</string>
              </property>
              <property name="icon">
-              <iconset resource="resources.qrc">
+              <iconset resource="../resources.qrc">
                <normaloff>:/img/cancelled</normaloff>:/img/cancelled</iconset>
              </property>
             </widget>
@@ -425,7 +425,7 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="resources.qrc"/>
+  <include location="../resources.qrc"/>
  </resources>
  <connections>
   <connection>

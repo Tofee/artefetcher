@@ -31,10 +31,9 @@ QList<FilmDetails*> ArteLiveCatalog::listFilmsFromCatalogAnswer(QString catalogN
 
             FilmDetails* newFilm = new FilmDetails(catalogName, title, url, arteId);
 
+            updateArteEpisodeNumber(newFilm);
             addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), "VDE", Description);
             addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), "VCG", Genre);
-            //addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_VIEWS, Views);
-            //addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_VIDEO_CHANNEL, Channels);
 
             extractArteVideoStreamsFromMap(catalogItem.toMap(), newFilm, false);
 

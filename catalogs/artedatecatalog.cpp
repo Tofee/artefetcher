@@ -14,6 +14,8 @@ ArteDateCatalog::ArteDateCatalog(QObject *parent)
 
 
 QString ArteDateCatalog::getUrlForCatalogNames(QString, QDate catalogDate) const {
+    // Goal build an URL with the date in this example format:
+    // "http://www.arte.tv/papi/tvguide/epg/schedule/F/L3/2014-09-05/2014-9-6.json"
     QString baseUrl("http://www.arte.tv/papi/tvguide/epg/schedule/F/L3/%1-%2-%3/%4-%5-%6.json");
     return baseUrl.arg(catalogDate.year())
                 .arg(catalogDate.month(), 2, 10, QChar('0'))
@@ -25,24 +27,20 @@ QString ArteDateCatalog::getUrlForCatalogNames(QString, QDate catalogDate) const
 
 QList<FilmDetails*> ArteDateCatalog::listFilmsFromCatalogAnswer(QString catalogName, const QString &catalogAnswer, int fromIndex, int toIndex, int &lastIndex)
 {
-    QList<FilmDetails*> result;
-    int i = -1;
     QList<QVariant> list = extractJsonMapFromAnswer(catalogAnswer).value("abstractBroadcastList").toList();
+    lastIndex = list.size();
+    QList<FilmDetails*> result;
 
-    foreach(QVariant catalogItem, list)
-    {
-        ++i;
-
-        if (i >= fromIndex && i < toIndex) {
+    for (int i = fromIndex; i < toIndex && i < list.size(); ++i){
+        QVariant catalogItem = list.at(i);
+        {
             QString url = catalogItem.toMap().value("PUR").toString();
             QString title = catalogItem.toMap().value("TIT").toString();
             QString arteId = catalogItem.toMap().value("PID").toString();
 
             FilmDetails* newFilm = new FilmDetails(catalogName, title, url, arteId);
-
+            updateArteEpisodeNumber(newFilm);
             addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), "DLO", Description);
-            // TODO addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_VIEWS, Views);
-            // TODO addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), JSON_VIDEO_CHANNEL, Channels);
 
             newFilm->m_replayAvailable = catalogItem.toMap().value("VDO").toMap().value("VTY").toString() == QString("ARTE_PLUS_SEVEN");
 
@@ -55,8 +53,6 @@ QList<FilmDetails*> ArteDateCatalog::listFilmsFromCatalogAnswer(QString catalogN
             }
         }
     }
-
-    lastIndex = i+1;// TODO c'est moche!!!
     return result;
 }
 
@@ -71,43 +67,5 @@ QString ArteDateCatalog::getFilmDetailsUrl(FilmDetails *film){
 }
 
 void ArteDateCatalog::processFilmDetails(FilmDetails *film, QString httpAnswer){
-    // TODO c'est un vulgaire copier coller depuis ArteMainCatalog
-    QMap<QString, QVariant> mymap = extractJsonMapFromAnswer(httpAnswer).value("videoJsonPlayer").toMap();
-    if (mymap.isEmpty())
-    {
-        qDebug() << "[ERROR] Cannot find 'videoJsonPlayer' for" << film->m_infoUrl << " in" << httpAnswer;
-        //TODO emit(errorOccured(film->m_infoUrl,tr("Cannot load stream details")));
-        return;
-    }
-    else {
-
-
-        if (mymap.value(JSON_FILMPAGE_DURATION_SECONDS).toString() != "" && film->m_title == "")
-        {
-            film->m_title = mymap.value(JSON_FILMPAGE_DURATION_SECONDS).toString();
-        }
-        film->m_durationInMinutes = mymap.value("videoDurationSeconds").toInt() /60;
-        film->m_summary = mymap.value(JSON_FILMPAGE_SUMMARY).toString();
-
-        addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_TYPE,              Type);
-        addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_FIRST_BROADCAST,   RAW_First_Broadcast, true); // 25/04/2013 20:50:30 +0200
-        addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_AVAILABILITY,      RAW_Available_until, true); // 02/05/2013 20:20:30 +0200
-        addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_VIDEO_TYPE,        Preview_Or_ArteP7); // EXTRAIT (AUSSCHNITT in german) or ARTE+7
-        addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_VSU,               Episode_name); // if not null, it belongs to a serie
-        addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_VIEWS,             Views); // different from the one in the catalog: this is just a number
-        addMetadataIfNotEmpty(film, mymap, JSON_FILMPAGE_DESCRIPTION,       Description);
-
-        QStringList labels;
-        foreach (QVariant channelItem, mymap.value(JSON_FILMPAGE_CHANNELS).toList())
-        {
-            labels << channelItem.toMap().value(JSON_FILMPAGE_CHANNELS_LABEL).toString();
-        }
-        if (!labels.isEmpty())
-        {
-            film->m_metadata.insert(Channels, labels.join(", "));
-        }
-
-        extractArteVideoStreamsFromMap(mymap, film, true);
-    }
-
+    defaultArteProcessFilmDetails(film, httpAnswer);
 }

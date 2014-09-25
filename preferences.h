@@ -25,6 +25,18 @@
 #include <QSet>
 #include <QSize>
 
+
+#define PREFERENCES_FILMMAP_ARTEID "arteId"
+#define PREFERENCES_FILMMAP_TITLE "title"
+#define PREFERENCES_FILMMAP_FILMURL "url"
+#define PREFERENCES_FILMMAP_DESC "desc"
+#define PREFERENCES_FILMMAP_VIDEOQUALITY "vQual"
+#define PREFERENCES_FILMMAP_VIDEOURL "vUrl"
+#define PREFERENCES_FILMMAP_IMAGE "image"
+#define PREFERENCES_FILMMAP_DURATION "duration"
+#define PREFERENCES_FILMMAP_EPISODE_NAME "episodeName"
+#define PREFERENCES_FILMMAP_EPISODE_NUMBER "episode#"
+
 class IPreferences
 {
 public:
@@ -57,11 +69,11 @@ public:
     {
         return m_destinationDir;
     }
-    const QList<QString> &pendingDownloads() const
+    const QList<QVariant> &pendingDownloads() const
     {
         return m_pendingDownloads;
     }
-    void setPendingDownloads(QList<QString> downloadUrls){
+    void setPendingDownloads(QList<QVariant> downloadUrls){
         m_pendingDownloads = downloadUrls;
     }
 
@@ -126,7 +138,7 @@ protected:
     QString m_filenamePattern;
     QString m_destinationDir;
     QSize   m_preferredWindowSize;
-    QList<QString> m_pendingDownloads;
+    QList<QVariant> m_pendingDownloads;
     bool    m_dedicatedDirectoryForSeries;
     bool    m_saveImagePreview;
     bool    m_saveMetaInInfoFile;

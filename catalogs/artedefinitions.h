@@ -32,5 +32,12 @@ class FilmDetails;
 
 void extractArteVideoStreamsFromMap(QMap<QString, QVariant> mapWithStream, FilmDetails* film, bool onlyHbbtv);
 
+/**
+ * @brief updateArteEpisodeNumber Extracts the arte episode number from the arte id
+ * @param film film to update
+ */
+void updateArteEpisodeNumber(FilmDetails* film);
+
+void defaultArteProcessFilmDetails(FilmDetails* film, QString httpAnswer);
 
 #endif // ARTEDEFINITIONS_H

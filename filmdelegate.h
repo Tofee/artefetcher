@@ -57,10 +57,8 @@ public:
                                                                                     return result; }
 
     void reloadFilm(FilmDetails* film);
-    bool addMovieFromUrl(QString catalogName, const QString url, QString title = QString());
 
-    void loadNextPage(QString catalogName);
-    void loadPreviousPage(QString catalogName);
+    void loadPage(QString catalogName, int offset);
 
     /**
      * @brief getLineForUrl for an URL of a film
@@ -126,7 +124,7 @@ private:
      */
     void downloadUrl(const QString &catalogName, const QString& url, int requestPageId, const QString& destinationKey, const QString &step);
 
-    void commonLoadPlaylist(QString catalogName, QString type);
+    void commonLoadPlaylist(QString catalogName);
 
     void abortDownloadItemsInProgress();
 
@@ -146,11 +144,6 @@ private:
 	int m_lastRequestPageId;
 
     QString m_lastPlaylistUrl;
-    /**
-     * @brief m_initialyCatalog is true if the initial request is a catalog fetch,
-     * i.e. is not a date fetch
-     */
-    bool m_initialyCatalog;
 
     QList<ICatalog*> m_catalogs;
 

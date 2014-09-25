@@ -2,7 +2,7 @@
 #include <QScriptEngine>
 #include <preferences.h>
 
-void ICatalog::addMetadataIfNotEmpty(FilmDetails *film, QVariantMap inputMap, QString fieldName, MetaType internalFieldName, bool isDate) {
+void addMetadataIfNotEmpty(FilmDetails *film, QVariantMap inputMap, QString fieldName, MetaType internalFieldName, bool isDate) {
     if (!inputMap.value(fieldName).isValid())
         return;
     QString value = inputMap.value(fieldName).toString();
@@ -16,7 +16,7 @@ void ICatalog::addMetadataIfNotEmpty(FilmDetails *film, QVariantMap inputMap, QS
 }
 
 
-QMap<QString, QVariant> ICatalog::extractJsonMapFromAnswer(QString httpAnswer){
+QMap<QString, QVariant> extractJsonMapFromAnswer(QString httpAnswer){
     QScriptEngine engine;
     QScriptValue json = engine.evaluate("JSON.parse").call(QScriptValue(),
                                                            QScriptValueList() << QString(httpAnswer));
