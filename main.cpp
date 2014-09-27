@@ -20,9 +20,21 @@
 #include <QApplication>
 #include "view/mainwindow.h"
 #include <QTranslator>
+
+#ifdef RUN_TESTS
+#include "test/testpreferences.h"
+#endif
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
+#ifdef RUN_TESTS
+    qDebug() << "Running tests...";
+    TestPreferences pref;
+    pref.testCompareVersions();
+    qDebug() << "Test ran.";
+#endif
 
     a.setApplicationVersion(APP_VERSION);
 

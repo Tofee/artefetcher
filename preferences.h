@@ -186,4 +186,15 @@ private:
 
 };
 
+/**
+ * @brief compareVersions Compares two versions
+ * @param v1 first version
+ * @param v2 second version
+ * @return depends on v1 and v2 :
+ *  if v1 == v2 returns 0
+ *  if v1 < v2 returns < 0
+ *  if v1 > v2 returns > 0
+ */
+int compareVersions(QString v1, QString v2);
+
 #endif // PREFERENCES_H

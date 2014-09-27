@@ -64,6 +64,25 @@ QStringList listVideoStreamTypes() {
     return list;
 }
 
+int compareVersions(QString v1, QString v2){
+    QRegExp regexp("[\\-.]");
+    QStringList v1List = v1.split(regexp);
+    QStringList v2List = v2.split(regexp);
+    for(int i = 0; i < std::max(v1List.size(), v2List.size()); ++i){
+        bool ok1, ok2;
+        if (v1List.size() == i) return -1;
+        if (v2List.size() == i) return 1;
+        int v1Item = v1List.at(i).toInt(&ok1);
+        int v2Item = v2List.at(i).toInt(&ok2);
+        if (ok1 && !ok2) return 1;
+        if (!ok1 && ok2) return -1;
+        if (!ok1 && !ok2) continue;// String are not compared.
+        // Now v1Item and v2Item are both integer, comparison is easy
+        if ((v2Item - v1Item) != 0) return v1Item - v2Item;
+    }
+    return 0;
+}
+
 void Preferences::load()
 {
     QString defaultWorkingPath(QDir::homePath().append(QDir::separator()).append("arteFetcher"));
@@ -90,16 +109,12 @@ void Preferences::load()
     m_proxyHttpUrl = settings.value(DEF_OPT_PROXY_HTTP_URL).toString();
     m_proxyHttpPort = settings.value(DEF_OPT_PROXY_HTTP_PORT, 3128).toInt();
 
-    if (settings.value(DEF_LAST_VERSION_USED, "0.5.1").toString() == "0.5.1"){
-        // TODO migration des langues pourries dans les préférences
-//http://stackoverflow.com/questions/6832596/how-to-compare-software-version-number-using-js-only-number
-//        const QString newFileNamePattern = "[%language] %title";
-//        QMessageBox::information(NULL, QObject::tr("New version"),
-//                                 QObject::tr("Your filename pattern was: %0.\nQuality is no longer supported.\nThus the pattern has been replaced with %1.\nYou can change it in the preference dialog.")
-//                                 .arg(m_filenamePattern)
-//                                 .arg(newFileNamePattern));
-//        m_filenamePattern = newFileNamePattern;
-        // Note : previous pending downloads will start from the beginning rather than continuing.
+    QString lastVersionUsed = settings.value(DEF_LAST_VERSION_USED, "0.5.4").toString();
+
+    if (compareVersions(lastVersionUsed, "0.5.4") <= 0){
+        // Migrate preferences because of a bug with 0.5.4 version :
+        // the favorite stream types countains bad encoded characters
+        m_favoriteStreamTypes = listVideoStreamTypes();
     }
 }
 

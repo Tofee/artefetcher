@@ -1,6 +1,5 @@
 #include "artedatecatalog.h"
 #include <QDate>
-#include <QDebug>//TODO remove that ugly thing
 #include <preferences.h>
 #include "artedefinitions.h"
 
@@ -66,6 +65,6 @@ QString ArteDateCatalog::getFilmDetailsUrl(FilmDetails *film){
     return jsonUrl;
 }
 
-void ArteDateCatalog::processFilmDetails(FilmDetails *film, QString httpAnswer){
-    defaultArteProcessFilmDetails(film, httpAnswer);
+void ArteDateCatalog::processFilmDetails(FilmDetails *film, QString htmlPage){
+    defaultArteProcessFilmDetails(film, htmlPage);
 }

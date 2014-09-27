@@ -15,10 +15,9 @@ void addMetadataIfNotEmpty(FilmDetails *film, QVariantMap inputMap, QString fiel
     }
 }
 
-
-QMap<QString, QVariant> extractJsonMapFromAnswer(QString httpAnswer){
+QMap<QString, QVariant> extractJsonMapFromAnswer(QString htmlPage){
     QScriptEngine engine;
     QScriptValue json = engine.evaluate("JSON.parse").call(QScriptValue(),
-                                                           QScriptValueList() << QString(httpAnswer));
+                                                           QScriptValueList() << QString(htmlPage));
     return json.toVariant().toMap();
 }

@@ -38,6 +38,6 @@ void extractArteVideoStreamsFromMap(QMap<QString, QVariant> mapWithStream, FilmD
  */
 void updateArteEpisodeNumber(FilmDetails* film);
 
-void defaultArteProcessFilmDetails(FilmDetails* film, QString httpAnswer);
+void defaultArteProcessFilmDetails(FilmDetails* film, QString htmlPage);
 
 #endif // ARTEDEFINITIONS_H

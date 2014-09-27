@@ -2,16 +2,15 @@
 #include <preferences.h>
 #include <film/filmdetails.h>
 #include "artedefinitions.h"
-#include <QDebug> // TODO
 
 ArteMainCatalog::ArteMainCatalog(QObject *parent)
     :QObject(parent)
 {
-    //m_urlByCatalogName.insert(tr("All"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7.json");
+    m_urlByCatalogName.insert(tr("All"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7.json");
     m_urlByCatalogName.insert(tr("Arte selection"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7/selection.json");
-    //m_urlByCatalogName.insert(tr("Most recent"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7/plus_recentes.json");
-    //m_urlByCatalogName.insert(tr("Most seen"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7/plus_vues.json");
-    //m_urlByCatalogName.insert(tr("Last chance"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7/derniere_chance.json");
+    m_urlByCatalogName.insert(tr("Most recent"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7/plus_recentes.json");
+    m_urlByCatalogName.insert(tr("Most seen"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7/plus_vues.json");
+    m_urlByCatalogName.insert(tr("Last chance"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7/derniere_chance.json");
 }
 
 
@@ -54,6 +53,6 @@ QString ArteMainCatalog::getFilmDetailsUrl(FilmDetails* film){
     return jsonUrl;
 }
 
-void ArteMainCatalog::processFilmDetails(FilmDetails* film, QString httpAnswer){
-    defaultArteProcessFilmDetails(film, httpAnswer);
+void ArteMainCatalog::processFilmDetails(FilmDetails* film, QString htmlPage){
+    defaultArteProcessFilmDetails(film, htmlPage);
 }

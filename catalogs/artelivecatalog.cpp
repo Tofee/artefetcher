@@ -1,5 +1,4 @@
 #include "artelivecatalog.h"
-#include <QDebug> // TODO
 #include <film/filmdetails.h>
 #include <preferences.h>
 #include "artedefinitions.h"
@@ -15,38 +14,31 @@ ArteLiveCatalog::ArteLiveCatalog(QObject *parent) : QObject(parent)
 }
 
 QList<FilmDetails*> ArteLiveCatalog::listFilmsFromCatalogAnswer(QString catalogName, const QString& catalogAnswer, int fromIndex, int toIndex, int& lastIndex){
-    QList<FilmDetails*> result;
-
-    int i = -1;
     QList<QVariant> list = extractJsonMapFromAnswer(catalogAnswer).value("videos").toList();
+    QList<FilmDetails*> result;
+    lastIndex = list.size();
 
-    foreach(QVariant catalogItem, list)
-    {
-        ++i;
+    for (int i = fromIndex; i < toIndex && i < list.size(); ++i){
+        QMap<QString, QVariant> catalogItem = list.at(i).toMap();
+        QString url = catalogItem.value("VTR").toString(); // or VUP
+        QString title = catalogItem.value("VTI").toString();
+        QString arteId = catalogItem.value("VPI").toString();
 
-        if (i >= fromIndex && i < toIndex) {
-            QString url = catalogItem.toMap().value("VTR").toString(); // or VUP
-            QString title = catalogItem.toMap().value("VTI").toString();
-            QString arteId = catalogItem.toMap().value("VPI").toString();
+        FilmDetails* newFilm = new FilmDetails(catalogName, title, url, arteId);
 
-            FilmDetails* newFilm = new FilmDetails(catalogName, title, url, arteId);
+        updateArteEpisodeNumber(newFilm);
+        addMetadataIfNotEmpty(newFilm, catalogItem, "VDE", Description);
+        addMetadataIfNotEmpty(newFilm, catalogItem, "VCG", Genre);
 
-            updateArteEpisodeNumber(newFilm);
-            addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), "VDE", Description);
-            addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), "VCG", Genre);
+        extractArteVideoStreamsFromMap(catalogItem, newFilm, false);
 
-            extractArteVideoStreamsFromMap(catalogItem.toMap(), newFilm, false);
+        result << newFilm;
 
-            result << newFilm;
-
-            QString imageUrl = catalogItem.toMap().value("VTU").toMap().value("IUR").toString();
-            if (!imageUrl.isEmpty()){
-                emit requestImageDownload(newFilm, imageUrl);
-            }
+        QString imageUrl = catalogItem.value("VTU").toMap().value("IUR").toString();
+        if (!imageUrl.isEmpty()){
+            emit requestImageDownload(newFilm, imageUrl);
         }
     }
-
-    lastIndex = i+1;// TODO c'est moche!!!
     return result;
 }
 

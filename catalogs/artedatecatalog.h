@@ -16,7 +16,7 @@ public:
 
     QString getFilmDetailsUrl(FilmDetails* film);
 
-    void processFilmDetails(FilmDetails* film, QString httpAnswer);
+    void processFilmDetails(FilmDetails* film, QString htmlPage);
 signals:
     void requestImageDownload(FilmDetails* film, QString imageUrl);
 };

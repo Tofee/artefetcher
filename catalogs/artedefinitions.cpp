@@ -22,8 +22,8 @@ void updateArteEpisodeNumber(FilmDetails* film){
     film->m_episodeNumber = (splittenCode.size() == 2 ? splittenCode.value(1).toInt() : 0);
 }
 
-void defaultArteProcessFilmDetails(FilmDetails *film, QString httpAnswer){
-    QMap<QString, QVariant> mymap = extractJsonMapFromAnswer(httpAnswer).value("videoJsonPlayer").toMap();
+void defaultArteProcessFilmDetails(FilmDetails *film, QString htmlPage){
+    QMap<QString, QVariant> mymap = extractJsonMapFromAnswer(htmlPage).value("videoJsonPlayer").toMap();
     if (mymap.value(JSON_FILMPAGE_DURATION_SECONDS).toString() != "" && film->m_title == "")
     {
         film->m_title = mymap.value(JSON_FILMPAGE_DURATION_SECONDS).toString();

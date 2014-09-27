@@ -10,39 +10,34 @@ IncompleteDownloads::IncompleteDownloads(QObject* parent)
 
 
 QList<FilmDetails*> IncompleteDownloads::listFilmsFromCatalogAnswer(QString catalogName, const QString&, int fromIndex, int toIndex, int& lastIndex){
-    QList<FilmDetails*> m_incompleteDownloads;
-    int i = -1;
+    QList<QVariant> list = Preferences::getInstance()->pendingDownloads();
+    QList<FilmDetails*> result;
+    lastIndex = list.size();
 
-    foreach(QVariant v, Preferences::getInstance()->pendingDownloads()){
-        ++i;
+    for (int i = fromIndex; i < toIndex && i < list.size(); ++i){
+        QMap<QString, QVariant> filmMap = list.at(i).toMap();
 
-        if (i >= fromIndex && i < toIndex) {
-            QMap<QString, QVariant> filmMap = v.toMap();
+        QString arteId = filmMap.value(PREFERENCES_FILMMAP_ARTEID).toString();
+        QString title = filmMap.value(PREFERENCES_FILMMAP_TITLE).toString();
+        QString filmUrl = filmMap.value(PREFERENCES_FILMMAP_FILMURL).toString();
 
-            QString arteId = filmMap.value(PREFERENCES_FILMMAP_ARTEID).toString();
-            QString title = filmMap.value(PREFERENCES_FILMMAP_TITLE).toString();
-            QString filmUrl = filmMap.value(PREFERENCES_FILMMAP_FILMURL).toString();
+        FilmDetails* film = new FilmDetails(catalogName, title, filmUrl, arteId);
+        film->m_summary = filmMap.value(PREFERENCES_FILMMAP_DESC).toString();
+        film->m_durationInMinutes = filmMap.value(PREFERENCES_FILMMAP_DURATION).toInt();
 
-            FilmDetails* film = new FilmDetails(catalogName, title, filmUrl, arteId);
-            film->m_summary = filmMap.value(PREFERENCES_FILMMAP_DESC).toString();
-            film->m_durationInMinutes = filmMap.value(PREFERENCES_FILMMAP_DURATION).toInt();
+        film->m_metadata.insert(Episode_name, filmMap.value(PREFERENCES_FILMMAP_EPISODE_NAME).toString());
+        film->m_episodeNumber = filmMap.value(PREFERENCES_FILMMAP_EPISODE_NUMBER).toInt();
 
-            film->m_metadata.insert(Episode_name, filmMap.value(PREFERENCES_FILMMAP_EPISODE_NAME).toString());
-            film->m_episodeNumber = filmMap.value(PREFERENCES_FILMMAP_EPISODE_NUMBER).toInt();
+        film->m_allStreams.insert(filmMap.value(PREFERENCES_FILMMAP_VIDEOQUALITY).toString()
+                                  ,filmMap.value(PREFERENCES_FILMMAP_VIDEOURL).toString());
 
-            film->m_allStreams.insert(filmMap.value(PREFERENCES_FILMMAP_VIDEOQUALITY).toString()
-                                      ,filmMap.value(PREFERENCES_FILMMAP_VIDEOURL).toString());
-
-            QString imageUrl = filmMap.value(PREFERENCES_FILMMAP_IMAGE).toString();
-            if (!imageUrl.isEmpty()) {
-                requestImageDownload(film, imageUrl);
-            }
-            m_incompleteDownloads << film;
-
+        QString imageUrl = filmMap.value(PREFERENCES_FILMMAP_IMAGE).toString();
+        if (!imageUrl.isEmpty()) {
+            requestImageDownload(film, imageUrl);
         }
+        result << film;
     }
-    lastIndex = i+1;// TODO c'est moche!!!
-    return m_incompleteDownloads;
+    return result;
 }
 
 QString IncompleteDownloads::getFilmDetailsUrl(FilmDetails*){
