@@ -1,8 +1,8 @@
 #include "artedefinitions.h"
+#include <QDebug>
 #include "../film/filmdetails.h"
 #include "../preferences.h"
 #include "icatalog.h"
-
 void extractArteVideoStreamsFromMap(QMap<QString, QVariant> mapWithStream, FilmDetails* film, bool onlyHbbtv)
 {
     foreach (QVariant streamJson, mapWithStream.value("VSR").toMap().values()){
@@ -12,7 +12,12 @@ void extractArteVideoStreamsFromMap(QMap<QString, QVariant> mapWithStream, FilmD
         }
         if (map.value("VQU").toString().toLower() == Preferences::getInstance()->selectedQuality())
         {
-            film->m_allStreams[map.value("versionLibelle").toString()] = map.value("url").toString();
+            QString streamName = map.value("versionLibelle").toString();
+            if (!Preferences::getInstance()->favoriteStreamTypes().contains(streamName)){
+                qDebug() << "Add missing stream type in preferences:" << streamName;
+                Preferences::getInstance()->addStreamName(streamName);
+            }
+            film->m_allStreams[streamName] = map.value("url").toString();
         }
     }
 }

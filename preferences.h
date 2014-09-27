@@ -77,6 +77,8 @@ public:
     void setFirstRegistrationDone()                             { m_firstRegistration = true; }
     void setSecondRegistrationDone()                            { m_secondRegistration = true; }
 
+    void addStreamName(QString streamName)                      { m_favoriteStreamTypes.append(streamName); }
+
     virtual void load() = 0;
     virtual void save() = 0;
 
@@ -157,5 +159,7 @@ private:
  *  if v1 > v2 returns > 0
  */
 int compareVersions(QString v1, QString v2);
+
+QStringList listVideoStreamTypes();
 
 #endif // PREFERENCES_H
