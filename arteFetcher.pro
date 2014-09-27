@@ -43,7 +43,8 @@ SOURCES += main.cpp\
     view/preferencedialog.cpp \
     catalogs/artedefinitions.cpp \
     catalogs/incompletedownloads.cpp \
-    test/testpreferences.cpp
+    test/testpreferences.cpp \
+    tools.cpp
 
 HEADERS  += \
     filmdelegate.h \
@@ -62,7 +63,8 @@ HEADERS  += \
     catalogs/artedefinitions.h \
     context.h \
     catalogs/incompletedownloads.h \
-    test/testpreferences.h
+    test/testpreferences.h \
+    tools.h
 TRANSLATIONS    = arteFetcher_de.ts \
                   arteFetcher_fr.ts
 

@@ -47,7 +47,7 @@ public:
      */
     void loadPlayList(QString catalogName, QDate date);
 
-    bool isDateCatalog(QString catalogName);
+    bool isDateCatalog(QString catalogName) const;
 
     const QList<FilmDetails*> visibleFilms() const { QList<FilmDetails*> result;
                                               foreach(QString key, m_visibleFilms)
@@ -65,14 +65,14 @@ public:
      * @param filmUrl url of the film description page
      * @return the lines in the view containing this film (or empty list if not found)
      */
-    QList<int> getLineForUrl(QString filmUrl);
+    QList<int> getLineForUrl(QString filmUrl) const;
 
     /**
      * @brief findFilmByUrl find the film for a given url
      * @param filmUrl url of the film description page
      * @return  the line in the view containing this film (of NULL if not found)
      */
-    FilmDetails* findFilmByUrl(QString filmUrl);
+    FilmDetails* findFilmByUrl(QString filmUrl) const;
 
 
     void addUrlToDownloadList(QString url)
@@ -90,10 +90,6 @@ public:
 
     double computeTotalDownloadProgress() const;
     double computeTotalDownloadRequestedDuration() const;
-
-    static StreamType getStreamTypeByLanguageAndQuality(QString languageCode, QString qualityCode);
-
-
 
 signals:
     void playListHasBeenUpdated();
@@ -128,7 +124,7 @@ private:
 
     void abortDownloadItemsInProgress();
 
-    ICatalog* getCatalogForName(QString catalogName);
+    ICatalog* getCatalogForName(QString catalogName) const;
 
     // List of the film description paged shown in the UI
     QList<QString> m_visibleFilms;

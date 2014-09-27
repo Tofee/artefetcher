@@ -119,7 +119,7 @@ void FilmDelegate::loadPlayList(QString catalogName, QDate date)
     commonLoadPlaylist(catalogName);
 }
 
-bool FilmDelegate::isDateCatalog(QString catalogName) {
+bool FilmDelegate::isDateCatalog(QString catalogName) const {
     ICatalog* catalog = getCatalogForName(catalogName);
     return catalog && catalog->isDateCatalog();
 }
@@ -166,7 +166,7 @@ void FilmDelegate::downloadImage(FilmDetails *film, QString imageUrl){
 }
 
 
-ICatalog* FilmDelegate::getCatalogForName(QString catalogName) {
+ICatalog* FilmDelegate::getCatalogForName(QString catalogName) const {
     foreach(ICatalog* catalog, m_catalogs){
         if (catalog->accept(catalogName)){
             return catalog;
@@ -271,7 +271,7 @@ void FilmDelegate::requestReadyToRead(QObject* object)
 
 }
 
-QList<int> FilmDelegate::getLineForUrl(QString filmUrl)
+QList<int> FilmDelegate::getLineForUrl(QString filmUrl) const
 {
     QList<int> indexes;
     int offset(0);
@@ -287,7 +287,7 @@ QList<int> FilmDelegate::getLineForUrl(QString filmUrl)
  * @param filmUrl url of the film description page
  * @return  the line in the view containing this film (of NULL if not found)
  */
-FilmDetails* FilmDelegate::findFilmByUrl(QString filmUrl)
+FilmDetails* FilmDelegate::findFilmByUrl(QString filmUrl) const
 {
     return m_films.contains(filmUrl) ? m_films[filmUrl] : NULL;
 }
@@ -347,21 +347,6 @@ double FilmDelegate::computeTotalDownloadRequestedDuration() const {
         }
     }
     return totalDurationInMinute;
-}
-
-StreamType FilmDelegate::getStreamTypeByLanguageAndQuality(QString languageCode, QString qualityCode)
-{
-    QList<StreamType> & streamTypeList = StreamType::listStreamTypes();
-    for (QList<StreamType>::const_iterator it = streamTypeList.constBegin();
-         it != streamTypeList.constEnd(); ++it)
-    {
-        StreamType streamType = *it;
-        if (streamType.languageCode.compare(languageCode) == 0
-                && streamType.qualityCode.compare(qualityCode) == 0)
-            return streamType;
-    }
-    qCritical() << "Cannot find StreamType for:" << languageCode << qualityCode;
-    return StreamType();
 }
 
 void FilmDelegate::reloadFilm(FilmDetails* film)

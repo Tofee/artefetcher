@@ -1,6 +1,6 @@
 #include "incompletedownloads.h"
 #include "preferences.h"
-#include <QDebug>
+
 IncompleteDownloads::IncompleteDownloads(QObject* parent)
     :QObject(parent)
 {

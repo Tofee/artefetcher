@@ -49,20 +49,6 @@ public:
     ~MainWindow();
 protected:
 
-    /**
-     * @brief getStreamIdForColumn
-     * @return the stream id matching user preferences
-     */
-    StreamType getStreamType() const;
-
-    /**
-     * @brief getFileName
-     * @param film to get the filename
-     * @param provide an optional file suffix (_<fileSuffixNumber> will be appened between the name and the extension of the file
-     * @return the filename
-     */
-    QString getFileName(const FilmDetails * const film) const;
-
     void downloadFilm(FilmDetails* film);
 
 

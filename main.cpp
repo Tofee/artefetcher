@@ -38,12 +38,9 @@ int main(int argc, char *argv[])
 
     a.setApplicationVersion(APP_VERSION);
 
-
     QCoreApplication::setOrganizationName("ArteFetcher");
     QCoreApplication::setOrganizationDomain("ArteFetcher");
     QCoreApplication::setApplicationName("ArteFetcher");
-
-    qRegisterMetaType<StreamType>("StreamType");
 
     QTranslator translator;
 #if QT_VERSION >= 0x040800
