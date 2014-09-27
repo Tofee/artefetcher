@@ -4,7 +4,7 @@
 IncompleteDownloads::IncompleteDownloads(QObject* parent)
     :QObject(parent)
 {
-    QString catalogName = tr("Incomplete downloads");
+    QString catalogName = tr("Downloads to resume");
     m_urlByCatalogName.insert(catalogName, INCOMPLETE_DOWNLOADS_URL);
 }
 

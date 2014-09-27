@@ -108,6 +108,9 @@ private slots:
     /* note : this slot is not triggered as a slot by the user click but a timer needs it as a slot */
     void clicOnPreview(bool fromTimer = true);
 
+    void firstRegistrationResult();
+    void secondRegistrationResult();
+
 private:
 
     static const QList<MetaType> &listInterestingDetails();
@@ -128,11 +131,11 @@ private:
     void applyProxySettings();
     bool eventFilter(QObject *obj, QEvent *event);
 
-
+    void registerApplication();
     
 private:
     Ui::MainWindow *ui;
-    QNetworkAccessManager* manager;
+    QNetworkAccessManager* m_manager;
     FilmDelegate* delegate;
     Qt::CheckState m_pressedItemCheckState;
     int m_pressedItemRow;

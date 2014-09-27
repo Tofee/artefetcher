@@ -37,100 +37,56 @@
 #define PREFERENCES_FILMMAP_EPISODE_NAME "episodeName"
 #define PREFERENCES_FILMMAP_EPISODE_NUMBER "episode#"
 
+#define USAGES_NEEDED_FOR_SECOND_REGISTRATION 20
+
 class IPreferences
 {
 public:
     friend class PreferenceDialog;
-    friend class MainWindow;
+//    friend class MainWindow;
 
     IPreferences()
         : m_dedicatedDirectoryForSeries(false), m_saveImagePreview(true), m_saveMetaInInfoFile(true), m_resultCountPerPage(10), m_proxyEnabled(false), m_proxyHttpPort(3128)
     {}
     virtual ~IPreferences(){}
 
-    /**
-     * @brief selectedStreams
-     * @return if empty, it means all
-     */
-    const QString &applicationLanguage() const
-    {
-        return m_applicationLanguage;
-    }
-    const QString &selectedQuality() const
-    {
-        return m_selectedQuality;
-    }
+    const QString &applicationLanguage()        const { return m_applicationLanguage; }
+    const QString &selectedQuality()            const { return m_selectedQuality; }
+    const QString &filenamePattern()            const { return m_filenamePattern; }
+    const QString &destinationDir()             const { return m_destinationDir; }
 
-    const QString &filenamePattern() const
-    {
-        return m_filenamePattern;
-    }
-    const QString &destinationDir() const
-    {
-        return m_destinationDir;
-    }
-    const QList<QVariant> &pendingDownloads() const
-    {
-        return m_pendingDownloads;
-    }
-    void setPendingDownloads(QList<QVariant> downloadUrls){
-        m_pendingDownloads = downloadUrls;
-    }
+    const QList<QVariant> &pendingDownloads()   const { return m_pendingDownloads; }
+    const QSize &preferredWindowSize()          const { return m_preferredWindowSize; }
+    bool useDedicatedDirectoryForSeries()       const { return m_dedicatedDirectoryForSeries; }
+    bool saveImagePreview()                     const { return m_saveImagePreview; }
+    bool saveMetaInInfoFile()                   const { return m_saveMetaInInfoFile; }
+    int resultCountPerPage()                    const { return m_resultCountPerPage ? m_resultCountPerPage : 100000; }
+    const QStringList favoriteStreamTypes()     const { return m_favoriteStreamTypes; }
 
-    const QSize &preferredWindowSize() const
-    {
-        return m_preferredWindowSize;
-    }
+    bool proxyEnabled()                         const { return m_proxyEnabled; }
+    QString proxyHttpUrl()                      const { return m_proxyHttpUrl; }
+    bool proxyHttpPort()                        const { return m_proxyHttpPort; }
 
-    void setPreferredWindowSize(QSize newSize)
-    {
-        m_preferredWindowSize = newSize;
-    }
+    bool registrationAgreement()                const { return m_registrationAgreement; }
+    bool firstRegistrationDone()                const { return m_firstRegistration; }
+    bool secondRegistrationDone()               const { return m_secondRegistration; }
+    int startAppCount()                         const { return m_startAppCount; }
 
-    bool useDedicatedDirectoryForSeries() const {
-        return m_dedicatedDirectoryForSeries;
-    }
-
-    void setUseDedicatedDirectoryForSeries(bool useInTheFuture) {
-        m_dedicatedDirectoryForSeries = useInTheFuture;
-    }
-
-    bool saveImagePreview() const {
-        return m_saveImagePreview;
-    }
-
-    void setSaveImagePreview(bool newValue) {
-        m_saveImagePreview = newValue;
-    }
-
-    bool saveMetaInInfoFile() const {
-        return m_saveMetaInInfoFile;
-    }
-
-    void setSaveMetaInInfoFile(bool newValue) {
-        m_saveMetaInInfoFile = newValue;
-    }
-
-    void setResultCountPerPage(int resultCountPerPage)
-    {
-        m_resultCountPerPage = resultCountPerPage;
-    }
-
-    int resultCountPerPage()
-    {
-        return m_resultCountPerPage ? m_resultCountPerPage : 100000;
-    }
-
-    const QStringList favoriteStreamTypes() const {
-        return m_favoriteStreamTypes;
-    }
-
-    void setFavoriteStreamTypes(const QStringList newList) {
-        m_favoriteStreamTypes = newList;
-    }
+    void setPendingDownloads(QList<QVariant> downloadUrls)      { m_pendingDownloads = downloadUrls; }
+    void setPreferredWindowSize(QSize newSize)                  { m_preferredWindowSize = newSize; }
+    void setFirstRegistrationDone()                             { m_firstRegistration = true; }
+    void setSecondRegistrationDone()                            { m_secondRegistration = true; }
 
     virtual void load() = 0;
     virtual void save() = 0;
+
+    static QString registrationAgreementText(){
+        return QObject::tr("<html>Artefetcher would like to have your agreement to register you as an ArteFetcher user.<br/><br/>"
+          "This will be helpful to know how much this application is used and thus give further motivation to the developers to provide improvements.<br/><br/>"
+          "This will be done through a simple download of this page http://artefetcher.sourceforge.net through a google short URL.<br/>"
+          "<b>The IP address and the OS type are the only private data that will be sent. ArteFetcher developpers team will not have access to the IP address, but only google will.</b><br/>"
+          "This registration will occur at the first run and after %1 arteFetcher starts.</html>").arg(USAGES_NEEDED_FOR_SECOND_REGISTRATION);
+    }
 
 protected:
     QString m_applicationLanguage;
@@ -151,6 +107,11 @@ protected:
     bool    m_proxyEnabled;
     QString m_proxyHttpUrl;
     short   m_proxyHttpPort;
+
+    bool    m_registrationAgreement;// User agree to register
+    int     m_startAppCount;// Number of times
+    bool    m_firstRegistration;//the first registration has been done
+    bool    m_secondRegistration;//the second registration has been done
 };
 
 

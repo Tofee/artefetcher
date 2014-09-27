@@ -54,6 +54,9 @@ PreferenceDialog::PreferenceDialog(QWidget *parent) :
 
     ui->favoriteStreamListWidget->addItems(Preferences::getInstance()->favoriteStreamTypes());
 
+    ui->registrationCheckBox->setToolTip(Preferences::registrationAgreementText());
+    ui->registrationCheckBox->setChecked(Preferences::getInstance()->registrationAgreement());
+
     updateProxyConfigVisibility();
 
     connect(ui->browsePushButton, SIGNAL(clicked()),
@@ -102,6 +105,8 @@ void PreferenceDialog::accept()
     Preferences::getInstance()->m_selectedQuality = ui->qualityComboBox->currentText();
 
     Preferences::getInstance()->m_applicationLanguage = ui->languageComboBox->currentText();
+
+    Preferences::getInstance()->m_registrationAgreement = ui->registrationCheckBox->isChecked();
 
     QDialog::accept();
 }

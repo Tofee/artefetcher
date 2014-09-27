@@ -52,7 +52,7 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    manager(new QNetworkAccessManager(this)),
+    m_manager(new QNetworkAccessManager(this)),
     m_currentPreview(0),
     thread (new DownloadManager(this)),
     m_trayIcon(new QSystemTrayIcon(QIcon(":/img/icon"), this))
@@ -68,7 +68,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
 
-    delegate = new FilmDelegate(manager);
+    delegate = new FilmDelegate(m_manager);
     delegate->addCatalog(new ArteMainCatalog(this));
     delegate->addCatalog(new ArteDateCatalog(this));
     delegate->addCatalog(new ArteLiveCatalog(this));
@@ -204,8 +204,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->previewLabel->installEventFilter(this);
 
+    registerApplication();
     clearAndLoadTable();
-
 }
 
 void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
@@ -237,7 +237,8 @@ void MainWindow::streamIndexLoaded(int resultCount, int currentPage, int pageCou
 
 StreamType MainWindow::getStreamType() const
 {
-    return FilmDelegate::getStreamTypeByLanguageAndQuality(Preferences::getInstance()->m_applicationLanguage, Preferences::getInstance()->m_selectedQuality);
+    return FilmDelegate::getStreamTypeByLanguageAndQuality(Preferences::getInstance()->applicationLanguage(),
+                                                           Preferences::getInstance()->selectedQuality());
 }
 
 
@@ -267,7 +268,7 @@ void MainWindow::updateItemProgressBar(){
         ui->playlistProgressBar->setMaximum(0);
     }
     const int currentMax = ui->playlistProgressBar->maximum();
-    const int newCount(manager->findChildren<QNetworkReply*>().size());
+    const int newCount(m_manager->findChildren<QNetworkReply*>().size());
     const int newMax(newCount > currentMax ? newCount : currentMax);
 
     ui->playlistProgressBar->setMaximum(newMax);
@@ -1056,15 +1057,15 @@ void MainWindow::showPreferences()
 }
 
 void MainWindow::applyProxySettings() {
-    if (!Preferences::getInstance()->m_proxyEnabled)
+    if (!Preferences::getInstance()->proxyEnabled())
     {
         QNetworkProxy::setApplicationProxy(QNetworkProxy::NoProxy);
     }
     else
     {
         m_userDefinedProxy.setType(QNetworkProxy::HttpProxy);
-        m_userDefinedProxy.setHostName(Preferences::getInstance()->m_proxyHttpUrl);
-        m_userDefinedProxy.setPort(Preferences::getInstance()->m_proxyHttpPort);
+        m_userDefinedProxy.setHostName(Preferences::getInstance()->proxyHttpUrl());
+        m_userDefinedProxy.setPort(Preferences::getInstance()->proxyHttpPort());
         QNetworkProxy::setApplicationProxy(m_userDefinedProxy);
     }
 }
@@ -1126,4 +1127,58 @@ void MainWindow::filmHasBeenUpdated(const FilmDetails * const film){
         updateCurrentDetails();
     }
     updateRowInTable(film);
+}
+
+void MainWindow::registerApplication(){
+    if (Preferences::getInstance()->registrationAgreement()){
+        QNetworkAccessManager * manager = new QNetworkAccessManager(this);
+        QString url = "http://goo.gl/VShoxJ"; // This URL should be change for every version
+        // web browser is used to make the difference between first run and 20th run.
+
+#ifdef Q_OS_WIN32
+        QString osName = "Windows NT 5.1";
+#elif defined Q_OS_MAC
+        QString osName = "Macintosh; Intel Mac OS X 10_9_2";
+#elif defined Q_OS_LINUX
+        QString osName = "X11; Linux x86_64";
+#else // Unknown
+        QString osName = "iPad; CPU OS 5_1 like Mac OS X";
+#endif
+
+        QNetworkRequest req = QNetworkRequest(QUrl(url));
+        if (!Preferences::getInstance()->firstRegistrationDone()){
+            QString userAgent = QString("Mozilla/5.0 (%1; rv:30.0) Gecko/20100101 Firefox/30.0").arg(osName);
+            qDebug() << "First registration, useragent:" << userAgent;
+            req.setRawHeader("User-Agent", userAgent.toStdString().c_str());
+            QNetworkReply* registrationReply = manager->get(QNetworkRequest(req));
+            connect(registrationReply, SIGNAL(finished()), SLOT(firstRegistrationResult()));
+
+        }
+        if (!Preferences::getInstance()->secondRegistrationDone()
+                && Preferences::getInstance()->startAppCount() >= USAGES_NEEDED_FOR_SECOND_REGISTRATION){
+            QString userAgent = QString("Mozilla/5.0 (%1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.67 Safari/537.36").arg(osName);
+            qDebug() << "Second registration, useragent:" << userAgent;
+            req.setRawHeader("User-Agent" , userAgent.toStdString().c_str());
+            QNetworkReply* registrationReply = manager->get(QNetworkRequest(req));
+            connect(registrationReply, SIGNAL(finished()), SLOT(secondRegistrationResult()));
+        }
+    }
+}
+
+void MainWindow::firstRegistrationResult(){
+    QNetworkReply* reply = dynamic_cast<QNetworkReply*>(sender());
+    if (reply->error() == QNetworkReply::NoError){
+        Preferences::getInstance()->setFirstRegistrationDone();
+    } else {
+        qDebug() << "Registration failed: " << reply->error() << reply->errorString();
+    }
+}
+
+void MainWindow::secondRegistrationResult(){
+    QNetworkReply* reply = dynamic_cast<QNetworkReply*>(sender());
+    if (reply->error() == QNetworkReply::NoError){
+        Preferences::getInstance()->setSecondRegistrationDone();
+    } else {
+        qDebug() << "Registration failed: " << reply->error() << reply->errorString();
+    }
 }

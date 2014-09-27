@@ -22,8 +22,6 @@
 #include <queuedownloader.h>
 #include <film/filmdetails.h>
 
-class QNetworkAccessManager;
-
 class DownloadManager : public QObject{
     Q_OBJECT
 public:

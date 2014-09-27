@@ -36,7 +36,11 @@
 #define DEF_OPT_PROXY_HTTP_ENABLED    "proxy_http_enabled"
 #define DEF_OPT_PROXY_HTTP_URL        "proxy_http_url"
 #define DEF_OPT_PROXY_HTTP_PORT       "proxy_http_port"
+#define DEF_OPT_REGISTERING_AGREEMENT "registering_agreement"
 #define DEF_LAST_VERSION_USED         "last_version_used"
+#define DEF_START_APP_COUNT           "start_app_count"
+#define DEF_FIRST_REGISTRATION_DONE   "first_registration"
+#define DEF_SECOND_REGISTRATION_DONE  "second_registration"
 
 #define RESULT_PER_PAGE 10
 
@@ -111,10 +115,31 @@ void Preferences::load()
 
     QString lastVersionUsed = settings.value(DEF_LAST_VERSION_USED, "0.5.4").toString();
 
+    // Migration
     if (compareVersions(lastVersionUsed, "0.5.4") <= 0){
         // Migrate preferences because of a bug with 0.5.4 version :
         // the favorite stream types countains bad encoded characters
         m_favoriteStreamTypes = listVideoStreamTypes();
+    }
+
+    // All about registration
+    if (settings.value(DEF_OPT_REGISTERING_AGREEMENT).isNull()){
+        qDebug() << "QUESTION";
+        m_registrationAgreement = (QMessageBox::question(NULL, QObject::tr("Registration request"),
+                              registrationAgreementText().append(QObject::tr("<br/><br/>You can change this setting anytime in preferences.<br/><br/>Do you agree?")),
+                              QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes);
+    } else {
+        m_registrationAgreement = settings.value(DEF_OPT_REGISTERING_AGREEMENT).toBool();
+    }
+    m_startAppCount = settings.value(DEF_START_APP_COUNT, 0).toInt();
+    m_startAppCount++;
+    m_firstRegistration = settings.value(DEF_FIRST_REGISTRATION_DONE, "false").toBool();
+    m_secondRegistration = settings.value(DEF_SECOND_REGISTRATION_DONE, "false").toBool();
+
+    if (QApplication::applicationVersion() != lastVersionUsed){
+        m_firstRegistration = false;
+        m_secondRegistration = false;
+        m_startAppCount = 1;
     }
 }
 
@@ -135,5 +160,9 @@ void Preferences::save()
     settings.setValue(DEF_OPT_PROXY_HTTP_URL, m_proxyHttpUrl);
     settings.setValue(DEF_OPT_PROXY_HTTP_PORT, m_proxyHttpPort);
     settings.setValue(DEF_LAST_VERSION_USED, QApplication::applicationVersion());
+    settings.setValue(DEF_OPT_REGISTERING_AGREEMENT, m_registrationAgreement);
+    settings.setValue(DEF_START_APP_COUNT, m_startAppCount);
+    settings.setValue(DEF_FIRST_REGISTRATION_DONE, m_firstRegistration);
+    settings.setValue(DEF_SECOND_REGISTRATION_DONE, m_secondRegistration);
     settings.sync();
 }
