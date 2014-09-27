@@ -765,6 +765,10 @@ void MainWindow::downloadFilm(FilmDetails* film){
     if (!isReadyForDownload(film))
         return;
 
+    if (film->m_choosenStreamType.isEmpty()){
+        film->m_choosenStreamType = ui->filmStreamComboBox->currentText();
+    }
+
     QString remoteUrl = film->m_allStreams[ui->filmStreamComboBox->currentText()];
     // keep existing file name, in case the download has been requested in a previous execution
     // if this name is empty, build a filename.
