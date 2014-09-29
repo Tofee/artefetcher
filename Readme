@@ -24,6 +24,16 @@ along with ArteFetcher.  If not, see <http://www.gnu.org/licenses/>.
 
 
 Release notes:
+v0.6.0
+  New features:
+  - add arte Live
+  - videos by date are back
+  - resume download remembers the language used
+  Fixes:
+  - fix weird character in video language names since v.0.5.2
+  - fix filename issues
+  - big refactor and code clean
+---------------------------------------------------------------
 v0.5.4
   Fixes:
     - german translations
