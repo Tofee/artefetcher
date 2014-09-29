@@ -49,12 +49,14 @@ public:
 
     bool isDateCatalog(QString catalogName) const;
 
-    const QList<FilmDetails*> visibleFilms() const { QList<FilmDetails*> result;
-                                              foreach(QString key, m_visibleFilms)
-                                              {
-                                                  result << m_films[key];
-                                              }
-                                                                                    return result; }
+    const QList<FilmDetails*> visibleFilms() const {
+        QList<FilmDetails*> result;
+        foreach(QString key, m_visibleFilms)
+        {
+          result << m_films[key];
+        }
+        return result;
+    }
 
     void reloadFilm(FilmDetails* film);
 
@@ -102,9 +104,6 @@ private slots:
     void downloadImage(FilmDetails*, QString);
 
 private:
-    const QMap<QString, FilmDetails*> films() const { return m_films; }
-
-    void playListLoaded(const QString page);
     /**
      * @brief downloadUrl Download a page from the url
      * @param catalogName catalog that requested the download

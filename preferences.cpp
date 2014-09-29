@@ -124,7 +124,6 @@ void Preferences::load()
 
     // All about registration
     if (settings.value(DEF_OPT_REGISTERING_AGREEMENT).isNull()){
-        qDebug() << "QUESTION";
         m_registrationAgreement = (QMessageBox::question(NULL, QObject::tr("Registration request"),
                               registrationAgreementText().append(QObject::tr("<br/><br/>You can change this setting anytime in preferences.<br/><br/>Do you agree?")),
                               QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes);

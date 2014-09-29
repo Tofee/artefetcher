@@ -75,6 +75,25 @@ QString cleanFilenameForFileSystem(const QString filename) {
     return cleanedFilename.simplified();
 }
 
+QRegExp getRegexpForEpisodeNumber(){
+    return QRegExp("\\([0-9 \\-/]+\\)");
+}
+
+QString getEpisodeNumberTextFromTitle(const QString& title){
+    QRegExp episodeNumberRegExp = getRegexpForEpisodeNumber();
+    /* Get the episode suffix, like "(12/15)" to put it as prefix of the film title */
+    QString episodeNumberText;
+    if (episodeNumberRegExp.indexIn(title) >= 0) {
+        episodeNumberText = episodeNumberRegExp.cap();
+    }
+    return episodeNumberText;
+}
+
+QString removeEpisodeNumberFromTitle(const QString& title){
+    QRegExp episodeNumberRegExp = getRegexpForEpisodeNumber();
+    return QString(title).replace(episodeNumberRegExp, "").trimmed();
+}
+
 QString getFileName(const FilmDetails * const film)
 {
     QString qualityUpperCase = Preferences::getInstance()->selectedQuality().toUpper();
@@ -89,35 +108,66 @@ QString getFileName(const FilmDetails * const film)
 
     QString cleanedTitle;
 
-    if (Preferences::getInstance()->useDedicatedDirectoryForSeries() && !episodeName.isEmpty())
-    {
-        QRegExp episodeNumberRegExp("\\([0-9 \\-/]+\\)");
+    ////////////////////////////////////////////////////////////////////////
+    /// CASE 1 : The film belongs to a serie and there is one name for the
+    /// episode, one for the serie.
+    /// Ex: serie "P'tit Quinquin" - episode 3/4 :"L'diable in Perchonne"
+    ////////////////////////////////////////////////////////////////////////
+    if (!episodeName.isEmpty()) {
 
-        QString serieName = QString(title).replace(episodeNumberRegExp, "");
+        QString serieName = removeEpisodeNumberFromTitle(title);
 
-        /* Get the episode suffix, like "(12/15)" to put it as prefix of the film title */
-        QString episodeNumberText;
-        if (episodeNumberRegExp.indexIn(title) >= 0)
-        {
-            episodeNumberText = episodeNumberRegExp.cap().append(" ");
+        QString episodeNumberText = getEpisodeNumberTextFromTitle(title);
+        if (episodeNumberText.isEmpty() && film->m_episodeNumber > 0){
+            episodeNumberText = QString("(%1)").arg(film->m_episodeNumber);
         }
 
-        QString filename = Preferences::getInstance()->filenamePattern();;
-        filename.replace("%title", episodeNumberText.append(episodeName))
+        QString filename = Preferences::getInstance()->filenamePattern();
+        filename.replace("%title", QString("%1 %2").arg(episodeNumberText).arg(episodeName))
                 .replace("%language", film->m_choosenStreamType)
                 .replace("%quality", qualityUpperCase);
+        QString serieNameSeparator;
+        if (Preferences::getInstance()->useDedicatedDirectoryForSeries()){
+            // Format : <serie_name>/<episode_number><episode_name>
+            serieNameSeparator = QDir::separator();
+        } else {
+            // Format : <serie_name> - <episode_number><episode_name>
+            serieNameSeparator = " - ";
+        }
 
-        cleanedTitle = cleanFilenameForFileSystem(serieName).append(QDir::separator()).append(cleanFilenameForFileSystem(filename));
+        cleanedTitle = cleanFilenameForFileSystem(serieName).append(serieNameSeparator).append(cleanFilenameForFileSystem(filename));
     } else if (film->m_episodeNumber){
-        QString filename = Preferences::getInstance()->filenamePattern();;
-        filename.replace("%title", QString("%0 (%1)").arg(title).arg(film->m_episodeNumber))
+        ////////////////////////////////////////////////////////////////////////
+        /// CASE 2 : There is no serie name but there is an episode numbering
+        /// Ex: 051912-015 28 minutes. Episode 15th of 28 minutes
+        ////////////////////////////////////////////////////////////////////////
+        QString filename = Preferences::getInstance()->filenamePattern();
+
+        QString titleWithoutEpisodeNumber = removeEpisodeNumberFromTitle(title);
+        QString episodeNumber = getEpisodeNumberTextFromTitle(title);
+        if (episodeNumber.isEmpty()) {
+            episodeNumber = QString("(%1)").arg(film->m_episodeNumber);
+        }
+
+        QString titleWithEpisodeNumber = QString(titleWithoutEpisodeNumber).append(" ").append(episodeNumber);
+
+        filename.replace("%title", titleWithEpisodeNumber)
                 .replace("%language", film->m_choosenStreamType)
                 .replace("%quality", qualityUpperCase);
 
-        cleanedTitle = cleanFilenameForFileSystem(filename);
+        if (Preferences::getInstance()->useDedicatedDirectoryForSeries()){
+            // Format : <serie_name>/<serie_name><episode_number>
+            cleanedTitle = cleanFilenameForFileSystem(titleWithoutEpisodeNumber).append(QDir::separator()).append(cleanFilenameForFileSystem(filename));
+        } else {
+            // Format : <serie_name><episode_number>
+            cleanedTitle = cleanFilenameForFileSystem(filename);
+        }
     }
     else
     {
+        ////////////////////////////////////////////////////////////////////////
+        /// CASE 3 : The film does not belong to an episode
+        ////////////////////////////////////////////////////////////////////////
         cleanedTitle = Preferences::getInstance()->filenamePattern();
         cleanedTitle.replace("%title", title)
                 .replace("%language",  film->m_choosenStreamType)
@@ -125,7 +175,7 @@ QString getFileName(const FilmDetails * const film)
         cleanedTitle = cleanFilenameForFileSystem(cleanedTitle);
     }
 
-    QString filename("%1%2%3.%5");
+    QString filename("%1%2%3.%4");
     filename = filename.arg(targetDirectory,
                             QDir::separator(),
                             cleanedTitle,
