@@ -8,4 +8,7 @@ To build arteFetcher from scratch for linux, you need:
 3) qmake
 4) make
 
+To package for windows:
+5) windeployqt .\release\arteFetcher.exe
+
 Then you can launch the arteFetcher application.

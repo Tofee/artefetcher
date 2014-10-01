@@ -1019,7 +1019,10 @@ void MainWindow::registerApplication(){
         QString osName = "iPad; CPU OS 5_1 like Mac OS X";
 #endif
 
+
         QNetworkRequest req = QNetworkRequest(QUrl(url));
+        req.setRawHeader("Referer", QString("http://v%1").arg(QApplication::applicationVersion()).toStdString().c_str());
+
         if (!Preferences::getInstance()->firstRegistrationDone()){
             QString userAgent = QString("Mozilla/5.0 (%1; rv:30.0) Gecko/20100101 Firefox/30.0").arg(osName);
             qDebug() << "First registration, useragent:" << userAgent;
