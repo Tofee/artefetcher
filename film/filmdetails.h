@@ -38,7 +38,8 @@ enum MetaType {
     RAW_Available_until,
     Episode_name /* This is only available for series */,
     Preview_Or_ArteP7,
-    Genre
+    Partnership,
+    Partnership_web
 };
 
 enum EDownloadStatus {
@@ -88,20 +89,16 @@ public:
     QString title() const { return m_title; }
     static const QString enum2Str(MetaType t){
         static const char* enum2Str[] = {
-//             QT_TRANSLATE_NOOP("FilmDetails","First broadcast"),
-//             QT_TRANSLATE_NOOP("FilmDetails","First broadcast"),
-//             QT_TRANSLATE_NOOP("FilmDetails","Time of the first broadcast"),
              QT_TRANSLATE_NOOP("FilmDetails","Description"),
-//             QT_TRANSLATE_NOOP("FilmDetails","Available until"),
              QT_TRANSLATE_NOOP("FilmDetails","Views"),
              QT_TRANSLATE_NOOP("FilmDetails","Channels"),
-//             QT_TRANSLATE_NOOP("FilmDetails","Rank"),
              QT_TRANSLATE_NOOP("FilmDetails","Type"),
              QT_TRANSLATE_NOOP("FilmDetails","First Broadcast"),
              QT_TRANSLATE_NOOP("FilmDetails","Available until"),
              QT_TRANSLATE_NOOP("FilmDetails","Episode"),
              QT_TRANSLATE_NOOP("FilmDetails","Broadcast type"),
-             QT_TRANSLATE_NOOP("FilmDetails", "Genre")
+             QT_TRANSLATE_NOOP("FilmDetails","Partnership"),
+             QT_TRANSLATE_NOOP("FilmDetails","Partnership website")
         };
 
 

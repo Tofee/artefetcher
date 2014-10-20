@@ -19,14 +19,16 @@
 #define JSON_FILMPAGE_VIDEO_TYPE        "VTX"
 #define JSON_FILMPAGE_VSU               "VSU"
 #define JSON_FILMPAGE_VIEWS             "VVI"
-// #define JSON_FILMPAGE_RANK              "videoRank"// useless, it just gives the position in the carousel...
+// #define JSON_FILMPAGE_RANK           "videoRank"// useless, it just gives the position in the carousel...
 #define JSON_FILMPAGE_DESCRIPTION       "V7T"
-#define JSON_FILMPAGE_DURATION_SECONDS  "VTI"
+#define JSON_FILMPAGE_TITLE             "VTI"
 #define JSON_FILMPAGE_SUMMARY           "VDE"
 #define JSON_FILMPAGE_CHANNELS          "VCH"
 #define JSON_FILMPAGE_CHANNELS_LABEL    "label"
 #define JSON_FILMPAGE_PREVIEW           "VTU"
 #define JSON_FILMPAGE_PREVIEW_URL       "IUR"
+#define JSON_FILMPAGE_PARTNERSHIP       "VPT"
+#define JSON_FILMPAGE_PARTNERSHIP_WEB   "VPA"
 
 class FilmDetails;
 
@@ -39,5 +41,7 @@ void extractArteVideoStreamsFromMap(QMap<QString, QVariant> mapWithStream, FilmD
 void updateArteEpisodeNumber(FilmDetails* film);
 
 void defaultArteProcessFilmDetails(FilmDetails* film, QString htmlPage);
+
+void extractMainArteMetaFromJsonMap(FilmDetails* film, QMap<QString, QVariant> map);
 
 #endif // ARTEDEFINITIONS_H

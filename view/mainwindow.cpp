@@ -303,7 +303,7 @@ void MainWindow::previousPage()
 bool isTeaserFromOriginalMovie(const FilmDetails& film)
 {
     return !film.m_metadata.value(Preview_Or_ArteP7).isEmpty()
-                                     && "ARTE+7" != film.m_metadata.value(Preview_Or_ArteP7);
+                                     && "ARTE+7" != film.m_metadata.value(Preview_Or_ArteP7) && "ARTE Concert" != film.m_metadata.value(Preview_Or_ArteP7);
 }
 
 bool hasFilmAnEpisodeName(const FilmDetails* const film){
@@ -510,7 +510,7 @@ const QList<MetaType>& MainWindow::listInterestingDetails() {
     {
         shownMetadata // << Available_until
                 << Description // << RAW_First_Broadcast
-                << Type << Views << Episode_name << Genre;
+                << Type << Views << Episode_name;
     }
     return shownMetadata;
 }
