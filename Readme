@@ -24,6 +24,10 @@ along with ArteFetcher.  If not, see <http://www.gnu.org/licenses/>.
 
 
 Release notes:
+v0.6.1
+  Fix:
+  - [tickets:1] Preferences panel is too big
+---------------------------------------------------------------
 v0.6.0
   New features:
   - add arte Live
