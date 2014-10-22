@@ -14,7 +14,7 @@ ArteDateCatalog::ArteDateCatalog(QObject *parent)
 
 QString ArteDateCatalog::getUrlForCatalogNames(QString, QDate catalogDate) const {
     // Goal build an URL with the date in this example format:
-    // "http://www.arte.tv/papi/tvguide/epg/schedule/F/L3/2014-09-05/2014-9-6.json"
+    // "http://www.arte.tv/papi/tvguide/epg/schedule/F/L3/2014-09-05/2014-9-5.json"
     QString baseUrl("http://www.arte.tv/papi/tvguide/epg/schedule/F/L3/%1-%2-%3/%4-%5-%6.json");
     return baseUrl.arg(catalogDate.year())
                 .arg(catalogDate.month(), 2, 10, QChar('0'))

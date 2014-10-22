@@ -135,13 +135,13 @@ void Preferences::load()
     m_firstRegistration = settings.value(DEF_FIRST_REGISTRATION_DONE, "false").toBool();
     m_secondRegistration = settings.value(DEF_SECOND_REGISTRATION_DONE, "false").toBool();
 
-    if (QApplication::applicationVersion() != lastVersionUsed
-            && QString("0.6.0")!= lastVersionUsed) // 0.6.0 to 0.6.1 is minor version
-    {
-        m_firstRegistration = false;
-        m_secondRegistration = false;
-        m_startAppCount = 1;
-    }
+//    if (QApplication::applicationVersion() != lastVersionUsed
+//            && QString("0.6.0")!= lastVersionUsed) // 0.6.0 to 0.6.1 is minor version
+//    {
+//        m_firstRegistration = false;
+//        m_secondRegistration = false;
+//        m_startAppCount = 1;
+//    }
 }
 
 void Preferences::save()
