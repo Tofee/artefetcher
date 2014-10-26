@@ -510,7 +510,7 @@ const QList<MetaType>& MainWindow::listInterestingDetails() {
     {
         shownMetadata // << Available_until
                 << Description // << RAW_First_Broadcast
-                << Type << Views << Episode_name;
+                << Type << Views << Episode_name << Production_year << Shooting_date;
     }
     return shownMetadata;
 }

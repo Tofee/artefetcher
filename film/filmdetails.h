@@ -39,7 +39,9 @@ enum MetaType {
     Episode_name /* This is only available for series */,
     Preview_Or_ArteP7,
     Partnership,
-    Partnership_web
+    Partnership_web,
+    Production_year,
+    Shooting_date
 };
 
 enum EDownloadStatus {
@@ -51,7 +53,7 @@ class FilmDetails {
     //TODO mettre tout en privé sauf les accesseurs
 public:
     FilmDetails(QString originCatalog, QString title, QString filmUrl, QString arteId)
-        :m_catalogName(originCatalog), m_title(title), m_infoUrl(filmUrl), m_arteId(arteId), m_episodeNumber(0), m_durationInMinutes(-1), m_year(-1), m_downloadStatus(DL_NONE), m_downloadProgress(0), m_replayAvailable(true)
+        :m_catalogName(originCatalog), m_title(title), m_infoUrl(filmUrl), m_arteId(arteId), m_episodeNumber(0), m_durationInMinutes(-1), m_downloadStatus(DL_NONE), m_downloadProgress(0), m_replayAvailable(true)
     {}
     QString m_catalogName;
     QString m_title;
@@ -66,7 +68,6 @@ public:
     uint m_numberOfViews;
 
     int m_durationInMinutes;
-    int m_year;
 
     QMap<MetaType, QString> m_metadata;
 
@@ -98,7 +99,9 @@ public:
              QT_TRANSLATE_NOOP("FilmDetails","Episode"),
              QT_TRANSLATE_NOOP("FilmDetails","Broadcast type"),
              QT_TRANSLATE_NOOP("FilmDetails","Partnership"),
-             QT_TRANSLATE_NOOP("FilmDetails","Partnership website")
+             QT_TRANSLATE_NOOP("FilmDetails","Partnership website"),
+             QT_TRANSLATE_NOOP("FilmDetails","Year"),
+             QT_TRANSLATE_NOOP("FilmDetails","Shooting date")
         };
 
 

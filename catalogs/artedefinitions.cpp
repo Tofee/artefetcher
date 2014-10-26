@@ -56,6 +56,7 @@ void extractMainArteMetaFromJsonMap(FilmDetails* film, QMap<QString, QVariant> m
     addMetadataIfNotEmpty(film, map, JSON_FILMPAGE_DESCRIPTION,       Description);
     addMetadataIfNotEmpty(film, map, JSON_FILMPAGE_PARTNERSHIP,       Partnership);
     addMetadataIfNotEmpty(film, map, JSON_FILMPAGE_PARTNERSHIP_WEB,   Partnership_web);
+    addMetadataIfNotEmpty(film, map, JSON_FILMPAGE_PRODUCTION_YEAR,   Production_year);
 
     QStringList labels;
     foreach (QVariant channelItem, map.value(JSON_FILMPAGE_CHANNELS).toList())

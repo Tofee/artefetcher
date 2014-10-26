@@ -29,6 +29,8 @@
 #define JSON_FILMPAGE_PREVIEW_URL       "IUR"
 #define JSON_FILMPAGE_PARTNERSHIP       "VPT"
 #define JSON_FILMPAGE_PARTNERSHIP_WEB   "VPA"
+#define JSON_FILMPAGE_PRODUCTION_YEAR   "productionYear"
+#define JSON_FILMPAGE_SHOOTING_DATE     "shootingDate"
 
 class FilmDetails;
 

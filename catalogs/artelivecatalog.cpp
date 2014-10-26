@@ -26,6 +26,12 @@ QList<FilmDetails*> ArteLiveCatalog::listFilmsFromCatalogAnswer(QString catalogN
 
         FilmDetails* newFilm = new FilmDetails(catalogName, title, url, arteId);
 
+        QDateTime shootingDate = QDateTime::fromString(catalogItem.value(JSON_FILMPAGE_SHOOTING_DATE).toString(), "dd/MM/yyyy HH:mm:ss +0200");
+        if (shootingDate.date().year() > 1900){
+            newFilm->m_metadata[Shooting_date] = shootingDate.toString(Qt::DefaultLocaleLongDate);
+            newFilm->m_metadata[Production_year] = QString::number(shootingDate.date().year());
+        }
+
         extractMainArteMetaFromJsonMap(newFilm, catalogItem);
         updateArteEpisodeNumber(newFilm);
 
