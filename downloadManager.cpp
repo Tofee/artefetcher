@@ -55,22 +55,22 @@ int DownloadManager::queueSize() const {
     return m_downloader.queueSize();
 }
 
-void DownloadManager::downloadProgressed(QString url, qint64 loadedSize, qint64 totalSize, double kbytesPerSecond, double remainingTimeInSecond){
-    QString key = m_keysForSignalByUrl.value(url);
-    emit(signalDownloadProgressed(key, 100.0 * loadedSize/ (double) totalSize, kbytesPerSecond, remainingTimeInSecond));
+void DownloadManager::downloadProgressed(QString downloadUrl, qint64 loadedSize, qint64 totalSize, double kbytesPerSecond, double remainingTimeInSecond){
+    QString filmKey = m_keysForSignalByUrl.value(downloadUrl);
+    emit(signalDownloadProgressed(filmKey, 100.0 * loadedSize/ (double) totalSize, kbytesPerSecond, remainingTimeInSecond));
 }
 
-void DownloadManager::downloadFinished(QString url)
+void DownloadManager::downloadFinished(QString downloadUrl)
 {
-    QString key = m_keysForSignalByUrl.value(url);
-    emit(signalDownloadFinished(key));
+    QString filmKey = m_keysForSignalByUrl.value(downloadUrl);
+    emit(signalDownloadFinished(filmKey));
 }
 
-void DownloadManager::downloadError(QString url, QString message)
+void DownloadManager::downloadError(QString downloadUrl, QString message)
 {
-    QString key = m_keysForSignalByUrl.value(url);
-    emit(signalDownloadError(key, message));
-    qDebug() << "Download error for " << url << ": " << message;
+    QString filmKey = m_keysForSignalByUrl.value(downloadUrl);
+    emit(signalDownloadError(filmKey, message));
+    qDebug() << "Download error for " << filmKey << ": " << message;
 }
 
 void DownloadManager::allDownloadsFinished(){
@@ -81,7 +81,7 @@ void DownloadManager::pause() {
     m_downloader.pause();
 }
 
-void DownloadManager::downloadCancelled(QString url) {
-    QString key = m_keysForSignalByUrl.value(url);
+void DownloadManager::downloadCancelled(QString downloadUrl) {
+    QString key = m_keysForSignalByUrl.value(downloadUrl);
     emit(signalDownloadCancelled(key));
 }

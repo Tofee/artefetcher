@@ -49,15 +49,14 @@ enum EDownloadStatus {
 };
 
 class FilmDetails {
-
     //TODO mettre tout en privé sauf les accesseurs
 public:
     FilmDetails(QString originCatalog, QString title, QString filmUrl, QString arteId)
-        :m_catalogName(originCatalog), m_title(title), m_infoUrl(filmUrl), m_arteId(arteId), m_episodeNumber(0), m_durationInMinutes(-1), m_downloadStatus(DL_NONE), m_downloadProgress(0), m_replayAvailable(true)
+        :m_catalogName(originCatalog), m_title(title), m_arteId(arteId), m_episodeNumber(0), m_durationInMinutes(-1), m_downloadStatus(DL_NONE), m_downloadProgress(0), m_replayAvailable(true), m_infoUrl(filmUrl)
     {}
     QString m_catalogName;
     QString m_title;
-    QString m_infoUrl;
+
     QString m_arteId;
 
     int m_episodeNumber;
@@ -85,6 +84,8 @@ public:
      */
     bool m_replayAvailable;
 
+    QString relatedWebPage(){ return m_infoUrl; }
+
     QStringList m_errors;
 
     QString title() const { return m_title; }
@@ -108,6 +109,8 @@ public:
         return QApplication::translate("FilmDetails",
                                        enum2Str[t]);
     }
+protected:
+    QString m_infoUrl;
 };
 
 

@@ -70,12 +70,14 @@ public:
     QList<int> getLineForUrl(QString filmUrl) const;
 
     /**
-     * @brief findFilmByUrl find the film for a given url
-     * @param filmUrl url of the film description page
-     * @return  the line in the view containing this film (of NULL if not found)
+     * @brief findFilmByKey find the film for a given key (the key comes from getFilmUniqueKey())
+     * @param filmKey key of the film
+     * @return  the line in the view containing this film (or NULL if not found)
      */
-    FilmDetails* findFilmByUrl(QString filmUrl) const;
+    FilmDetails* findFilmByKey(QString filmKey) const;
 
+    // using the arte fetcher id as unique key
+    static QString getFilmUniqueKey(const FilmDetails* const film) { return film->m_arteId; }
 
     void addUrlToDownloadList(QString url)
     {
@@ -129,7 +131,8 @@ private:
     QList<QString> m_visibleFilms;
     QList<QString> m_currentDownloads;
 
-    // Indexed by the url of the film description page
+
+    // Indexed by the unique key of the film
     QMap<QString, FilmDetails*> m_films;
     QNetworkAccessManager* m_manager;
     QSignalMapper* m_signalMapper;
@@ -143,6 +146,5 @@ private:
     QList<ICatalog*> m_catalogs;
 
 };
-
 
 #endif // FILMDELEGATE_H

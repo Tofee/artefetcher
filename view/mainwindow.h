@@ -67,11 +67,11 @@ private slots:
 
     /* Triggered by the downloader*/
     void allFilmDownloadFinished();
-    void downloadProgressed(QString filmUrl, double progression, double kBytesPersecond, double remainingTimeForCurrentFilm);
-    void filmDownloaded(QString filmUrl);
+    void downloadProgressed(QString filmKey, double progression, double kBytesPersecond, double remainingTimeForCurrentFilm);
+    void filmDownloaded(QString filmKey);
     void hasBeenPaused();
-    void downloadCancelled(QString filmUrl);
-    void downloadError(QString filmUrl, QString errorMsg);
+    void downloadCancelled(QString filmKey);
+    void downloadError(QString filmKey, QString errorMsg);
 
     /* User actions */
     void downloadButtonClicked();
@@ -88,7 +88,7 @@ private slots:
     void showAboutWindow();
 
     /* Film delegate */
-    void errorOccured(QString filmUrl, QString errorMessage);
+    void errorOccured(QString filmKey, QString errorMessage);
     void streamIndexLoaded(int resultCount, int currentPage, int pageCount);
 
     /* note : this slot is not triggered as a slot by the user click but a timer needs it as a slot */

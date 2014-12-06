@@ -441,7 +441,7 @@ void MainWindow::updateRowInTable(const FilmDetails* const film){
     if (!film)
         return;
 
-    QList<int> rows = delegate->getLineForUrl(film->m_infoUrl);
+    QList<int> rows = delegate->getLineForUrl(delegate->getFilmUniqueKey(film));
 
     int rowNumber;
     foreach (rowNumber, rows)
@@ -664,8 +664,8 @@ void MainWindow::downloadFilm(FilmDetails* film){
         film->m_downloadStatus = DL_REQUESTED;
         film->m_targetFileName = futureFileName;
 
-        delegate->addUrlToDownloadList(film->m_infoUrl); // TODO c'est trop trop moche de faire ça. Design à revoir
-        thread->addFilmToDownloadQueue(film->m_infoUrl, remoteUrl, futureFileName);
+        delegate->addUrlToDownloadList(delegate->getFilmUniqueKey(film)); // TODO c'est trop trop moche de faire ça. Design à revoir
+        thread->addFilmToDownloadQueue(delegate->getFilmUniqueKey(film), remoteUrl, futureFileName);
     }
 
     updateRowInTable(film);
@@ -689,7 +689,7 @@ void MainWindow::cancelSelectedFilmDownload()
             || film->m_downloadStatus == DL_NONE
             || film->m_downloadStatus == DL_ERROR)
         return;
-    thread->cancelDownload(film->m_infoUrl);
+    thread->cancelDownload(delegate->getFilmUniqueKey(film));
 }
 
 void MainWindow::playFilm() {
@@ -775,11 +775,11 @@ void MainWindow::allFilmDownloadFinished()
     statusBar()->showMessage(tr("Download finished."));
 }
 
-void MainWindow::downloadProgressed(QString filmUrl, double progression, double kBytesPersecond, double remainingTimeForCurrentFilm)
+void MainWindow::downloadProgressed(QString filmKey, double progression, double kBytesPersecond, double remainingTimeForCurrentFilm)
 {
     changeDownloadPartVisibility(true);
 
-    FilmDetails* film = delegate->findFilmByUrl(filmUrl);
+    FilmDetails* film = delegate->findFilmByKey(filmKey);
     if (!film)
         return;
 
@@ -818,9 +818,9 @@ void MainWindow::downloadProgressed(QString filmUrl, double progression, double 
     }
 }
 
-void MainWindow::downloadCancelled(QString filmUrl)
+void MainWindow::downloadCancelled(QString filmKey)
 {
-    FilmDetails* film = delegate->findFilmByUrl(filmUrl);
+    FilmDetails* film = delegate->findFilmByKey(filmKey);
     if (film)
     {
         film->m_downloadStatus = DL_CANCELLED;
@@ -831,8 +831,8 @@ void MainWindow::downloadCancelled(QString filmUrl)
     }
 }
 
-void MainWindow::downloadError(QString filmUrl, QString errorMsg){
-    FilmDetails* film = delegate->findFilmByUrl(filmUrl);
+void MainWindow::downloadError(QString filmKey, QString errorMsg){
+    FilmDetails* film = delegate->findFilmByKey(filmKey);
     if (film)
     {
         film->m_errors.append(tr("Download error: %1").arg(errorMsg));
@@ -846,9 +846,9 @@ void MainWindow::hasBeenPaused() {
     ui->downloadLabel->setText(tr("Paused"));
 }
 
-void MainWindow::filmDownloaded(QString filmUrl)
+void MainWindow::filmDownloaded(QString filmKey)
 {
-    FilmDetails * film = delegate->findFilmByUrl(filmUrl);
+    FilmDetails * film = delegate->findFilmByKey(filmKey);
     if (film == NULL)
         return;
     // All of that should be done in the delegate!!
@@ -907,13 +907,13 @@ void MainWindow::reloadCurrentRow()
     delegate->reloadFilm(delegate->visibleFilms()[currentRow]);
 }
 
-void MainWindow::errorOccured(QString filmUrl, QString errorMessage)
+void MainWindow::errorOccured(QString filmKey, QString errorMessage)
 {
-    FilmDetails * film = delegate->findFilmByUrl(filmUrl);
+    FilmDetails * film = delegate->findFilmByKey(filmKey);
     if (!film)
         return;
     film->m_errors.append(errorMessage);
-    qDebug() << errorMessage << " for " << filmUrl;
+    qDebug() << errorMessage << " for " << filmKey;
 
     updateRowInTable(film);
     updateCurrentDetails();
@@ -981,7 +981,7 @@ void MainWindow::webPageButtonClicked()
     FilmDetails * film = delegate->visibleFilms()[row];
     if (film != NULL)
     {
-        QDesktopServices::openUrl(QUrl(film->m_infoUrl));
+        QDesktopServices::openUrl(QUrl(film->relatedWebPage()));
     }
 }
 

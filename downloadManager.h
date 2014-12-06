@@ -45,15 +45,15 @@ public slots:
     void cancelDownloadInProgress();
 
 private slots:
-    void downloadProgressed(QString url, qint64 loadedSize, qint64 totalSize, double kbytesPerSecond, double remainingTimeInSecond);
+    void downloadProgressed(QString downloadUrl, qint64 loadedSize, qint64 totalSize, double kbytesPerSecond, double remainingTimeInSecond);
 
-    void downloadFinished(QString url);
+    void downloadFinished(QString downloadUrl);
 
-    void downloadError(QString url, QString message);
+    void downloadError(QString downloadUrl, QString message);
 
     void allDownloadsFinished();
 
-    void downloadCancelled(QString url);
+    void downloadCancelled(QString downloadUrl);
 
 private:
     // Keys sent in emitted signals, indexed by their URL

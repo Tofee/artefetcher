@@ -54,9 +54,9 @@ void FilmDelegate::addCatalog(ICatalog* catalog) {
 FilmDelegate::~FilmDelegate()
 {
     QList<QVariant> pendingDownloads;
-    foreach (QString dlUrl, m_currentDownloads)
+    foreach (QString key, m_currentDownloads)
     {
-        FilmDetails* film = findFilmByUrl(dlUrl);
+        FilmDetails* film = findFilmByKey(key);
         QMap<QString, QVariant> map;
 
         if (film && (film->m_downloadStatus == DL_REQUESTED
@@ -65,7 +65,7 @@ FilmDelegate::~FilmDelegate()
 
             map.insert(PREFERENCES_FILMMAP_ARTEID, film->m_arteId);
             map.insert(PREFERENCES_FILMMAP_TITLE, film->m_title);
-            map.insert(PREFERENCES_FILMMAP_FILMURL, film->m_infoUrl);
+            map.insert(PREFERENCES_FILMMAP_FILMURL, film->relatedWebPage());
             map.insert(PREFERENCES_FILMMAP_DESC, film->m_summary);
             map.insert(PREFERENCES_FILMMAP_VIDEOQUALITY, film->m_choosenStreamType);
             map.insert(PREFERENCES_FILMMAP_VIDEOURL, film->m_allStreams.value(film->m_choosenStreamType));
@@ -103,8 +103,8 @@ void FilmDelegate::loadPlayList(QString catalogName, QDate date)
         // we can put a dedicated catalog which lists the films in the hard drive and fetch the related metadata
         m_visibleFilms.clear();
 
-        foreach(QString filmUrl, m_currentDownloads) {
-            m_visibleFilms << filmUrl;
+        foreach(QString key, m_currentDownloads) {
+            m_visibleFilms << key;
         }
         m_currentPageCount = 1;
         emit(streamIndexLoaded(m_visibleFilms.size(), 1, m_currentPageCount));
@@ -162,7 +162,7 @@ void FilmDelegate::downloadUrl(const QString& catalogName, const QString& url, i
 }
 
 void FilmDelegate::downloadImage(FilmDetails *film, QString imageUrl){
-    downloadUrl(film->m_catalogName, imageUrl, m_lastRequestPageId, film->m_infoUrl, MAPPER_STEP_CODE_4_IMAGE);
+    downloadUrl(film->m_catalogName, imageUrl, m_lastRequestPageId, getFilmUniqueKey(film), MAPPER_STEP_CODE_4_IMAGE);
 }
 
 
@@ -207,19 +207,19 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                     ->listFilmsFromCatalogAnswer(context->catalogName, page, resultCountPerPage * (m_currentPage - 1), resultCountPerPage * m_currentPage, i);
 
             foreach(FilmDetails* film, foundInCatalogPage){
-                QString url = film->m_infoUrl;
-                m_visibleFilms << url;
+                QString filmKey = getFilmUniqueKey(film);
+                m_visibleFilms << filmKey;
 
-                if (m_films.contains(url)) {
-                    if (m_films.value(url)->m_preview.isEmpty() || m_films.value(url)->m_allStreams.isEmpty()) {
+                if (m_films.contains(filmKey)) {
+                    if (m_films.value(filmKey)->m_preview.isEmpty() || m_films.value(filmKey)->m_allStreams.isEmpty()) {
                         // refresh incomplete cache
-                        reloadFilm(m_films.value(url));
+                        reloadFilm(m_films.value(filmKey));
                     }
                     // Continue with cache
                     continue;
                 } else {
-                    m_films.insert(film->m_infoUrl, film);
-                    reloadFilm(m_films.value(url));
+                    m_films.insert(filmKey, film);
+                    reloadFilm(m_films.value(filmKey));
                 }
             }
 
@@ -260,7 +260,7 @@ void FilmDelegate::requestReadyToRead(QObject* object)
                     }
                     else
                     {
-                        emit(errorOccured(film->m_infoUrl,tr("Cannot load the preview image")));
+                        emit(errorOccured(getFilmUniqueKey(film),tr("Cannot load the preview image")));
                     }
                 }
             }
@@ -287,9 +287,9 @@ QList<int> FilmDelegate::getLineForUrl(QString filmUrl) const
  * @param filmUrl url of the film description page
  * @return  the line in the view containing this film (of NULL if not found)
  */
-FilmDetails* FilmDelegate::findFilmByUrl(QString filmUrl) const
+FilmDetails* FilmDelegate::findFilmByKey(QString key) const
 {
-    return m_films.contains(filmUrl) ? m_films[filmUrl] : NULL;
+    return m_films.contains(key) ? m_films[key] : NULL;
 }
 
 QStringList FilmDelegate::listCatalogNames() const {
@@ -303,8 +303,8 @@ QStringList FilmDelegate::listCatalogNames() const {
 double FilmDelegate::computeTotalDownloadProgress() const {
     double totalDurationInMinute(0);
     double completedDurationInMinute(0);
-    foreach (QString url, m_currentDownloads) {
-        FilmDetails* film = m_films.value(url);
+    foreach (QString key, m_currentDownloads) {
+        FilmDetails* film = m_films.value(key);
         switch (film->m_downloadStatus)
         {
         case DL_DOWNLOADING:
@@ -330,8 +330,8 @@ double FilmDelegate::computeTotalDownloadProgress() const {
 
 double FilmDelegate::computeTotalDownloadRequestedDuration() const {
     int totalDurationInMinute(0);
-    foreach (QString url, m_currentDownloads){
-        FilmDetails* film = m_films.value(url);
+    foreach (QString key, m_currentDownloads){
+        FilmDetails* film = m_films.value(key);
         switch (film->m_downloadStatus)
         {
         case DL_DOWNLOADING:
@@ -354,6 +354,6 @@ void FilmDelegate::reloadFilm(FilmDetails* film)
     QString jsonUrl = getCatalogForName(film->m_catalogName)->getFilmDetailsUrl(film);
     if (film->m_replayAvailable && !jsonUrl.isEmpty()){
         film->m_errors.clear();
-        downloadUrl(film->m_catalogName, jsonUrl, m_lastRequestPageId, film->m_infoUrl, MAPPER_STEP_CODE_2_XML);
+        downloadUrl(film->m_catalogName, jsonUrl, m_lastRequestPageId, getFilmUniqueKey(film), MAPPER_STEP_CODE_2_XML);
     }
 }
