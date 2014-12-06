@@ -58,17 +58,16 @@
 <context>
     <name>ArteMainCatalog</name>
     <message>
-        <location filename="catalogs/artemaincatalog.cpp" line="9"/>
+        <location filename="catalogs/artemaincatalog.cpp" line="10"/>
         <source>All</source>
         <translation>Alle</translation>
     </message>
     <message>
-        <location filename="catalogs/artemaincatalog.cpp" line="10"/>
+        <location filename="catalogs/artemaincatalog.cpp" line="11"/>
         <source>Arte selection</source>
         <translation>Auswahl durch Arte</translation>
     </message>
     <message>
-        <location filename="catalogs/artemaincatalog.cpp" line="11"/>
         <source>Most recent</source>
         <translation>Letzte</translation>
     </message>
@@ -163,7 +162,7 @@
         <translation type="obsolete">Verfügbar bis (RAW)</translation>
     </message>
     <message>
-        <location filename="filmdelegate.cpp" line="263"/>
+        <location filename="filmdelegate.cpp" line="314"/>
         <source>Cannot load the preview image</source>
         <translation>Vorschaubild nicht verfügbar</translation>
     </message>
@@ -179,32 +178,57 @@
         <translation type="obsolete">Uhrzeit der ersten Ausstrahlung</translation>
     </message>
     <message>
-        <location filename="film/filmdetails.h" line="94"/>
+        <location filename="film/filmdetails.h" line="97"/>
         <source>Description</source>
         <translation>Beschreibung</translation>
     </message>
     <message>
-        <location filename="film/filmdetails.h" line="100"/>
+        <location filename="film/filmdetails.h" line="101"/>
         <source>First Broadcast</source>
         <translation>Erste Ausstrahlung</translation>
     </message>
     <message>
-        <location filename="film/filmdetails.h" line="101"/>
+        <location filename="film/filmdetails.h" line="102"/>
         <source>Available until</source>
         <translation>Verfügbar bis</translation>
     </message>
     <message>
-        <location filename="film/filmdetails.h" line="104"/>
-        <source>Genre</source>
+        <location filename="film/filmdetails.h" line="105"/>
+        <source>Partnership</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="film/filmdetails.h" line="96"/>
+        <location filename="film/filmdetails.h" line="106"/>
+        <source>Partnership website</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="film/filmdetails.h" line="107"/>
+        <source>Year</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="film/filmdetails.h" line="108"/>
+        <source>Shooting date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="film/filmdetails.h" line="109"/>
+        <source>Director</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="film/filmdetails.h" line="110"/>
+        <source>Origine</source>
+        <translation type="unfinished">Ursprung</translation>
+    </message>
+    <message>
+        <location filename="film/filmdetails.h" line="98"/>
         <source>Views</source>
         <translation>Gesamtaufrufe</translation>
     </message>
     <message>
-        <location filename="film/filmdetails.h" line="97"/>
+        <location filename="film/filmdetails.h" line="99"/>
         <source>Channels</source>
         <translation>Kanäle</translation>
     </message>
@@ -213,7 +237,7 @@
         <translation type="obsolete">Bewertung</translation>
     </message>
     <message>
-        <location filename="film/filmdetails.h" line="99"/>
+        <location filename="film/filmdetails.h" line="100"/>
         <source>Type</source>
         <translation>Kategorie</translation>
     </message>
@@ -226,12 +250,12 @@
         <translation type="obsolete">Verfügbar bis (RAW)</translation>
     </message>
     <message>
-        <location filename="film/filmdetails.h" line="102"/>
+        <location filename="film/filmdetails.h" line="103"/>
         <source>Episode</source>
         <translation>Folge</translation>
     </message>
     <message>
-        <location filename="film/filmdetails.h" line="103"/>
+        <location filename="film/filmdetails.h" line="104"/>
         <source>Broadcast type</source>
         <translation>Art der Ausstrahlung</translation>
     </message>
@@ -441,7 +465,7 @@ Check: &lt;%1&gt;</source>
         <translation type="obsolete">Kann Ordner %1 nicht erstellen</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="775"/>
+        <location filename="view/mainwindow.cpp" line="781"/>
         <source>Download finished.</source>
         <translation>Download beendet.</translation>
     </message>
@@ -470,7 +494,7 @@ Check: &lt;%1&gt;</source>
         <translation type="obsolete">Bewertung</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="547"/>
+        <location filename="view/mainwindow.cpp" line="552"/>
         <source>&lt;b&gt; %0 : &lt;/b&gt;%1&lt;br/&gt;</source>
         <translation>&lt;b&gt; %0: &lt;/b&gt;%1&lt;br/&gt;</translation>
     </message>
@@ -521,7 +545,12 @@ Gesamtergebnisse: %3</translation>
         <translation>Lädt...</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="953"/>
+        <location filename="view/mainwindow.cpp" line="546"/>
+        <source>&lt;b&gt;Countries: &lt;/b&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="view/mainwindow.cpp" line="959"/>
         <source>Download is still in progress. Closing the application will stop them immediately and your films file may be incomplete, corrupted or not event downloaded.</source>
         <translation>Laufender Download. Beim Schließen der Anwendung wird der Download sofort unterbrochen und die Datei könnte unvollständig, kaputt oder garnicht erst heruntergeladen sein.</translation>
     </message>
@@ -536,14 +565,14 @@ Gesamtergebnisse: %3</translation>
         <translation type="obsolete">Folge: %1</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="556"/>
+        <location filename="view/mainwindow.cpp" line="562"/>
         <source>The related video is a teaser of the original movie.
 </source>
         <translation>Das Video ist ein Ausschnitt des ursprünglichen Films.
 </translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="565"/>
+        <location filename="view/mainwindow.cpp" line="571"/>
         <source>%1 %2 </source>
         <translation>%1 %2 </translation>
     </message>
@@ -566,7 +595,7 @@ Gesamtergebnisse: %3</translation>
         <translation type="obsolete">Heruntergeladen</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="653"/>
+        <location filename="view/mainwindow.cpp" line="659"/>
         <source>File already exists</source>
         <translation>Datei existiert bereits</translation>
     </message>
@@ -581,14 +610,14 @@ Möchten Sie fortfahren und sie ersetzen?</translation>
         <translation type="obsolete">Letzter Download fehlerhaft.</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="559"/>
+        <location filename="view/mainwindow.cpp" line="565"/>
         <source>(%1 min)
 </source>
         <translation>(%1 Min.)
 </translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="573"/>
+        <location filename="view/mainwindow.cpp" line="579"/>
         <source>
 Available until %1</source>
         <translation>
@@ -603,7 +632,7 @@ Verfügbar bis %1</translation>
         <translation type="obsolete">Fehlerhafter Download</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="654"/>
+        <location filename="view/mainwindow.cpp" line="660"/>
         <source>A file with the same name already exists:
 %1
 Do you want to continue and replace it?</source>
@@ -620,24 +649,24 @@ Möchten Sie fortfahren und sie ersetzen?</translation>
         <translation type="obsolete">Ein Teil des Filmes &lt;%1&gt; wurde schon heruntergeladen. Weiter herunterladen?</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="807"/>
+        <location filename="view/mainwindow.cpp" line="813"/>
         <source>Downloading %1
 Speed %2 kB/s  -  Remaining: %3</source>
         <translation>Lade %1 herunter
 Geschwindigkeit %2 kB/s  -  Restzeit: %3</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="813"/>
+        <location filename="view/mainwindow.cpp" line="819"/>
         <source>%1 item(s) in queue</source>
         <translation>%1 Film(e) in der Warteschlange</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="838"/>
+        <location filename="view/mainwindow.cpp" line="844"/>
         <source>Download error: %1</source>
         <translation>Downloadfehler: %1</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="846"/>
+        <location filename="view/mainwindow.cpp" line="852"/>
         <source>Paused</source>
         <translation>Pause</translation>
     </message>
@@ -650,7 +679,7 @@ Geschwindigkeit %2 kB/s  -  Restzeit: %3</translation>
         <translation type="obsolete">Geben Sie die URL des Films auf der Arteseite ein</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="952"/>
+        <location filename="view/mainwindow.cpp" line="958"/>
         <source>Close the application?</source>
         <translation>Anwendung schließen?</translation>
     </message>
@@ -659,12 +688,12 @@ Geschwindigkeit %2 kB/s  -  Restzeit: %3</translation>
         <translation type="obsolete">Unfertiger Download. Ein Schließen der Anwendung wird den Download sofort unterbrechen und die Datei könnte unvollständig, kaputt oder nicht einmal heruntergeladen sein.</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="954"/>
+        <location filename="view/mainwindow.cpp" line="960"/>
         <source>Quit anyway</source>
         <translation>Dennoch beenden</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="955"/>
+        <location filename="view/mainwindow.cpp" line="961"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
@@ -932,7 +961,7 @@ SQ: höchste Qualität - 2200 (1280 x 720)</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="preferences.h" line="86"/>
+        <location filename="preferences.h" line="88"/>
         <source>&lt;html&gt;Artefetcher would like to have your agreement to register you as an ArteFetcher user.&lt;br/&gt;&lt;br/&gt;This will be helpful to know how much this application is used and thus give further motivation to the developers to provide improvements.&lt;br/&gt;&lt;br/&gt;This will be done through a simple download of this page http://artefetcher.sourceforge.net through a google short URL.&lt;br/&gt;&lt;b&gt;The IP address and the OS type are the only private data that will be sent. ArteFetcher developpers team will not have access to the IP address, but only google will.&lt;/b&gt;&lt;br/&gt;This registration will occur at the first run and after %1 arteFetcher starts.&lt;/html&gt;</source>
         <oldsource>&lt;html&gt;We would like to have your agreement to register you as an ArteFetcher user.&lt;br/&gt;&lt;br/&gt;This will be helpful to know how much this application is used and thus get further motivation to the developers to provide improvements.&lt;br/&gt;&lt;br/&gt;This will be done through a simple download of this page http://arteFetcher.sourceforge.net through a google short URL.&lt;br/&gt;&lt;b&gt;The IP address and the OS type are the only private data that will be sent. ArteFetcher developpers team will not have access to the IP address, but only google will.&lt;/b&gt;&lt;br/&gt;This registration will occur at the first run and after %1 starts.&lt;/html&gt;</oldsource>
         <translation type="unfinished"></translation>
