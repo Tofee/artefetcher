@@ -24,6 +24,14 @@ along with ArteFetcher.  If not, see <http://www.gnu.org/licenses/>.
 
 
 Release notes:
+v0.6.3
+  New features:
+  - Add production year, film directory, producing countries
+  - Using arte id to detect film unicity
+  - Save all metadata when leaving arteFetcher
+  Fix:
+  - Remove deprecated "most recent" movies
+---------------------------------------------------------------
 v0.6.2
   Fix:
   - missing duration in arte live catalogs
