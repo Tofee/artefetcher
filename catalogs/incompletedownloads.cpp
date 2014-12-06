@@ -25,8 +25,15 @@ QList<FilmDetails*> IncompleteDownloads::listFilmsFromCatalogAnswer(QString cata
         film->m_summary = filmMap.value(PREFERENCES_FILMMAP_DESC).toString();
         film->m_durationInMinutes = filmMap.value(PREFERENCES_FILMMAP_DURATION).toInt();
 
-        film->m_metadata.insert(Episode_name, filmMap.value(PREFERENCES_FILMMAP_EPISODE_NAME).toString());
         film->m_episodeNumber = filmMap.value(PREFERENCES_FILMMAP_EPISODE_NUMBER).toInt();
+        film->m_producingCountries = filmMap.value(PREFERENCES_FILMMAP_COUNTRIES).toStringList();
+
+        // All metadata
+        QMap<QString, QVariant> metadatas = filmMap.value(PREFERENCES_FILMMAP_METADATAS).toMap();
+        foreach(QString skey, metadatas.keys()){
+            int key = skey.toInt();
+            film->m_metadata[static_cast<MetaType>(key)] = metadatas[skey].toString();
+        }
 
         film->m_allStreams.insert(filmMap.value(PREFERENCES_FILMMAP_VIDEOQUALITY).toString()
                                   ,filmMap.value(PREFERENCES_FILMMAP_VIDEOURL).toString());

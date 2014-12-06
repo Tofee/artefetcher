@@ -71,8 +71,13 @@ FilmDelegate::~FilmDelegate()
             map.insert(PREFERENCES_FILMMAP_VIDEOURL, film->m_allStreams.value(film->m_choosenStreamType));
             map.insert(PREFERENCES_FILMMAP_IMAGE, film->m_preview.begin().key());
             map.insert(PREFERENCES_FILMMAP_DURATION, film->m_durationInMinutes);
-            map.insert(PREFERENCES_FILMMAP_EPISODE_NAME, film->m_metadata.value(Episode_name));
+            QMap<QString, QVariant> outputMap;
+            foreach(MetaType key, film->m_metadata.keys()){
+                outputMap[QString::number(static_cast<int>(key))] = film->m_metadata[key];
+            }
+            map.insert(PREFERENCES_FILMMAP_METADATAS, outputMap);
             map.insert(PREFERENCES_FILMMAP_EPISODE_NUMBER, film->m_episodeNumber);
+            map.insert(PREFERENCES_FILMMAP_COUNTRIES, film->m_producingCountries);
 
             pendingDownloads << map;
         }

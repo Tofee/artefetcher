@@ -41,7 +41,9 @@ enum MetaType {
     Partnership,
     Partnership_web,
     Production_year,
-    Shooting_date
+    Shooting_date,
+    Director,
+    Infoprog
 };
 
 enum EDownloadStatus {
@@ -87,6 +89,7 @@ public:
     QString relatedWebPage(){ return m_infoUrl; }
 
     QStringList m_errors;
+    QStringList m_producingCountries;// Liste des pays de réalisation du film
 
     QString title() const { return m_title; }
     static const QString enum2Str(MetaType t){
@@ -102,7 +105,9 @@ public:
              QT_TRANSLATE_NOOP("FilmDetails","Partnership"),
              QT_TRANSLATE_NOOP("FilmDetails","Partnership website"),
              QT_TRANSLATE_NOOP("FilmDetails","Year"),
-             QT_TRANSLATE_NOOP("FilmDetails","Shooting date")
+             QT_TRANSLATE_NOOP("FilmDetails","Shooting date"),
+             QT_TRANSLATE_NOOP("FilmDetails","Director"),
+             QT_TRANSLATE_NOOP("FilmDetails","Origine") // Pays d'origine
         };
 
 

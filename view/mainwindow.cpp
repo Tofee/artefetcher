@@ -510,7 +510,7 @@ const QList<MetaType>& MainWindow::listInterestingDetails() {
     {
         shownMetadata // << Available_until
                 << Description // << RAW_First_Broadcast
-                << Type << Views << Episode_name << Production_year << Shooting_date;
+                << Type << Views << Episode_name << Production_year << Shooting_date << Director;
     }
     return shownMetadata;
 }
@@ -542,12 +542,18 @@ void MainWindow::updateCurrentDetails() {
 
     QString prefix;
 
+    if (!film->m_producingCountries.empty()){
+        prefix.append(tr("<b>Countries: </b>"));
+        prefix.append(film->m_producingCountries.join(", "));
+        prefix.append("<br/>");
+    }
     foreach(MetaType key, listInterestingDetails()){
         if (film->m_metadata.contains(key) && film->m_metadata.value(key) != "0")
                 prefix.append(tr("<b> %0 : </b>%1<br/>").arg(FilmDetails::enum2Str(key)).arg(film->m_metadata.value(key)));
     }
 
     prefix.append("<br/>");
+
     ui->summaryLabel->setText(prefix.append(film->m_summary));
 
     {

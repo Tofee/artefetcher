@@ -31,6 +31,9 @@
 #define JSON_FILMPAGE_PARTNERSHIP_WEB   "VPA"
 #define JSON_FILMPAGE_PRODUCTION_YEAR   "productionYear"
 #define JSON_FILMPAGE_SHOOTING_DATE     "shootingDate"
+#define JSON_FILMPAGE_DIRECTOR          "director"
+#define JSON_FILMPAGE_INFOPROG          "infoProg" /*Donne quelque chose comme : "(ROYAUME UNI , 2008, 52mn)
+    ARTE F"*/
 
 class FilmDetails;
 

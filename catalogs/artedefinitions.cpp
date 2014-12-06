@@ -57,6 +57,18 @@ void extractMainArteMetaFromJsonMap(FilmDetails* film, QMap<QString, QVariant> m
     addMetadataIfNotEmpty(film, map, JSON_FILMPAGE_PARTNERSHIP,       Partnership);
     addMetadataIfNotEmpty(film, map, JSON_FILMPAGE_PARTNERSHIP_WEB,   Partnership_web);
     addMetadataIfNotEmpty(film, map, JSON_FILMPAGE_PRODUCTION_YEAR,   Production_year);
+    addMetadataIfNotEmpty(film, map, JSON_FILMPAGE_DIRECTOR,          Director);
+    addMetadataIfNotEmpty(film, map, JSON_FILMPAGE_INFOPROG,          Infoprog);
+
+    // Extracts the producing countries from infoprog field
+    QString infoProg = film->m_metadata.value(Infoprog);
+    if (!infoProg.isEmpty())
+    { /* Infoprog looks like : "(ROYAUME UNI , 2008, 52mn)
+        ARTE F"  and we want to extract production countries*/
+        QString result = infoProg.mid(1, infoProg.indexOf(',')-1);
+
+        film->m_producingCountries = result.split('/'); // slash is the country separator
+    }
 
     QStringList labels;
     foreach (QVariant channelItem, map.value(JSON_FILMPAGE_CHANNELS).toList())
