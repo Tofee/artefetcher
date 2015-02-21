@@ -6,12 +6,12 @@
     <message>
         <location filename="view/aboutdialog.cpp" line="24"/>
         <source>Release notes are not available</source>
-        <translation>Release Notes nicht verfügbar</translation>
+        <translation>Es gibt keine Release Notes</translation>
     </message>
     <message>
         <location filename="view/aboutdialog.ui" line="14"/>
         <source>About Arte Fetcher</source>
-        <translation>Über Arte Fetcher</translation>
+        <translation>Über arteFetcher</translation>
     </message>
 </context>
 <context>
@@ -19,7 +19,7 @@
     <message>
         <location filename="catalogs/artedatecatalog.cpp" line="9"/>
         <source>By date</source>
-        <translation type="unfinished">Nach Datum</translation>
+        <translation>Nach Datum</translation>
     </message>
 </context>
 <context>
@@ -27,32 +27,32 @@
     <message>
         <location filename="catalogs/artelivecatalog.cpp" line="8"/>
         <source>Live - Selection</source>
-        <translation type="unfinished"></translation>
+        <translation>Live - Selection</translation>
     </message>
     <message>
         <location filename="catalogs/artelivecatalog.cpp" line="9"/>
         <source>Live - Classical</source>
-        <translation type="unfinished"></translation>
+        <translation>Live - Classical</translation>
     </message>
     <message>
         <location filename="catalogs/artelivecatalog.cpp" line="10"/>
         <source>Live - Rock</source>
-        <translation type="unfinished"></translation>
+        <translation>Live - Rock</translation>
     </message>
     <message>
         <location filename="catalogs/artelivecatalog.cpp" line="11"/>
         <source>Live - Jazz</source>
-        <translation type="unfinished"></translation>
+        <translation>Live - Jazz</translation>
     </message>
     <message>
         <location filename="catalogs/artelivecatalog.cpp" line="12"/>
         <source>Live - World</source>
-        <translation type="unfinished"></translation>
+        <translation>Live - World</translation>
     </message>
     <message>
         <location filename="catalogs/artelivecatalog.cpp" line="13"/>
         <source>Live - Dance</source>
-        <translation type="unfinished"></translation>
+        <translation>Live - Dance</translation>
     </message>
 </context>
 <context>
@@ -65,16 +65,18 @@
     <message>
         <location filename="catalogs/artemaincatalog.cpp" line="11"/>
         <source>Arte selection</source>
-        <translation>Auswahl durch Arte</translation>
+        <translatorcomment>Bei ARD: Tipps der Redaktion; ZDF: unsere Tipps</translatorcomment>
+        <translation>von arte empfohlen</translation>
     </message>
     <message>
         <source>Most recent</source>
-        <translation>Letzte</translation>
+        <translation>Die neuesten</translation>
     </message>
     <message>
         <location filename="catalogs/artemaincatalog.cpp" line="12"/>
         <source>Most seen</source>
-        <translation>Meistgesehene</translation>
+        <translatorcomment>Schön wäre: &quot;beliebteste&quot; - viel Klick -&gt; viel gut?</translatorcomment>
+        <translation>Beliebteste</translation>
     </message>
     <message>
         <location filename="catalogs/artemaincatalog.cpp" line="13"/>
@@ -195,32 +197,33 @@
     <message>
         <location filename="film/filmdetails.h" line="105"/>
         <source>Partnership</source>
-        <translation type="unfinished"></translation>
+        <translation>Partner</translation>
     </message>
     <message>
         <location filename="film/filmdetails.h" line="106"/>
         <source>Partnership website</source>
-        <translation type="unfinished"></translation>
+        <translation>Partner-Homepage</translation>
     </message>
     <message>
         <location filename="film/filmdetails.h" line="107"/>
         <source>Year</source>
-        <translation type="unfinished"></translation>
+        <translation>Jahr</translation>
     </message>
     <message>
         <location filename="film/filmdetails.h" line="108"/>
         <source>Shooting date</source>
-        <translation type="unfinished"></translation>
+        <translation>Drehdatum</translation>
     </message>
     <message>
         <location filename="film/filmdetails.h" line="109"/>
         <source>Director</source>
-        <translation type="unfinished"></translation>
+        <translation>Regisseur</translation>
     </message>
     <message>
         <location filename="film/filmdetails.h" line="110"/>
         <source>Origine</source>
-        <translation type="unfinished">Ursprung</translation>
+        <translatorcomment>Ursprungsland, Herkunftsland</translatorcomment>
+        <translation>Land</translation>
     </message>
     <message>
         <location filename="film/filmdetails.h" line="98"/>
@@ -266,7 +269,8 @@
         <location filename="catalogs/incompletedownloads.cpp" line="7"/>
         <source>Downloads to resume</source>
         <oldsource>Incomplete downloads</oldsource>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Downloads, die man wieder aufnehmen kann - die man fort setzen kann - die nicht abgeschlossen sind</translatorcomment>
+        <translation>fort zu setzende Donwnloads</translation>
     </message>
 </context>
 <context>
@@ -287,8 +291,8 @@
     <message>
         <location filename="view/mainwindow.ui" line="40"/>
         <source>dd/MM/yy</source>
-        <translatorcomment>This string is just use to specify the default date format (for example, in english month are written before day of month)</translatorcomment>
-        <translation type="unfinished">dd/MM/yy</translation>
+        <translatorcomment>This string is just use to specify the default date format (for example, in english month are written before day of month) -&gt; auf Deutsch eigentlich TT/MM/JJ, aber dann füllt sich das Feld als: &quot;TT/01/JJ&quot;</translatorcomment>
+        <translation>dd/mm/yy</translation>
     </message>
     <message>
         <location filename="view/mainwindow.ui" line="50"/>
@@ -324,7 +328,7 @@
     <message>
         <location filename="view/mainwindow.ui" line="202"/>
         <source>Open the directory containing the video</source>
-        <translation>Ordner des Videos öffnen</translation>
+        <translation>Ordner, in dem das Video gespeichert ist, öffnen</translation>
     </message>
     <message>
         <location filename="view/mainwindow.ui" line="216"/>
@@ -338,6 +342,7 @@
     <message>
         <location filename="view/mainwindow.ui" line="247"/>
         <source>Download this video</source>
+        <translatorcomment>Video downloaden wird immer üblicher</translatorcomment>
         <translation>Video herunterladen</translation>
     </message>
     <message>
@@ -467,7 +472,7 @@ Check: &lt;%1&gt;</source>
     <message>
         <location filename="view/mainwindow.cpp" line="781"/>
         <source>Download finished.</source>
-        <translation>Download beendet.</translation>
+        <translation>Download abgeschlossen.</translation>
     </message>
     <message>
         <source>Waiting...</source>
@@ -547,12 +552,12 @@ Gesamtergebnisse: %3</translation>
     <message>
         <location filename="view/mainwindow.cpp" line="546"/>
         <source>&lt;b&gt;Countries: &lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Länder: &lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="view/mainwindow.cpp" line="959"/>
         <source>Download is still in progress. Closing the application will stop them immediately and your films file may be incomplete, corrupted or not event downloaded.</source>
-        <translation>Laufender Download. Beim Schließen der Anwendung wird der Download sofort unterbrochen und die Datei könnte unvollständig, kaputt oder garnicht erst heruntergeladen sein.</translation>
+        <translation>Laufender Download. Durch Schließen des Programms wird der Download sofort unterbrochen und die Datei könnte kaputt, unvollständig oder gar nicht heruntergeladen sein.</translation>
     </message>
     <message>
         <source>%1 %2 (%3min)
@@ -568,7 +573,7 @@ Gesamtergebnisse: %3</translation>
         <location filename="view/mainwindow.cpp" line="562"/>
         <source>The related video is a teaser of the original movie.
 </source>
-        <translation>Das Video ist ein Ausschnitt des ursprünglichen Films.
+        <translation>Dieses Video ist ein Programmhinweis auf den eigentlichen Films.
 </translation>
     </message>
     <message>
@@ -638,7 +643,7 @@ Verfügbar bis %1</translation>
 Do you want to continue and replace it?</source>
         <translation>Eine Datei mit demselben Namen existiert bereits:
 %1
-Möchten Sie fortfahren und sie ersetzen?</translation>
+Möchten Sie fortfahren und diese überschreiben?</translation>
     </message>
     <message>
         <source>Incomplete download found</source>
@@ -681,7 +686,7 @@ Geschwindigkeit %2 kB/s  -  Restzeit: %3</translation>
     <message>
         <location filename="view/mainwindow.cpp" line="958"/>
         <source>Close the application?</source>
-        <translation>Anwendung schließen?</translation>
+        <translation>Programm schließen?</translation>
     </message>
     <message>
         <source>Download is still in progress. Closing the application will stop them immediately and your films file may be incomplete, corrupted or not even downloaded.</source>
@@ -690,7 +695,7 @@ Geschwindigkeit %2 kB/s  -  Restzeit: %3</translation>
     <message>
         <location filename="view/mainwindow.cpp" line="960"/>
         <source>Quit anyway</source>
-        <translation>Dennoch beenden</translation>
+        <translation>Ja, beenden</translation>
     </message>
     <message>
         <location filename="view/mainwindow.cpp" line="961"/>
@@ -708,12 +713,12 @@ Geschwindigkeit %2 kB/s  -  Restzeit: %3</translation>
     <message>
         <location filename="view/preferencedialog.ui" line="196"/>
         <source>Downloads</source>
-        <translation type="unfinished">Downloads</translation>
+        <translation>Downloads</translation>
     </message>
     <message>
         <location filename="view/preferencedialog.ui" line="331"/>
         <source>Connection</source>
-        <translation type="unfinished">Verbindung</translation>
+        <translation>Verbindung</translation>
     </message>
     <message>
         <location filename="view/preferencedialog.ui" line="337"/>
@@ -763,13 +768,13 @@ Geschwindigkeit %2 kB/s  -  Restzeit: %3</translation>
     <message>
         <location filename="view/preferencedialog.ui" line="146"/>
         <source>I allow arteFetcher to register</source>
-        <translation type="unfinished"></translation>
+        <translation>Ich gestatte eine Registrierung durch arteFetcher</translation>
     </message>
     <message>
         <location filename="view/preferencedialog.ui" line="129"/>
         <source>Favorite video translation:</source>
         <oldsource>Favorite streams:</oldsource>
-        <translation>Bevorzugte Übersetzung:</translation>
+        <translation>Bevorzugte Spracheinstellung:</translation>
     </message>
     <message>
         <location filename="view/preferencedialog.ui" line="136"/>
@@ -927,7 +932,7 @@ SQ: höchste Qualität - 2200 (1280 x 720)</translation>
     <message>
         <location filename="view/mainwindow.cpp" line="354"/>
         <source>Previous download failed.</source>
-        <translation>Letzter Download fehlerhaft.</translation>
+        <translation>Vorheriger Download fehlerhaft.</translation>
     </message>
     <message>
         <source>All</source>
@@ -953,18 +958,19 @@ SQ: höchste Qualität - 2200 (1280 x 720)</translation>
         <location filename="preferences.cpp" line="127"/>
         <source>Registration request</source>
         <oldsource>Registration agreement</oldsource>
-        <translation type="unfinished"></translation>
+        <translation>Registrierungsanfrage</translation>
     </message>
     <message>
         <location filename="preferences.cpp" line="128"/>
         <source>&lt;br/&gt;&lt;br/&gt;You can change this setting anytime in preferences.&lt;br/&gt;&lt;br/&gt;Do you agree?</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;br/&gt;&lt;br/&gt;Sie können dies jederzeit in Einstellungen/Allgemein wieder ändern.&lt;br/&gt;&lt;br/&gt;Gestatten Sie das Registrieren?</translation>
     </message>
     <message>
         <location filename="preferences.h" line="88"/>
         <source>&lt;html&gt;Artefetcher would like to have your agreement to register you as an ArteFetcher user.&lt;br/&gt;&lt;br/&gt;This will be helpful to know how much this application is used and thus give further motivation to the developers to provide improvements.&lt;br/&gt;&lt;br/&gt;This will be done through a simple download of this page http://artefetcher.sourceforge.net through a google short URL.&lt;br/&gt;&lt;b&gt;The IP address and the OS type are the only private data that will be sent. ArteFetcher developpers team will not have access to the IP address, but only google will.&lt;/b&gt;&lt;br/&gt;This registration will occur at the first run and after %1 arteFetcher starts.&lt;/html&gt;</source>
         <oldsource>&lt;html&gt;We would like to have your agreement to register you as an ArteFetcher user.&lt;br/&gt;&lt;br/&gt;This will be helpful to know how much this application is used and thus get further motivation to the developers to provide improvements.&lt;br/&gt;&lt;br/&gt;This will be done through a simple download of this page http://arteFetcher.sourceforge.net through a google short URL.&lt;br/&gt;&lt;b&gt;The IP address and the OS type are the only private data that will be sent. ArteFetcher developpers team will not have access to the IP address, but only google will.&lt;/b&gt;&lt;br/&gt;This registration will occur at the first run and after %1 starts.&lt;/html&gt;</oldsource>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;ArteFetcher hätte gerne Ihre Zustimmung, Sie als arteFetcher-Benutzer zu registrieren.&lt;br/&gt;&lt;br/&gt;Ein &quot;Ja&quot; wäre hilfreich, da wir dadurch erfahren können, wie oft das Programm installiert und genutzt wird - was den Entwicklern eine weitere Motivation bietet an der Verbesserung des Programms weiter zu arbeiten.&lt;br/&gt;&lt;br/&gt;Dazu wird die Seite http://artefetcher.sourceforge.net über eine google Kurz-URL aufgerufen.&lt;br/&gt;&lt;b&gt;Es werden dabei nur IP Adresse und Betriebssystemtyp verarbeitet. Das arteFetcher Entwicklerteam hat keinen Zugriff auf dieIP Adresse - den hat nur Google.&lt;/b&gt;&lt;br/&gt;Die Seite wird beim ersten Start und nach %1 arteFetcher-Starts aufgerufen.&lt;/html&gt;
+</translation>
     </message>
 </context>
 <context>
