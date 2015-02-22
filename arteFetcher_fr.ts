@@ -68,16 +68,17 @@
         <translation>Sélection Arte</translation>
     </message>
     <message>
+        <location filename="catalogs/artemaincatalog.cpp" line="12"/>
         <source>Most recent</source>
         <translation>Les plus récentes</translation>
     </message>
     <message>
-        <location filename="catalogs/artemaincatalog.cpp" line="12"/>
+        <location filename="catalogs/artemaincatalog.cpp" line="13"/>
         <source>Most seen</source>
         <translation>Les plus vues</translation>
     </message>
     <message>
-        <location filename="catalogs/artemaincatalog.cpp" line="13"/>
+        <location filename="catalogs/artemaincatalog.cpp" line="14"/>
         <source>Last chance</source>
         <translation>Dernière chance</translation>
     </message>
@@ -426,7 +427,7 @@
         <translation type="obsolete">Télécharger les vidéos</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="90"/>
+        <location filename="view/mainwindow.cpp" line="93"/>
         <source>Title</source>
         <translation>Titre</translation>
     </message>
@@ -439,7 +440,7 @@
         <translation type="obsolete">Vues</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="91"/>
+        <location filename="view/mainwindow.cpp" line="94"/>
         <source>Duration</source>
         <translation>Durée</translation>
     </message>
@@ -472,7 +473,7 @@ Check: &lt;%1&gt;</source>
         <translation type="obsolete">Impossible de créer le dossier %1</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="781"/>
+        <location filename="view/mainwindow.cpp" line="783"/>
         <source>Download finished.</source>
         <translation>Téléchargement terminé.</translation>
     </message>
@@ -505,7 +506,7 @@ Check: &lt;%1&gt;</source>
         <translation type="obsolete">Note</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="552"/>
+        <location filename="view/mainwindow.cpp" line="554"/>
         <source>&lt;b&gt; %0 : &lt;/b&gt;%1&lt;br/&gt;</source>
         <translation>&lt;b&gt; %0 : &lt;/b&gt;%1&lt;br/&gt;</translation>
     </message>
@@ -515,7 +516,7 @@ Check: &lt;%1&gt;</source>
     </message>
     <message>
         <location filename="view/mainwindow.ui" line="374"/>
-        <location filename="view/mainwindow.cpp" line="229"/>
+        <location filename="view/mainwindow.cpp" line="231"/>
         <source>Downloads</source>
         <translation>Téléchargements</translation>
     </message>
@@ -544,7 +545,7 @@ Check: &lt;%1&gt;</source>
         <translation type="obsolete">Par date</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="233"/>
+        <location filename="view/mainwindow.cpp" line="235"/>
         <source>Page %1/%2
 Total results: %3</source>
         <translation>Page %1/%2
@@ -561,14 +562,14 @@ Total: %3 résultats</translation>
         <translation type="obsolete">Épisode : %1</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="562"/>
+        <location filename="view/mainwindow.cpp" line="564"/>
         <source>The related video is a teaser of the original movie.
 </source>
         <translation>La vidéo associée est un extrait de l&apos;émission originale.
 </translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="571"/>
+        <location filename="view/mainwindow.cpp" line="573"/>
         <source>%1 %2 </source>
         <translation>%1 %2 </translation>
     </message>
@@ -591,7 +592,7 @@ Total: %3 résultats</translation>
         <translation type="obsolete">Téléchargé</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="659"/>
+        <location filename="view/mainwindow.cpp" line="661"/>
         <source>File already exists</source>
         <translation>Le fichier existe déjà</translation>
     </message>
@@ -606,14 +607,14 @@ Voulez-vous continuer et le remplacer ?</translation>
         <translation type="obsolete">Le dernier téléchargement a échoué.</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="565"/>
+        <location filename="view/mainwindow.cpp" line="567"/>
         <source>(%1 min)
 </source>
         <translation>(%1 min.)
 </translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="579"/>
+        <location filename="view/mainwindow.cpp" line="581"/>
         <source>
 Available until %1</source>
         <translation>
@@ -628,7 +629,7 @@ Disponible jusqu&apos;au %1</translation>
         <translation type="obsolete">Erreur de téléchargement</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="660"/>
+        <location filename="view/mainwindow.cpp" line="662"/>
         <source>A file with the same name already exists:
 %1
 Do you want to continue and replace it?</source>
@@ -645,34 +646,34 @@ Voulez-vous quand même le télécharger ?</translation>
         <translation type="obsolete">Une partie du film &lt;%1&gt; a déjà été téléchargée. Voulez vous continuer le téléchargement ?</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="287"/>
+        <location filename="view/mainwindow.cpp" line="289"/>
         <source>Loading...</source>
         <translation>Chargement...</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="546"/>
+        <location filename="view/mainwindow.cpp" line="548"/>
         <source>&lt;b&gt;Countries: &lt;/b&gt;</source>
         <translation>&lt;b&gt;Pays : &lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="813"/>
+        <location filename="view/mainwindow.cpp" line="815"/>
         <source>Downloading %1
 Speed %2 kB/s  -  Remaining: %3</source>
         <translation>Téléchargement: %1
 Débit : %2 ko/s -  Temps restant : %3</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="819"/>
+        <location filename="view/mainwindow.cpp" line="821"/>
         <source>%1 item(s) in queue</source>
         <translation>%1 film(s) en attente</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="844"/>
+        <location filename="view/mainwindow.cpp" line="846"/>
         <source>Download error: %1</source>
         <translation>Erreur de téléchargement : %1</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="852"/>
+        <location filename="view/mainwindow.cpp" line="854"/>
         <source>Paused</source>
         <translation>En pause</translation>
     </message>
@@ -685,22 +686,22 @@ Débit : %2 ko/s -  Temps restant : %3</translation>
         <translation type="obsolete">Entrez l&apos;URL de la page de votre film Arte</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="958"/>
+        <location filename="view/mainwindow.cpp" line="961"/>
         <source>Close the application?</source>
         <translation>Fermer l&apos;application ?</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="959"/>
+        <location filename="view/mainwindow.cpp" line="962"/>
         <source>Download is still in progress. Closing the application will stop them immediately and your films file may be incomplete, corrupted or not event downloaded.</source>
         <translation>Téléchargement en cours. Fermer l&apos;application arrêtera les téléchargements immédiatement et le film en cours pourrait être incomplet voire corrompu.</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="960"/>
+        <location filename="view/mainwindow.cpp" line="963"/>
         <source>Quit anyway</source>
         <translation>Quitter quand même</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="961"/>
+        <location filename="view/mainwindow.cpp" line="964"/>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
@@ -714,48 +715,64 @@ Débit : %2 ko/s -  Temps restant : %3</translation>
     </message>
     <message>
         <location filename="view/preferencedialog.ui" line="196"/>
+        <source>Streams</source>
+        <translation>Flux</translation>
+    </message>
+    <message>
+        <location filename="view/preferencedialog.ui" line="204"/>
+        <source>Select the streams you want to use:</source>
+        <translation>Flux que vous souhaitez utiliser :</translation>
+    </message>
+    <message>
+        <location filename="view/preferencedialog.ui" line="231"/>
+        <source>When starting Arte Fetcher, show first:</source>
+        <translation>Quand Arte Fetcher démarre,
+commencer avec :</translation>
+    </message>
+    <message>
+        <location filename="view/preferencedialog.ui" line="270"/>
         <source>Downloads</source>
         <translation>Téléchargements</translation>
     </message>
     <message>
-        <location filename="view/preferencedialog.ui" line="331"/>
+        <location filename="view/preferencedialog.ui" line="405"/>
         <source>Connection</source>
         <translation>Connexion</translation>
     </message>
     <message>
-        <location filename="view/preferencedialog.ui" line="337"/>
+        <location filename="view/preferencedialog.ui" line="411"/>
         <source>Connection settings</source>
         <translation>Paramètres de connexion</translation>
     </message>
     <message>
-        <location filename="view/preferencedialog.ui" line="356"/>
+        <location filename="view/preferencedialog.ui" line="430"/>
         <source>Use a proxy</source>
         <translation>Utiliser un proxy</translation>
     </message>
     <message>
-        <location filename="view/preferencedialog.ui" line="363"/>
+        <location filename="view/preferencedialog.ui" line="437"/>
         <source>HTTP:</source>
         <translation>HTTP :</translation>
     </message>
     <message>
-        <location filename="view/preferencedialog.ui" line="383"/>
+        <location filename="view/preferencedialog.ui" line="457"/>
         <source>Port:</source>
         <translation>Port :</translation>
     </message>
     <message>
-        <location filename="view/preferencedialog.ui" line="305"/>
+        <location filename="view/preferencedialog.ui" line="379"/>
         <source>After a successful video download</source>
         <translation>Après un téléchargement réussi</translation>
     </message>
     <message>
-        <location filename="view/preferencedialog.ui" line="311"/>
+        <location filename="view/preferencedialog.ui" line="385"/>
         <source>Save an image preview
 (filename.png)</source>
         <translation>Enregistrer une image d&apos;aperçu
 (nom_du_fichier.png)</translation>
     </message>
     <message>
-        <location filename="view/preferencedialog.ui" line="319"/>
+        <location filename="view/preferencedialog.ui" line="393"/>
         <source>Save the video information (title, type, summary...)
 (filename.info)</source>
         <translation>Enregistrer les informations de la vidéo (titre, type, résumé...)
@@ -818,32 +835,32 @@ EQ: qualité moyenne - 1500 (1280 x 720)
 SQ: meilleure qualité - 2200 (1280 x 720)</translation>
     </message>
     <message>
-        <location filename="view/preferencedialog.ui" line="202"/>
+        <location filename="view/preferencedialog.ui" line="276"/>
         <source>Generated files</source>
         <translation>Fichiers générés</translation>
     </message>
     <message>
-        <location filename="view/preferencedialog.ui" line="245"/>
+        <location filename="view/preferencedialog.ui" line="319"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pattern to generate the film filenames:&lt;br/&gt;%title: video title&lt;br/&gt;%language: language code&lt;br/&gt;%quality: stream type code (hd/sd...)&lt;/p&gt;&lt;p&gt;Example: &apos;[%quality %language] %title&apos; will create&lt;br/&gt;[HQ DE] Movie title.mp4&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Patron pour générer les noms de fichier de film :&lt;br/&gt;%title : titre de la vidéo&lt;br/&gt;%quality : code de la langue&lt;br/&gt;%language : qualité (HD/ED/SD...)&lt;/p&gt;&lt;p&gt;Exemple: &apos;[%quality %language] %title&apos; créera&lt;br/&gt;[HQ DE] Titre de film.mp4&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="view/preferencedialog.ui" line="208"/>
+        <location filename="view/preferencedialog.ui" line="282"/>
         <source>Destination:</source>
         <translation>Destination :</translation>
     </message>
     <message>
-        <location filename="view/preferencedialog.ui" line="228"/>
+        <location filename="view/preferencedialog.ui" line="302"/>
         <source>Browse...</source>
         <translation>Parcourir...</translation>
     </message>
     <message>
-        <location filename="view/preferencedialog.ui" line="235"/>
+        <location filename="view/preferencedialog.ui" line="309"/>
         <source>When a movie belongs to series, a folder will be created for the serie and all episodes will be gathered in this directory.</source>
         <translation>Quand un film appartient à une série, un dossier est créé et tous les épisodes y sont rassemblés.</translation>
     </message>
     <message>
-        <location filename="view/preferencedialog.ui" line="238"/>
+        <location filename="view/preferencedialog.ui" line="312"/>
         <source>Place films belonging to series into a dedicated directory</source>
         <translation>Rassembler tous les épisodes d&apos;une série dans un même dossier</translation>
     </message>
@@ -852,7 +869,7 @@ SQ: meilleure qualité - 2200 (1280 x 720)</translation>
         <translation type="obsolete">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Patron pour générer les noms de fichier de film :&lt;br/&gt;%1 : titre de la vidéo&lt;br/&gt;%2 : code de la langue&lt;br/&gt;%3 : type de flux (HD/SD...)&lt;/p&gt;&lt;p&gt;Exemple: [%2 %3]%1.flv&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="view/preferencedialog.ui" line="221"/>
+        <location filename="view/preferencedialog.ui" line="295"/>
         <source>Filename pattern:</source>
         <translation>Patron de nom de fichiers :</translation>
     </message>
@@ -865,17 +882,17 @@ SQ: meilleure qualité - 2200 (1280 x 720)</translation>
         <translation type="obsolete">Flux souhaités :</translation>
     </message>
     <message>
-        <location filename="view/preferencedialog.cpp" line="116"/>
+        <location filename="view/preferencedialog.cpp" line="168"/>
         <source>Target directory</source>
         <translation>Répertoire de destination</translation>
     </message>
     <message>
-        <location filename="view/preferencedialog.cpp" line="126"/>
+        <location filename="view/preferencedialog.cpp" line="178"/>
         <source>Target directory does not exist</source>
         <translation>Le répertoire de destination n&apos;existe pas</translation>
     </message>
     <message>
-        <location filename="view/preferencedialog.cpp" line="131"/>
+        <location filename="view/preferencedialog.cpp" line="183"/>
         <source>Filename pattern is not correct</source>
         <translation>Patron de nom de fichiers incorrect</translation>
     </message>
@@ -919,32 +936,32 @@ SQ: meilleure qualité - 2200 (1280 x 720)</translation>
         <translation type="obsolete">Disponible jusqu&apos;à (RAW)</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="331"/>
+        <location filename="view/mainwindow.cpp" line="333"/>
         <source>Episode: %1</source>
         <translation>Épisode : %1</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="342"/>
+        <location filename="view/mainwindow.cpp" line="344"/>
         <source>Download pending</source>
         <translation>Téléchargement en attente</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="345"/>
+        <location filename="view/mainwindow.cpp" line="347"/>
         <source>Download in progress: %1%2</source>
         <translation>Téléchargement en cours : %1%2</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="348"/>
+        <location filename="view/mainwindow.cpp" line="350"/>
         <source>Download finished</source>
         <translation>Téléchargement terminé</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="351"/>
+        <location filename="view/mainwindow.cpp" line="353"/>
         <source>Download has been cancelled.</source>
         <translation>Le téléchargement a été annulé.</translation>
     </message>
     <message>
-        <location filename="view/mainwindow.cpp" line="354"/>
+        <location filename="view/mainwindow.cpp" line="356"/>
         <source>Previous download failed.</source>
         <translation>Le dernier téléchargement a échoué.</translation>
     </message>
@@ -969,18 +986,18 @@ SQ: meilleure qualité - 2200 (1280 x 720)</translation>
         <translation type="obsolete">Dernière chance</translation>
     </message>
     <message>
-        <location filename="preferences.cpp" line="127"/>
+        <location filename="preferences.cpp" line="131"/>
         <source>Registration request</source>
         <oldsource>Registration agreement</oldsource>
         <translation>Demande d&apos;enregistrement</translation>
     </message>
     <message>
-        <location filename="preferences.cpp" line="128"/>
+        <location filename="preferences.cpp" line="132"/>
         <source>&lt;br/&gt;&lt;br/&gt;You can change this setting anytime in preferences.&lt;br/&gt;&lt;br/&gt;Do you agree?</source>
         <translation>&lt;br/&gt;&lt;br/&gt;Vous pouvez changer ce réglage dans les préférences à tout moment.&lt;br/&gt;&lt;br/&gt;Êtes-vous d&apos;accord ?</translation>
     </message>
     <message>
-        <location filename="preferences.h" line="88"/>
+        <location filename="preferences.h" line="91"/>
         <source>&lt;html&gt;Artefetcher would like to have your agreement to register you as an ArteFetcher user.&lt;br/&gt;&lt;br/&gt;This will be helpful to know how much this application is used and thus give further motivation to the developers to provide improvements.&lt;br/&gt;&lt;br/&gt;This will be done through a simple download of this page http://artefetcher.sourceforge.net through a google short URL.&lt;br/&gt;&lt;b&gt;The IP address and the OS type are the only private data that will be sent. ArteFetcher developpers team will not have access to the IP address, but only google will.&lt;/b&gt;&lt;br/&gt;This registration will occur at the first run and after %1 arteFetcher starts.&lt;/html&gt;</source>
         <oldsource>&lt;html&gt;We would like to have your agreement to register you as an ArteFetcher user.&lt;br/&gt;&lt;br/&gt;This will be helpful to know how much this application is used and thus get further motivation to the developers to provide improvements.&lt;br/&gt;&lt;br/&gt;This will be done through a simple download of this page http://arteFetcher.sourceforge.net through a google short URL.&lt;br/&gt;&lt;b&gt;The IP address and the OS type are the only private data that will be sent. ArteFetcher developpers team will not have access to the IP address, but only google will.&lt;/b&gt;&lt;br/&gt;This registration will occur at the first run and after %1 starts.&lt;/html&gt;</oldsource>
         <translation>&lt;html&gt;ArteFetcher demande votre accord pour vous enregistrer en tant qu&apos;utilisateur.&lt;br/&gt;&lt;br/&gt;Ceci permettra de mesurer le nombre d&apos;utilisation de cette application et sera une source de motivation pour que les développeurs continuent de l&apos;améliorer&lt;br/&gt;&lt;br/&gt;Ceci sera réalisé par un simple téléchargement de cette page http://artefetcher.sourceforge.net par l&apos;intermédiaire d&apos;une URL raccourcie google.&lt;br/&gt;&lt;b&gt;Seuls l&apos;adresse IP et le nom du système d&apos;exploitation seront envoyés. L&apos;équipe de développement d&apos;ArteFetcher n&apos;aura pas accès à l&apos;adresse IP, seul google détiendra ces informations&lt;/b&gt;&lt;br/&gt;L&apos;enregistrement sera effectué pour le premier lancement et après %1 démarrages.&lt;/html&gt;</translation>
