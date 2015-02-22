@@ -41,6 +41,8 @@
 #define DEF_START_APP_COUNT           "start_app_count"
 #define DEF_FIRST_REGISTRATION_DONE   "first_registration"
 #define DEF_SECOND_REGISTRATION_DONE  "second_registration"
+#define DEF_FAVORITE_CATALOGS         "favorite_catalogs"
+#define DEF_CATALOG_AT_STARTUP        "startup_catalog"
 
 #define RESULT_PER_PAGE 10
 
@@ -112,6 +114,8 @@ void Preferences::load()
     m_proxyEnabled = settings.value(DEF_OPT_PROXY_HTTP_ENABLED, false).toBool();
     m_proxyHttpUrl = settings.value(DEF_OPT_PROXY_HTTP_URL).toString();
     m_proxyHttpPort = settings.value(DEF_OPT_PROXY_HTTP_PORT, 3128).toInt();
+    m_favoriteCatalogs = settings.value(DEF_FAVORITE_CATALOGS, QStringList() /*when empty, it means no filter*/).toStringList();
+    m_catalogAtStartup = settings.value(DEF_CATALOG_AT_STARTUP, QString() /*when empty, it means first catalog*/).toString();
 
     QString lastVersionUsed = settings.value(DEF_LAST_VERSION_USED, "0.5.4").toString();
 
@@ -164,5 +168,7 @@ void Preferences::save()
     settings.setValue(DEF_START_APP_COUNT, m_startAppCount);
     settings.setValue(DEF_FIRST_REGISTRATION_DONE, m_firstRegistration);
     settings.setValue(DEF_SECOND_REGISTRATION_DONE, m_secondRegistration);
+    settings.setValue(DEF_FAVORITE_CATALOGS, m_favoriteCatalogs);
+    settings.setValue(DEF_CATALOG_AT_STARTUP, m_catalogAtStartup);
     settings.sync();
 }

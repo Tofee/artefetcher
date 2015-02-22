@@ -19,14 +19,14 @@
 
 #include "preferencedialog.h"
 #include "ui_preferencedialog.h"
-
+#include "../catalogs/incompletedownloads.h"
 #include <QtGui>
 #include <QFileDialog>
 
 #include <filmdelegate.h>
 
 
-PreferenceDialog::PreferenceDialog(QWidget *parent) :
+PreferenceDialog::PreferenceDialog(QWidget *parent, QStringList catalogs) :
     QDialog(parent),
     ui(new Ui::PreferenceDialog)
 {
@@ -57,6 +57,16 @@ PreferenceDialog::PreferenceDialog(QWidget *parent) :
     ui->registrationCheckBox->setToolTip(Preferences::registrationAgreementText());
     ui->registrationCheckBox->setChecked(Preferences::getInstance()->registrationAgreement());
 
+    foreach (QString item, catalogs){
+        QListWidgetItem* widgetItem = new QListWidgetItem(item);
+
+        bool isLocked = item == IncompleteDownloads(this).listSupportedCatalogNames().first();
+        bool checked = Preferences::getInstance()->favoriteCatalogs().empty() || Preferences::getInstance()->favoriteCatalogs().contains(item);
+        widgetItem->setCheckState(isLocked || checked ? Qt::Checked : Qt::Unchecked);
+        widgetItem->setFlags(isLocked ? (widgetItem->flags() & ~Qt::ItemIsUserCheckable) : (widgetItem->flags() | Qt::ItemIsUserCheckable)); // TODO les téléchargements inachevés ne sont pas décochables
+        ui->subscriptionListWidget->addItem(widgetItem);
+    }
+
     updateProxyConfigVisibility();
 
     connect(ui->browsePushButton, SIGNAL(clicked()),
@@ -74,6 +84,14 @@ PreferenceDialog::PreferenceDialog(QWidget *parent) :
             SLOT(upStreamType()));
     connect(ui->downPushButton, SIGNAL(clicked()),
             SLOT(downStreamType()));
+
+    connect(ui->subscriptionListWidget, SIGNAL(itemChanged(QListWidgetItem*)),
+            SLOT(reloadCatalogsAtStartup()));
+
+    reloadCatalogsAtStartup();
+
+    int index = ui->startupCatalogComboBox->findText(Preferences::getInstance()->catalogAtStartup());
+    ui->startupCatalogComboBox->setCurrentIndex(index > 0 ? index : 0);
 }
 
 PreferenceDialog::~PreferenceDialog()
@@ -108,7 +126,41 @@ void PreferenceDialog::accept()
 
     Preferences::getInstance()->m_registrationAgreement = ui->registrationCheckBox->isChecked();
 
+    //
+    QStringList favoriteCatalogs;
+    for (int i = 0; i < ui->subscriptionListWidget->count(); ++i){
+        QListWidgetItem* item = ui->subscriptionListWidget->item(i);
+        if (item->checkState() == Qt::Checked){
+            favoriteCatalogs << item->text();
+        }
+    }
+    Preferences::getInstance()->m_favoriteCatalogs.clear();
+    if (favoriteCatalogs.size() != ui->subscriptionListWidget->count()){
+        Preferences::getInstance()->m_favoriteCatalogs.append(favoriteCatalogs);
+    }
+
+    Preferences::getInstance()->m_catalogAtStartup = ui->startupCatalogComboBox->currentText();
+
     QDialog::accept();
+}
+
+void PreferenceDialog::reloadCatalogsAtStartup(){
+    QString previousSelection = ui->startupCatalogComboBox->currentText();
+
+    QStringList checkedItems;
+    QStringList allItems;
+    ui->startupCatalogComboBox->clear();
+    for (int i = 0; i < ui->subscriptionListWidget->count(); ++i){
+        QListWidgetItem* item = ui->subscriptionListWidget->item(i);
+        if (item->checkState() == Qt::Checked){
+            checkedItems.append(item->text());
+        }
+        allItems.append(item->text());
+    }
+    ui->startupCatalogComboBox->addItems(checkedItems.empty() ? allItems : checkedItems);
+
+    int index = ui->startupCatalogComboBox->findText(previousSelection);
+    ui->startupCatalogComboBox->setCurrentIndex(index > 0 ? index : 0);
 }
 
 void PreferenceDialog::browse()

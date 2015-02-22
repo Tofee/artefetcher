@@ -64,6 +64,8 @@ public:
     bool saveMetaInInfoFile()                   const { return m_saveMetaInInfoFile; }
     int resultCountPerPage()                    const { return m_resultCountPerPage ? m_resultCountPerPage : 100000; }
     const QStringList favoriteStreamTypes()     const { return m_favoriteStreamTypes; }
+    const QStringList favoriteCatalogs()        const { return m_favoriteCatalogs; }
+    const QString catalogAtStartup()            const { return m_catalogAtStartup; }
 
     bool proxyEnabled()                         const { return m_proxyEnabled; }
     QString proxyHttpUrl()                      const { return m_proxyHttpUrl; }
@@ -80,6 +82,7 @@ public:
     void setSecondRegistrationDone()                            { m_secondRegistration = true; }
 
     void addStreamName(QString streamName)                      { m_favoriteStreamTypes.append(streamName); }
+    void setFavoriteCatalogs(QStringList catalogs)              { m_favoriteCatalogs = catalogs; }
 
     virtual void load() = 0;
     virtual void save() = 0;
@@ -106,6 +109,10 @@ protected:
     int     m_resultCountPerPage;
     /* Stream types in a favorite order */
     QStringList m_favoriteStreamTypes;
+    /* List of catalogs to show. If empty, no catalog filtering */
+    QStringList m_favoriteCatalogs;
+    /*Catalog to show when starting the application*/
+    QString m_catalogAtStartup;
 
     /* Proxy : */
     bool    m_proxyEnabled;

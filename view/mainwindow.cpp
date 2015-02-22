@@ -79,6 +79,9 @@ MainWindow::MainWindow(QWidget *parent) :
     delegate->addCatalog(incompleteCatalog);
 
     loadStreamComboBox();
+    int index = ui->streamComboBox->findText(Preferences::getInstance()->catalogAtStartup());
+    ui->streamComboBox->setCurrentIndex(index > 0 ? index : 0);
+
     if (!Preferences::getInstance()->pendingDownloads().isEmpty())
     {
         ui->streamComboBox->setCurrentIndex(ui->streamComboBox->findText(incompleteCatalog->listSupportedCatalogNames().first()));
@@ -224,8 +227,7 @@ void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
 
 void MainWindow::loadStreamComboBox() {
     ui->streamComboBox->clear();
-    ui->streamComboBox->addItems(delegate->listCatalogNames());
-
+    ui->streamComboBox->addItems(Preferences::getInstance()->favoriteCatalogs().empty() ? delegate->listCatalogNames() : Preferences::getInstance()->favoriteCatalogs());
     ui->streamComboBox->addItem(tr("Downloads"), DOWNLOAD_STREAM);
 }
 
@@ -927,7 +929,8 @@ void MainWindow::errorOccured(QString filmKey, QString errorMessage)
 
 void MainWindow::showPreferences()
 {
-    PreferenceDialog dial(this);
+    PreferenceDialog dial(this, delegate->listCatalogNames());
+
     if (QDialog::Accepted == dial.exec())
     {
         applyProxySettings();

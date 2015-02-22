@@ -32,7 +32,7 @@ class PreferenceDialog : public QDialog
     Q_OBJECT
     
 public:
-    explicit PreferenceDialog(QWidget *parent);
+    explicit PreferenceDialog(QWidget *parent, QStringList catalogs);
     ~PreferenceDialog();
 public slots:
     void accept();
@@ -43,6 +43,8 @@ private slots:
 
     void upStreamType();
     void downStreamType();
+
+    void reloadCatalogsAtStartup();
 
 private:
     Ui::PreferenceDialog *ui;
