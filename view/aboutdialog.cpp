@@ -16,7 +16,7 @@ AboutDialog::AboutDialog(QWidget *parent) :
                            + "Arte Fetcher is developped by Emmanuel Quincerot, under GPL-v3 license<br/>"
                            + "Website: <a href='" + PROJECT_URL + "'>"
                            + PROJECT_URL + "</a><br/><br/>"
-                           + "This application is using the Qt framework</html>");
+                           + "This application is using the Qt framework ("+ QT_VERSION_STR +")</html>");
 
     QFile file(":/doc/Readme");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
