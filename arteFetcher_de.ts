@@ -287,6 +287,7 @@
     <message>
         <location filename="view/mainwindow.ui" line="30"/>
         <source>Stream:</source>
+        <translatorcomment>In Preference Dialog: &quot;Streamingquelle&quot; statt &quot;Stream&quot; - hier aber wegen knappen Platz eher Stream.</translatorcomment>
         <translation>Stream:</translation>
     </message>
     <message>
@@ -714,17 +715,19 @@ Geschwindigkeit %2 kB/s  -  Restzeit: %3</translation>
     <message>
         <location filename="view/preferencedialog.ui" line="196"/>
         <source>Streams</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>&quot;Streams&quot; würde von den meisten bestimmt verstanden - &quot;Streaming&quot; als Oberbegriff vielleicht besser?</translatorcomment>
+        <translation>Streaming</translation>
     </message>
     <message>
         <location filename="view/preferencedialog.ui" line="204"/>
         <source>Select the streams you want to use:</source>
-        <translation type="unfinished"></translation>
+        <translation>Auswahl der Streams, die genutzt werden sollen:</translation>
     </message>
     <message>
         <location filename="view/preferencedialog.ui" line="231"/>
         <source>When starting Arte Fetcher, show first:</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Wenn arteFetcher geöffnet wird soll zunächst diese Streamquelle angezeigt werden: </translatorcomment>
+        <translation>Als erstes soll arteFetcher anzeigen:</translation>
     </message>
     <message>
         <location filename="view/preferencedialog.ui" line="270"/>
