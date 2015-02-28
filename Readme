@@ -24,6 +24,12 @@ along with ArteFetcher.  If not, see <http://www.gnu.org/licenses/>.
 
 
 Release notes:
+v0.6.4
+  New features:
+  - Can select favorites streams in preferences
+  - Most recent streams are back
+  - German translations update
+---------------------------------------------------------------
 v0.6.3
   New features:
   - Add production year, film directory, producing countries
