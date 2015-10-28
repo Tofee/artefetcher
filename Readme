@@ -24,6 +24,9 @@ along with ArteFetcher.  If not, see <http://www.gnu.org/licenses/>.
 
 
 Release notes:
+v0.6.5
+  Quick and temporary fix for new arte API
+---------------------------------------------------------------
 v0.6.4
   New features:
   - Can select favorites streams in preferences
