@@ -15,41 +15,36 @@ ArteDateCatalog::ArteDateCatalog(QObject *parent)
 QString ArteDateCatalog::getUrlForCatalogNames(QString, QDate catalogDate) const {
     // Goal build an URL with the date in this example format:
     // "http://www.arte.tv/papi/tvguide/epg/schedule/F/L3/2014-09-05/2014-9-5.json"
-    QString baseUrl("http://www.arte.tv/papi/tvguide/epg/schedule/F/L3/%1-%2-%3/%4-%5-%6.json");
+    // 2015-10-28 new goal : "http://www.arte.tv/papi/tvguide/videos/plus7/program/F/L3/ALL/ALL/-1/AIRDATE_DESC/0/0/DE_FR/2015-10-28.json;
+    QString baseUrl("http://www.arte.tv/papi/tvguide/videos/plus7/program/F/L3/ALL/ALL/-1/AIRDATE_DESC/0/0/DE_FR/%1-%2-%3.json");
     return baseUrl.arg(catalogDate.year())
                 .arg(catalogDate.month(), 2, 10, QChar('0'))
-                .arg(catalogDate.day(), 2, 10, QChar('0'))
-                .arg(catalogDate.year())
-                .arg(catalogDate.month())
-                .arg(catalogDate.day());
+                .arg(catalogDate.day(), 2, 10, QChar('0'));
 }
 
 QList<FilmDetails*> ArteDateCatalog::listFilmsFromCatalogAnswer(QString catalogName, const QString &catalogAnswer, int fromIndex, int toIndex, int &lastIndex)
 {
-    QList<QVariant> list = extractJsonMapFromAnswer(catalogAnswer).value("abstractBroadcastList").toList();
+    QList<QVariant> list = extractJsonMapFromAnswer(catalogAnswer).value("programFRList").toList();
     lastIndex = list.size();
     QList<FilmDetails*> result;
 
     for (int i = fromIndex; i < toIndex && i < list.size(); ++i){
-        QVariant catalogItem = list.at(i);
-        {
-            QString url = catalogItem.toMap().value("PUR").toString();
-            QString title = catalogItem.toMap().value("TIT").toString();
-            QString arteId = catalogItem.toMap().value("PID").toString();
+        QMap<QString, QVariant> catalogItem = list.at(i).toMap();
+        QString url = catalogItem.value("videoStreamUrl").toString();
+        QString title = catalogItem.value("TIT").toString();
+        QString arteId = catalogItem.value("PID").toString();
 
-            FilmDetails* newFilm = new FilmDetails(catalogName, title, url, arteId);
-            updateArteEpisodeNumber(newFilm);
-            addMetadataIfNotEmpty(newFilm, catalogItem.toMap(), "DLO", Description);
+        FilmDetails* newFilm = new FilmDetails(catalogName, title, url, arteId);
+        // updateArteEpisodeNumber(newFilm);
+        addMetadataIfNotEmpty(newFilm, catalogItem, JSON_DESC, Description);
+        //addMetadataIfNotEmpty(newFilm, catalogItem, JSON_VIEWS, Views);
+        //addMetadataIfNotEmpty(newFilm, catalogItem, JSON_VIDEO_CHANNEL, Channels);
 
-            newFilm->m_replayAvailable = catalogItem.toMap().value("VDO").toMap().value("VTY").toString() == QString("ARTE_PLUS_SEVEN");
+        result << newFilm;
 
-            result << newFilm;
-
-            QString imageUrl = catalogItem.toMap().value("VDO").toMap().value("programImage").toString();
-            // Other possibility IMG/IUR but it seems the format is not always valid.
-            if (!imageUrl.isEmpty()){
-                emit requestImageDownload(newFilm, imageUrl);
-            }
+        QString imageUrl = catalogItem.value("IMG").toMap().value("IUR").toString();
+        if (!imageUrl.isEmpty()){
+            emit requestImageDownload(newFilm, imageUrl);
         }
     }
     return result;

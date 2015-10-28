@@ -7,7 +7,7 @@
 #define JSON_AIRDATE        "airdate"
 #define JSON_AIRDATE_LONG   "airdate_long"
 #define JSON_AIRTIME        "airtime"
-#define JSON_DESC           "desc"
+#define JSON_DESC           "DLO"
 #define JSON_RIGHTS_UNTIL   "video_rights_until"
 #define JSON_VIEWS          "video_views"
 #define JSON_VIDEO_CHANNEL  "video_channels"
