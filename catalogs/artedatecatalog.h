@@ -12,8 +12,6 @@ public:
 
     QString getUrlForCatalogNames(QString, QDate catalogDate) const;
 
-    QList<FilmDetails*> listFilmsFromCatalogAnswer(QString catalogName, const QString& catalogAnswer, int fromIndex, int toIndex, int& index);
-
     QString getFilmDetailsUrl(FilmDetails* film);
 
     void processFilmDetails(FilmDetails* film, QString htmlPage);

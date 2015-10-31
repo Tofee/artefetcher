@@ -9,8 +9,6 @@ class ArteMainCatalog : public QObject, public ICatalog
 public:
     ArteMainCatalog(QObject* parent);
 
-    QList<FilmDetails*> listFilmsFromCatalogAnswer(QString catalogName, const QString& catalogAnswer, int fromIndex, int toIndex, int& index);
-
     QString getFilmDetailsUrl(FilmDetails* film);
 
     void processFilmDetails(FilmDetails* film, QString htmlPage);

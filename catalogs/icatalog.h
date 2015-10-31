@@ -89,7 +89,7 @@ public:
      * @param totalCount count of all the items in the catalog (even if not in the current page)
      * @return list of the items in the page
      */
-    virtual QList<FilmDetails*> listFilmsFromCatalogAnswer(QString catalogName, const QString& catalogAnswer, int fromIndex, int toIndex, int& totalCount) = 0;
+    virtual QList<FilmDetails*> listFilmsFromCatalogAnswer(QString catalogName, const QString& catalogAnswer, int fromIndex, int toIndex, int& totalCount);
 
     /**
      * @brief getFilmDetailsUrl Some catalogs needs to fetch an extra webpage to get more details of
@@ -110,6 +110,9 @@ public:
     virtual void processFilmDetails(FilmDetails* film, QString htmlPage) = 0;
 
 protected:
+    // SIGNAL:
+    virtual void requestImageDownload(FilmDetails* film, QString imageUrl) = 0;
+
     /**
      * @brief m_urlByCatalogName This is a list of the url indexed by their catalog name.
      * Most of implementation of ICatalog will use default implementation of listSupportedCatalogNames()

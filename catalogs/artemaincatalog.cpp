@@ -6,42 +6,22 @@
 ArteMainCatalog::ArteMainCatalog(QObject *parent)
     :QObject(parent)
 {
+    // On extrait un language code sur un caractère (F, D)
+    QString languageCode = Preferences::getInstance()->applicationLanguage().left(1).toUpper();
+
     //  http://www.arte.tv/hbbtvv2/index.html?lang=fr_FR&tv=false
-    //m_urlByCatalogName.insert(tr("All"), "http://www.arte.tv/papi/tvguide/videos/plus7/program/F/L3/ALL/ALL/-1/AIRDATE_DESC/0/0/DE_FR/2015-10-28.json");
-    //m_urlByCatalogName.insert(tr("Arte selection"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7/selection.json");
+    //m_urlByCatalogName.insert(tr("All"),            QString("http://www.arte.tv/papi/tvguide/videos/ARTE_PLUS_SEVEN/%1.json?limit=1").arg(languageCode));
+    // Url parameters :
+    //   First number after AIRDATE_DESC is the maxResult
+    //   Second number after AIRDATE_DESC is the offset
+    m_urlByCatalogName.insert(tr("Arte selection"), QString("http://www.arte.tv/papi/tvguide/videos/plus7/program/%1/L3/ALL/ALL/1/AIRDATE_DESC/6/0/DE_FR.json").arg(languageCode));
+
     //m_urlByCatalogName.insert(tr("Most recent"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7/plus_recentes.json");
-    //m_urlByCatalogName.insert(tr("Most seen"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7/plus_vues.json");
+    m_urlByCatalogName.insert(tr("Most seen"),      QString("http://www.arte.tv/papi/tvguide/videos/plus7/program/%1/L3/ALL/ALL/-1/VIEWS/10/0/DE_FR.json").arg(languageCode));
     //m_urlByCatalogName.insert(tr("Last chance"), "http://www.arte.tv/guide/"+ Preferences::getInstance()->applicationLanguage() + "/plus7/derniere_chance.json");
 }
 
 
-QList<FilmDetails*> ArteMainCatalog::listFilmsFromCatalogAnswer(QString catalogName, const QString& catalogAnswer, int fromIndex, int toIndex, int& lastIndex){
-    QList<QVariant> list = extractJsonMapFromAnswer(catalogAnswer).value("videos").toList();
-    lastIndex = list.size();
-    QList<FilmDetails*> result;
-
-    for (int i = fromIndex; i < toIndex && i < list.size(); ++i){
-        QMap<QString, QVariant> catalogItem = list.at(i).toMap();
-        QString url = catalogItem.value("url").toString();
-        url.prepend("http://www.arte.tv");
-        QString title = catalogItem.value("title").toString();
-        QString arteId = catalogItem.value("em").toString();
-
-        FilmDetails* newFilm = new FilmDetails(catalogName, title, url, arteId);
-        updateArteEpisodeNumber(newFilm);
-        addMetadataIfNotEmpty(newFilm, catalogItem, JSON_DESC, Description);
-        addMetadataIfNotEmpty(newFilm, catalogItem, JSON_VIEWS, Views);
-        addMetadataIfNotEmpty(newFilm, catalogItem, JSON_VIDEO_CHANNEL, Channels);
-
-        result << newFilm;
-
-        QString imageUrl = catalogItem.value("image_url").toString();
-        if (!imageUrl.isEmpty()){
-            emit requestImageDownload(newFilm, imageUrl);
-        }
-    }
-    return result;
-}
 
 QString ArteMainCatalog::getFilmDetailsUrl(FilmDetails* film){
 
