@@ -486,21 +486,15 @@ void MainWindow::updateRowInTable(const FilmDetails* const film){
 
         QString tooltip(buildTooltip(film));
 
-        if (ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW)) {
-            ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW)->setBackgroundColor(isEpisode ? Qt::lightGray : Qt::white);
-            ui->tableWidget->item(rowNumber, COLUMN_FOR_PREVIEW)->setToolTip(tooltip);
+        for (int col: { COLUMN_FOR_PREVIEW, COLUMN_FOR_PREVIEW, COLUMN_FOR_TITLE, COLUMN_FOR_DURATION }) {
+            QTableWidgetItem *colItem = ui->tableWidget->item(rowNumber, col);
+            if (colItem) {
+                if (isEpisode) {
+                    colItem->setBackgroundColor(QColor(30,200,30,20));
+                }
+                colItem->setToolTip(tooltip);
+            }
         }
-
-        if (ui->tableWidget->item(rowNumber, COLUMN_FOR_TITLE)) {
-            ui->tableWidget->item(rowNumber, COLUMN_FOR_TITLE)->setBackgroundColor(isEpisode ? Qt::lightGray : Qt::white);
-            ui->tableWidget->item(rowNumber, COLUMN_FOR_TITLE)->setToolTip(tooltip);
-        }
-
-        if (ui->tableWidget->item(rowNumber, COLUMN_FOR_DURATION)) {
-            ui->tableWidget->item(rowNumber, COLUMN_FOR_DURATION)->setBackgroundColor(isEpisode ? Qt::lightGray : Qt::white);
-            ui->tableWidget->item(rowNumber, COLUMN_FOR_DURATION)->setToolTip(tooltip);
-        }
-
     }
 }
 
